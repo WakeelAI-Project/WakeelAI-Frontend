@@ -1,0 +1,54 @@
+import React from "react"
+import { FileDown, Sparkles } from "lucide-react"
+import { Badge } from "../ui/badge"
+import { cn } from "../../lib/utils"
+
+export function DocumentCard({
+  filename,
+  fileSize,
+  isAiGenerated = false,
+  date,
+  onDownload,
+  className
+}) {
+  return (
+    <div
+      className={cn(
+        "rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--bg-card)] p-4 flex items-center justify-between gap-4 hover:bg-[var(--bg-card-raised)] transition-colors text-start select-none",
+        className
+      )}
+    >
+      <div className="flex items-center gap-3 overflow-hidden">
+        {/* Document Icon Chip */}
+        <div className="p-3 rounded-[var(--radius-sm)] bg-[var(--legal-surface)] text-[var(--legal-primary)] shrink-0 font-medium">
+          DOC
+        </div>
+
+        <div className="flex flex-col overflow-hidden">
+          <div className="flex items-center gap-2">
+            <span className="font-medium text-sm text-[var(--text-primary)] truncate">
+              {filename}
+            </span>
+            {isAiGenerated && (
+              <Badge variant="ai" className="h-5 py-0 px-1.5 shrink-0 flex items-center gap-0.5">
+                <Sparkles className="h-3 w-3" />
+                <span>ذكاء اصطناعي</span>
+              </Badge>
+            )}
+          </div>
+          <span className="text-xs text-[var(--text-secondary)] mt-1">
+            {fileSize} • {date}
+          </span>
+        </div>
+      </div>
+
+      <button
+        onClick={onDownload}
+        type="button"
+        className="p-2 hover:bg-[var(--bg-card-raised)] rounded-full text-[var(--text-secondary)] hover:text-[var(--text-primary)] cursor-pointer transition-colors"
+      >
+        <FileDown className="h-5 w-5" />
+      </button>
+    </div>
+  )
+}
