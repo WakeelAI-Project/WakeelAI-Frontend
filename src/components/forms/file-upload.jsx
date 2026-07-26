@@ -1,6 +1,5 @@
 import React, { useState, useRef } from "react"
-import { UploadCloud, File, X, Sparkles } from "lucide-react"
-import { Progress } from "../ui/progress"
+import { UploadCloud, File, X } from "lucide-react"
 import { cn } from "../../lib/utils"
 
 export function FileUpload({
@@ -65,8 +64,8 @@ export function FileUpload({
         onDrop={handleDrop}
         onClick={() => fileInputRef.current?.click()}
         className={cn(
-          "h-48 border-2 border-dashed rounded-[var(--radius-md)] flex flex-col items-center justify-center p-6 text-center cursor-pointer transition-colors bg-[var(--stone-0)] border-[var(--stone-300)] dark:bg-[var(--stone-900)] dark:border-[var(--stone-800)]",
-          isDragActive && "bg-[var(--ochre-50)] border-[var(--ochre-500)] dark:bg-[var(--ochre-900)/20]"
+          "h-48 border-2 border-dashed rounded-[var(--radius-md)] flex flex-col items-center justify-center p-6 text-center cursor-pointer transition-colors bg-[var(--color-paper)] border-[var(--text-muted)] dark:bg-[var(--bg-card)] dark:border-[var(--bg-card-raised)]",
+          isDragActive && "bg-[var(--accent-surface)] border-[var(--accent-primary)] dark:bg-[var(--accent-primary-active)/20]"
         )}
       >
         <input
@@ -77,11 +76,11 @@ export function FileUpload({
           accept={acceptedTypes}
           onChange={handleInputChange}
         />
-        <UploadCloud className="h-10 w-10 text-[var(--stone-400)] mb-3 shrink-0" />
+        <UploadCloud className="h-10 w-10 text-[var(--text-muted)] mb-3 shrink-0" />
         <span className="text-sm font-semibold text-[var(--text-primary)]">
           {isRtl ? "اسحب الملفات وأفلتها هنا أو اضغط للاختيار" : "Drag and drop files here or click to browse"}
         </span>
-        <span className="text-xs text-[var(--stone-500)] mt-1.5">
+        <span className="text-xs text-[var(--text-muted)] mt-1.5">
           {isRtl ? `حجم الملف الأقصى: ${maxSizeMB} ميجابايت` : `Maximum file size: ${maxSizeMB} MB`}
         </span>
       </div>
@@ -92,14 +91,14 @@ export function FileUpload({
           {files.map((file, idx) => (
             <div
               key={idx}
-              className="flex items-center justify-between p-3 border border-[var(--border-default)] rounded-[var(--radius-sm)] bg-[var(--stone-50)] dark:bg-[var(--stone-850)] dark:border-[var(--stone-800)] shrink-0"
+              className="flex items-center justify-between p-3 border border-[var(--border-default)] rounded-[var(--radius-sm)] bg-[var(--bg-card-raised)] dark:bg-[var(--bg-card-raised)] dark:border-[var(--bg-card-raised)] shrink-0"
             >
               <div className="flex items-center gap-2 overflow-hidden flex-1">
-                <File className="h-4 w-4 text-[var(--ochre-600)] shrink-0" />
+                <File className="h-4 w-4 text-[var(--accent-primary)] shrink-0" />
                 <span className="text-xs text-[var(--text-primary)] truncate">
                   {file.name}
                 </span>
-                <span className="text-[10px] text-[var(--stone-500)] shrink-0">
+                <span className="text-[10px] text-[var(--text-muted)] shrink-0">
                   ({(file.size / (1024 * 1024)).toFixed(2)} MB)
                 </span>
               </div>
@@ -109,7 +108,7 @@ export function FileUpload({
                   e.stopPropagation()
                   removeFile(idx)
                 }}
-                className="p-1 hover:bg-[var(--stone-100)] rounded-full text-[var(--stone-500)] hover:text-[var(--text-primary)] dark:hover:bg-[var(--stone-800)] cursor-pointer"
+                className="p-1 hover:bg-[var(--bg-page-alt)] rounded-full text-[var(--text-muted)] hover:text-[var(--text-primary)] dark:hover:bg-[var(--bg-card-raised)] cursor-pointer"
               >
                 <X className="h-4 w-4" />
               </button>

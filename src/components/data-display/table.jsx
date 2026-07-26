@@ -1,7 +1,6 @@
 import React, { useState } from "react"
-import { ChevronDown, ChevronRight, ArrowUpDown, MoreVertical } from "lucide-react"
+import { ChevronDown, ChevronRight, ArrowUpDown } from "lucide-react"
 import { Checkbox } from "../ui/checkbox"
-import { Button } from "../ui/button"
 import { cn } from "../../lib/utils"
 
 export function Table({
@@ -60,9 +59,9 @@ export function Table({
   }
 
   return (
-    <div className={cn("w-full overflow-x-auto rounded-[var(--radius-md)] border border-[var(--border-default)] dark:border-[var(--stone-800)] bg-[var(--stone-0)] dark:bg-[var(--stone-900)]", className)}>
+    <div className={cn("w-full overflow-x-auto rounded-[var(--radius-md)] border border-[var(--border-default)] dark:border-[var(--bg-card-raised)] bg-[var(--color-paper)] dark:bg-[var(--bg-card)]", className)}>
       <table className="w-full border-collapse text-sm text-start select-none">
-        <thead className="bg-[var(--stone-50)] dark:bg-[var(--stone-950)] border-b border-[var(--border-default)] dark:border-[var(--stone-800)]">
+        <thead className="bg-[var(--bg-card-raised)] dark:bg-[var(--bg-page-alt)] border-b border-[var(--border-default)] dark:border-[var(--bg-card-raised)]">
           <tr>
             {/* Expand indicator column */}
             {expandableRowRender && <th className="w-10 px-4 py-3" />}
@@ -96,7 +95,7 @@ export function Table({
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-[var(--border-default)] dark:divide-[var(--stone-800)]">
+        <tbody className="divide-y divide-[var(--border-default)] dark:divide-[var(--bg-card-raised)]">
           {sortedData.map((row, idx) => {
             const rowId = row.id || idx
             const isSelected = selectedIds.includes(rowId)
@@ -107,8 +106,8 @@ export function Table({
                 <tr
                   onClick={() => onRowClick && onRowClick(row)}
                   className={cn(
-                    "hover:bg-[var(--stone-50)] dark:hover:bg-[var(--stone-850)] transition-colors",
-                    isSelected && "bg-[var(--ochre-25)]/40 hover:bg-[var(--ochre-25)]/60 dark:bg-[var(--ochre-900)]/10"
+                    "hover:bg-[var(--bg-card-raised)] dark:hover:bg-[var(--bg-card-raised)] transition-colors",
+                    isSelected && "bg-[var(--accent-surface)]/40 hover:bg-[var(--accent-surface)]/60 dark:bg-[var(--accent-primary-active)]/10"
                   )}
                 >
                   {/* Expand cell */}
@@ -120,7 +119,7 @@ export function Table({
                           e.stopPropagation()
                           toggleRowExpand(rowId)
                         }}
-                        className="p-1 hover:bg-[var(--stone-100)] rounded-full dark:hover:bg-[var(--stone-800)] cursor-pointer"
+                        className="p-1 hover:bg-[var(--bg-page-alt)] rounded-full dark:hover:bg-[var(--bg-card-raised)] cursor-pointer"
                       >
                         {isExpanded ? (
                           <ChevronDown className="h-4 w-4 opacity-75" />
@@ -160,10 +159,10 @@ export function Table({
 
                 {/* Expanded content row */}
                 {expandableRowRender && isExpanded && (
-                  <tr className="bg-[var(--stone-25)] dark:bg-[var(--stone-950)]">
+                  <tr className="bg-[var(--bg-card-subtle)] dark:bg-[var(--bg-page-alt)]">
                     <td
                       colSpan={columns.length + (enableSelection ? 2 : 1)}
-                      className="px-8 py-4 border-t border-[var(--border-default)] dark:border-[var(--stone-800)] text-start"
+                      className="px-8 py-4 border-t border-[var(--border-default)] dark:border-[var(--bg-card-raised)] text-start"
                     >
                       {expandableRowRender(row)}
                     </td>

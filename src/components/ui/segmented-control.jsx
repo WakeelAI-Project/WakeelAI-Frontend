@@ -12,7 +12,7 @@ export function SegmentedControl({
   return (
     <div
       className={cn(
-        "inline-flex h-10 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--stone-100)] p-1 text-[var(--stone-500)] dark:bg-[var(--stone-900)] border border-[var(--border-default)]",
+        "inline-flex h-10 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--bg-page-alt)] p-1 text-[var(--text-muted)] dark:bg-[var(--bg-card)] border border-[var(--border-default)]",
         className
       )}
     >
@@ -31,7 +31,7 @@ export function SegmentedControl({
             {isActive && (
               <motion.div
                 layoutId={`segmented-active-${name}`}
-                className="absolute inset-0 -z-10 rounded-[var(--radius-sm)] bg-[var(--stone-0)] shadow-[var(--elevation-1)] dark:bg-[var(--stone-800)]"
+                className="absolute inset-0 -z-10 rounded-[var(--radius-sm)] bg-[var(--color-paper)] shadow-[var(--shadow-1)] dark:bg-[var(--bg-card-raised)]"
                 transition={{ type: "spring", stiffness: 380, damping: 30 }}
               />
             )}

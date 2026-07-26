@@ -4,7 +4,7 @@ const ThemeContext = createContext(undefined)
 
 export function ThemeProvider({ children }) {
   const [theme, setThemeState] = useState(() => {
-    return localStorage.getItem("wakeel-theme") || "dark"
+    return localStorage.getItem("wakeel-theme") || "light"
   })
   const [contrast, setContrastState] = useState(() => {
     return localStorage.getItem("wakeel-contrast") || "normal"

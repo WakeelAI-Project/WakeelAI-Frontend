@@ -1,60 +1,59 @@
-import React, { useState, useEffect } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { Mic, Send, AlertTriangle, Sparkles, User, HelpCircle } from "lucide-react"
-import { useDirection } from "../../hooks/use-direction"
+import React, { useEffect, useState } from "react"
+import { motion } from "framer-motion"
+import { AlertTriangle, HelpCircle, Mic, Sparkles, User } from "lucide-react"
 import { cn } from "../../lib/utils"
+import { SealMark } from "../brand/seal-mark"
 
-/* AI Message Bubble Component */
 export function AiMessageBubble({
   message,
   citation,
+  confidence,
   isLowConfidence = false,
   isRtl = true
 }) {
   return (
     <div className="flex flex-col gap-2 max-w-[85%] text-start self-start">
       <div className="flex items-center gap-2">
-        {/* Seal Mark AI Avatar */}
-        <div className="w-6 h-6 rounded-full bg-[var(--teal-500)] text-[var(--stone-0)] flex items-center justify-center rotate-45 select-none shrink-0">
-          <Sparkles className="h-3 w-3 -rotate-45" />
-        </div>
-        <span className="text-[10px] font-semibold text-[var(--teal-600)] dark:text-[var(--teal-400)]">
+        <SealMark className="h-7 w-7" iconClassName="h-2.5 w-2.5" />
+        <span className="text-[10px] font-semibold uppercase tracking-wide text-[var(--ai-primary)]">
           {isRtl ? "وكيل" : "Wakeel AI"}
         </span>
       </div>
 
-      {/* Bubble Container */}
       <div
         className={cn(
-          "bg-[var(--teal-25)] text-[var(--color-ink)] p-4 rounded-[var(--radius-xl)] dark:bg-[var(--teal-900)/20] dark:text-[var(--stone-100)] border border-[var(--teal-100)] dark:border-[var(--teal-900)]",
+          "bg-[var(--ai-surface)] text-[var(--text-primary)] p-4 rounded-[var(--radius-xl)] border border-[var(--border-emphasis)] shadow-[var(--shadow-1)]",
           isRtl ? "rounded-tr-[4px]" : "rounded-tl-[4px]"
         )}
       >
         <p className="text-sm leading-relaxed whitespace-pre-wrap">{message}</p>
       </div>
 
-      {/* Source Citation Chip */}
       {citation && (
         <button
           type="button"
-          className="self-start text-[10px] font-semibold text-[var(--teal-700)] bg-[var(--teal-50)] px-2 py-0.5 rounded-[var(--radius-full)] border border-[var(--teal-100)] hover:bg-[var(--teal-100)] dark:bg-[var(--teal-950)] dark:border-[var(--teal-900)] dark:text-[var(--teal-300)] cursor-pointer transition-colors"
+          className="self-start inline-flex items-center gap-1.5 text-[10px] font-semibold text-[var(--brand-primary)] bg-[var(--bg-card)] px-2.5 py-1 rounded-[var(--radius-full)] border border-[var(--ai-primary)] hover:bg-[var(--ai-surface)] cursor-pointer transition-colors shadow-[var(--shadow-1)]"
         >
-          {citation}
+          <SealMark className="h-4 w-4 border bg-[var(--bg-card)]" iconClassName="h-2 w-2" />
+          <span>{citation}</span>
+          {confidence && (
+            <span className="font-mono text-[9px] text-[var(--text-secondary)]">
+              {confidence}
+            </span>
+          )}
         </button>
       )}
 
-      {/* Confidence Warning Flag */}
       {isLowConfidence && (
-        <div className="flex items-center gap-2 border border-amber-200 bg-amber-50/50 p-2.5 rounded-[var(--radius-md)] text-xs text-amber-800 dark:bg-amber-950/20 dark:border-amber-900/30 dark:text-amber-300">
-          <AlertTriangle className="h-4 w-4 shrink-0 text-[var(--status-warning-fg)]" />
-          <span>{isRtl ? "هذا الجزء يحتاج مراجعة بشري" : "This section requires human review"}</span>
+        <div className="flex items-center gap-2 border border-[var(--status-warning-fg)] bg-[var(--status-warning-bg)] p-2.5 rounded-[var(--radius-md)] text-xs text-[var(--status-warning-fg)]">
+          <AlertTriangle className="h-4 w-4 shrink-0" />
+          <span>{isRtl ? "هذا الجزء يحتاج مراجعة بشرية" : "This section requires human review"}</span>
         </div>
       )}
     </div>
   )
 }
 
-/* User Message Bubble Component */
 export function UserMessageBubble({ message, isRtl = true }) {
   return (
     <div className="flex flex-col gap-2 max-w-[85%] text-start self-end">
@@ -62,14 +61,14 @@ export function UserMessageBubble({ message, isRtl = true }) {
         <span className="text-[10px] font-semibold text-[var(--text-secondary)]">
           {isRtl ? "أنت" : "You"}
         </span>
-        <div className="w-6 h-6 rounded-full bg-[var(--stone-100)] text-[var(--text-primary)] flex items-center justify-center dark:bg-[var(--stone-800)] shrink-0">
+        <div className="w-6 h-6 rounded-full bg-[var(--bg-page-alt)] text-[var(--text-primary)] flex items-center justify-center border border-[var(--border-default)] shrink-0">
           <User className="h-3.5 w-3.5" />
         </div>
       </div>
 
       <div
         className={cn(
-          "bg-[var(--stone-100)] text-[var(--color-ink)] p-4 rounded-[var(--radius-xl)] dark:bg-[var(--stone-850)] dark:text-[var(--stone-100)] border border-[var(--border-default)] dark:border-[var(--stone-800)]",
+          "bg-[var(--bg-page-alt)] text-[var(--text-primary)] p-4 rounded-[var(--radius-xl)] border border-[var(--border-default)]",
           isRtl ? "rounded-tl-[4px]" : "rounded-tr-[4px]"
         )}
       >
@@ -79,33 +78,30 @@ export function UserMessageBubble({ message, isRtl = true }) {
   )
 }
 
-/* AI Thinking State Component */
 export function AiThinkingState({ label, isRtl = true }) {
   return (
     <div className="flex items-center gap-3 self-start text-start py-2 select-none">
-      {/* Ink-Bloom Inhale/Exhale Avatar */}
-      <div className="w-8 h-8 rounded-full bg-[var(--teal-50)] dark:bg-[var(--teal-900)/30] flex items-center justify-center relative shrink-0">
-        <div className="absolute inset-0 rounded-full bg-[var(--teal-100)] dark:bg-[var(--teal-800)] animate-ink-bloom opacity-70" />
-        <Sparkles className="h-4 w-4 text-[var(--teal-600)] dark:text-[var(--teal-400)] relative z-10" />
+      <div className="w-8 h-8 rounded-full bg-[var(--ai-surface)] flex items-center justify-center relative shrink-0">
+        <div className="absolute inset-0 rounded-full bg-[var(--ai-primary)] animate-ink-bloom opacity-20" />
+        <Sparkles className="h-4 w-4 text-[var(--ai-primary)] relative z-10" />
       </div>
-      <span className="text-xs text-[var(--teal-600)] dark:text-[var(--teal-400)] font-medium">
+      <span className="text-xs text-[var(--ai-primary)] font-medium">
         {label || (isRtl ? "جاري البحث في قانون العمل المصري..." : "Searching Egyptian Labor Law...")}
       </span>
     </div>
   )
 }
 
-/* AI Chat Suggestions Row */
 export function AiSuggestions({ suggestions = [], onSelect }) {
   return (
     <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none justify-start select-none py-1">
-      {suggestions.map((suggestion, idx) => (
+      {suggestions.map((suggestion) => (
         <button
-          key={idx}
+          key={suggestion}
           onClick={() => onSelect(suggestion)}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-[var(--radius-full)] bg-[var(--teal-50)] text-xs text-[var(--teal-700)] border border-[var(--teal-100)] hover:bg-[var(--teal-100)] dark:bg-[var(--teal-950)] dark:border-[var(--teal-900)] dark:text-[var(--teal-300)] cursor-pointer transition-colors whitespace-nowrap"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-[var(--radius-full)] bg-[var(--ai-surface)] text-xs text-[var(--brand-primary)] border border-[var(--border-emphasis)] hover:border-[var(--ai-primary)] cursor-pointer transition-colors whitespace-nowrap"
         >
-          <HelpCircle className="h-3.5 w-3.5 shrink-0" />
+          <HelpCircle className="h-3.5 w-3.5 shrink-0 text-[var(--ai-primary)]" />
           <span>{suggestion}</span>
         </button>
       ))}
@@ -113,8 +109,7 @@ export function AiSuggestions({ suggestions = [], onSelect }) {
   )
 }
 
-/* Voice Recorder Button Component */
-export function VoiceButton({ isActive, onStart, onEnd, isRtl = true }) {
+export function VoiceButton({ isActive, onStart, onEnd }) {
   const [amplitudeArr, setAmplitudeArr] = useState([1, 1, 1])
 
   useEffect(() => {
@@ -135,30 +130,30 @@ export function VoiceButton({ isActive, onStart, onEnd, isRtl = true }) {
 
   return (
     <div className="relative flex items-center justify-center shrink-0">
-      {/* Concentric amplitude waves when active */}
       {isActive &&
         amplitudeArr.map((scale, idx) => (
           <motion.div
             key={idx}
-            className="absolute rounded-full bg-[var(--teal-400)] opacity-20 -z-10"
+            className="absolute rounded-full bg-[var(--ai-primary)] opacity-20 -z-10"
             style={{
               width: 44 + idx * 12,
               height: 44 + idx * 12
             }}
-            animate={{ scale: scale }}
-            transition={{ type: "spring", stiffness: 200, damping: 10 }}
+            animate={{ scale }}
+            transition={{ duration: 0.12 }}
           />
         ))}
 
       <button
         onPointerDown={onStart}
         onPointerUp={onEnd}
+        onPointerCancel={onEnd}
         type="button"
         className={cn(
-          "w-11 h-11 rounded-full flex items-center justify-center transition-colors cursor-pointer select-none text-[var(--stone-0)] shrink-0",
+          "w-11 h-11 rounded-full flex items-center justify-center transition-colors cursor-pointer select-none shrink-0",
           isActive
-            ? "bg-[var(--status-error)] hover:bg-rose-600"
-            : "bg-[var(--teal-500)] hover:bg-[var(--teal-600)]"
+            ? "bg-[var(--status-error-fg)] text-[var(--color-paper)]"
+            : "bg-[var(--ai-primary)] text-[var(--text-on-accent)] hover:bg-[var(--accent-primary-hover)]"
         )}
       >
         <Mic className="h-5 w-5" />

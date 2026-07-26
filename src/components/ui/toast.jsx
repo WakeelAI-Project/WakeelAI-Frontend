@@ -50,7 +50,7 @@ export function ToastProvider({ children }) {
                 exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.15 } }}
                 layout
                 className={cn(
-                  "pointer-events-auto w-full bg-[var(--stone-900)] text-[var(--stone-50)] rounded-[var(--radius-md)] p-4 shadow-[var(--elevation-3)] border-s-4 flex items-start gap-3 justify-between",
+                  "pointer-events-auto w-full bg-[var(--bg-card)] text-[var(--bg-card-raised)] rounded-[var(--radius-md)] p-4 shadow-[var(--shadow-3)] border-s-4 flex items-start gap-3 justify-between",
                   toastBorders[t.type || "info"]
                 )}
               >
@@ -64,7 +64,7 @@ export function ToastProvider({ children }) {
                   <div className="flex flex-col gap-1">
                     <span className="text-sm font-semibold">{t.message}</span>
                     {t.description && (
-                      <span className="text-xs text-[var(--stone-400)] leading-relaxed">
+                      <span className="text-xs text-[var(--text-muted)] leading-relaxed">
                         {t.description}
                       </span>
                     )}
@@ -72,7 +72,7 @@ export function ToastProvider({ children }) {
                 </div>
                 <button
                   onClick={() => removeToast(t.id)}
-                  className="text-[var(--stone-400)] hover:text-[var(--stone-50)] rounded-full p-1 cursor-pointer shrink-0"
+                  className="text-[var(--text-muted)] hover:text-[var(--bg-card-raised)] rounded-full p-1 cursor-pointer shrink-0"
                 >
                   <X className="h-4 w-4" />
                 </button>

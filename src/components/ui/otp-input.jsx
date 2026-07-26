@@ -78,8 +78,8 @@ export function OTPInput({ length = 6, value, onChange, disabled = false, error 
             onPaste={handlePaste}
             ref={(el) => (inputRefs.current[index] = el)}
             className={cn(
-              "w-12 h-12 text-center text-lg font-semibold rounded-[var(--radius-sm)] border border-[var(--border-default)] bg-[var(--stone-0)] focus-visible:outline-none focus-visible:border-[var(--border-focus)] focus-visible:ring-1 focus-visible:ring-[var(--border-focus)] disabled:bg-[var(--stone-200)] disabled:text-[var(--stone-400)] dark:bg-[var(--stone-900)] dark:border-[var(--stone-700)]",
-              error && "border-[var(--status-error)] focus-visible:ring-[var(--status-error)] focus-visible:border-[var(--status-error)]"
+              "w-12 h-12 text-center text-lg font-semibold rounded-[var(--radius-sm)] border border-[var(--border-default)] bg-[var(--color-paper)] focus-visible:outline-none focus-visible:border-[var(--border-focus)] focus-visible:ring-1 focus-visible:ring-[var(--border-focus)] disabled:bg-[var(--bg-disabled)] disabled:text-[var(--text-muted)] dark:bg-[var(--bg-card)] dark:border-[var(--border-emphasis)]",
+              error && "border-[var(--status-error-fg)] focus-visible:ring-[var(--status-error-fg)] focus-visible:border-[var(--status-error-fg)]"
             )}
           />
         ))}

@@ -11,18 +11,18 @@ export function StatCard({
   className
 }) {
   const domainColors = {
-    neutral: "text-[var(--stone-700)] dark:text-[var(--stone-200)]",
-    AI: "text-[var(--teal-600)] dark:text-[var(--teal-400)]",
-    legal: "text-[var(--ochre-600)] dark:text-[var(--ochre-400)]",
-    employee: "text-[var(--bark-500)] dark:text-[var(--bark-400)]",
-    leave: "text-[var(--teal-500)] dark:text-[var(--teal-400)]",
-    document: "text-[var(--ochre-700)] dark:text-[var(--ochre-400)]",
+    neutral: "text-[var(--border-emphasis)] dark:text-[var(--bg-disabled)]",
+    AI: "text-[var(--ai-primary)] dark:text-[var(--ai-primary)]",
+    legal: "text-[var(--accent-primary)] dark:text-[var(--accent-primary-hover)]",
+    employee: "text-[var(--brand-primary)] dark:text-[var(--brand-primary-hover)]",
+    leave: "text-[var(--ai-primary)] dark:text-[var(--ai-primary)]",
+    document: "text-[var(--accent-primary-active)] dark:text-[var(--accent-primary-hover)]",
   }
 
   return (
     <div
       className={cn(
-        "rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--stone-0)] p-5 flex flex-col gap-3 dark:bg-[var(--stone-900)] dark:border-[var(--stone-800)] text-start shadow-sm select-none",
+        "rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-paper)] p-5 flex flex-col gap-3 dark:bg-[var(--bg-card)] dark:border-[var(--bg-card-raised)] text-start shadow-sm select-none",
         className
       )}
     >
@@ -63,7 +63,7 @@ export function StatCard({
 
       {/* Description / Caption */}
       {description && (
-        <span className="text-xs text-[var(--stone-500)] leading-relaxed truncate">
+        <span className="text-xs text-[var(--text-muted)] leading-relaxed truncate">
           {description}
         </span>
       )}

@@ -21,26 +21,26 @@ const Input = React.forwardRef(
         {label && (
           <label className="text-sm font-medium text-[var(--text-primary)] select-none">
             {label}
-            {props.required && <span className="text-[var(--stone-500)] ms-1">*</span>}
+            {props.required && <span className="text-[var(--text-muted)] ms-1">*</span>}
           </label>
         )}
 
         <div className="relative w-full flex items-center">
           {/* Prefix Icon / Search Icon */}
           {isSearch && !prefixIcon && (
-            <div className="absolute inset-y-0 start-3 flex items-center pointer-events-none text-[var(--stone-400)]">
+            <div className="absolute inset-y-0 start-3 flex items-center pointer-events-none text-[var(--text-muted)]">
               <Search className="h-4 w-4" />
             </div>
           )}
           {prefixIcon && (
-            <div className="absolute inset-y-0 start-3 flex items-center pointer-events-none text-[var(--stone-400)]">
+            <div className="absolute inset-y-0 start-3 flex items-center pointer-events-none text-[var(--text-muted)]">
               {prefixIcon}
             </div>
           )}
 
           {/* Currency Prefix */}
           {isCurrency && (
-            <span className="absolute inset-y-0 start-3 flex items-center pointer-events-none text-sm font-mono text-[var(--stone-500)]">
+            <span className="absolute inset-y-0 start-3 flex items-center pointer-events-none text-sm font-mono text-[var(--text-muted)]">
               {currencySymbol}
             </span>
           )}
@@ -48,10 +48,10 @@ const Input = React.forwardRef(
           <input
             type={resolvedType}
             className={cn(
-              "flex h-10 w-full rounded-[var(--radius-sm)] border border-[var(--border-default)] bg-[var(--stone-0)] px-3 py-2 text-sm text-[var(--text-primary)] placeholder:text-[var(--stone-400)] transition-all file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none focus-visible:border-[var(--border-focus)] focus-visible:ring-1 focus-visible:ring-[var(--border-focus)] disabled:cursor-not-allowed disabled:bg-[var(--stone-200)] disabled:text-[var(--stone-400)] dark:bg-[var(--stone-900)] dark:border-[var(--stone-700)] dark:focus-visible:ring-[var(--border-focus)]",
+              "flex h-10 w-full rounded-[var(--radius-sm)] border border-[var(--border-default)] bg-[var(--color-paper)] px-3 py-2 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] transition-all file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none focus-visible:border-[var(--border-focus)] focus-visible:ring-1 focus-visible:ring-[var(--border-focus)] disabled:cursor-not-allowed disabled:bg-[var(--bg-disabled)] disabled:text-[var(--text-muted)] dark:bg-[var(--bg-card)] dark:border-[var(--border-emphasis)] dark:focus-visible:ring-[var(--border-focus)]",
               (isSearch || prefixIcon || isCurrency) && "ps-10",
               (isPassword || suffixIcon) && "pe-10",
-              errorText && "border-[var(--status-error)] focus-visible:ring-[var(--status-error)] focus-visible:border-[var(--status-error)]",
+              errorText && "border-[var(--status-error-fg)] focus-visible:ring-[var(--status-error-fg)] focus-visible:border-[var(--status-error-fg)]",
               className
             )}
             ref={ref}
@@ -64,13 +64,13 @@ const Input = React.forwardRef(
               type="button"
               onClick={handleTogglePassword}
               tabIndex={-1}
-              className="absolute inset-y-0 end-3 flex items-center text-[var(--stone-400)] hover:text-[var(--text-primary)] cursor-pointer"
+              className="absolute inset-y-0 end-3 flex items-center text-[var(--text-muted)] hover:text-[var(--text-primary)] cursor-pointer"
             >
               {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
           )}
           {!isPassword && suffixIcon && (
-            <div className="absolute inset-y-0 end-3 flex items-center pointer-events-none text-[var(--stone-400)]">
+            <div className="absolute inset-y-0 end-3 flex items-center pointer-events-none text-[var(--text-muted)]">
               {suffixIcon}
             </div>
           )}
@@ -78,7 +78,7 @@ const Input = React.forwardRef(
 
         {/* Hints and Errors */}
         {errorText ? (
-          <p className="text-xs text-[var(--status-error)]" role="alert">
+          <p className="text-xs text-[var(--status-error-fg)]" role="alert">
             {errorText}
           </p>
         ) : (
@@ -97,20 +97,20 @@ export const Textarea = React.forwardRef(
         {label && (
           <label className="text-sm font-medium text-[var(--text-primary)] select-none">
             {label}
-            {props.required && <span className="text-[var(--stone-500)] ms-1">*</span>}
+            {props.required && <span className="text-[var(--text-muted)] ms-1">*</span>}
           </label>
         )}
         <textarea
           className={cn(
-            "flex min-h-[80px] w-full rounded-[var(--radius-sm)] border border-[var(--border-default)] bg-[var(--stone-0)] px-3 py-2 text-sm text-[var(--text-primary)] placeholder:text-[var(--stone-400)] focus-visible:outline-none focus-visible:border-[var(--border-focus)] focus-visible:ring-1 focus-visible:ring-[var(--border-focus)] disabled:cursor-not-allowed disabled:bg-[var(--stone-200)] disabled:text-[var(--stone-400)] dark:bg-[var(--stone-900)] dark:border-[var(--stone-700)]",
-            errorText && "border-[var(--status-error)] focus-visible:ring-[var(--status-error)] focus-visible:border-[var(--status-error)]",
+            "flex min-h-[80px] w-full rounded-[var(--radius-sm)] border border-[var(--border-default)] bg-[var(--color-paper)] px-3 py-2 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus-visible:outline-none focus-visible:border-[var(--border-focus)] focus-visible:ring-1 focus-visible:ring-[var(--border-focus)] disabled:cursor-not-allowed disabled:bg-[var(--bg-disabled)] disabled:text-[var(--text-muted)] dark:bg-[var(--bg-card)] dark:border-[var(--border-emphasis)]",
+            errorText && "border-[var(--status-error-fg)] focus-visible:ring-[var(--status-error-fg)] focus-visible:border-[var(--status-error-fg)]",
             className
           )}
           ref={ref}
           {...props}
         />
         {errorText ? (
-          <p className="text-xs text-[var(--status-error)]" role="alert">
+          <p className="text-xs text-[var(--status-error-fg)]" role="alert">
             {errorText}
           </p>
         ) : (

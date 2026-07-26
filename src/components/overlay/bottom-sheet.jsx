@@ -53,7 +53,7 @@ export function BottomSheet({ isOpen, onClose, children, title, className }) {
             onDragEnd={handleDragEnd}
             style={{ y }}
             className={cn(
-              "relative z-50 w-full max-w-lg bg-[var(--color-paper)] rounded-t-[var(--radius-xl)] shadow-[var(--elevation-4)] border-t border-[var(--border-default)] flex flex-col max-h-[85vh] dark:bg-[var(--stone-800)] dark:border-[var(--stone-700)] overflow-hidden",
+              "relative z-50 w-full max-w-lg bg-[var(--color-paper)] rounded-t-[var(--radius-xl)] shadow-[var(--shadow-4)] border-t border-[var(--border-default)] flex flex-col max-h-[85vh] dark:bg-[var(--bg-card-raised)] dark:border-[var(--border-emphasis)] overflow-hidden",
               className
             )}
           >
@@ -62,12 +62,12 @@ export function BottomSheet({ isOpen, onClose, children, title, className }) {
               onPointerDown={(e) => dragControls.start(e)}
               className="flex justify-center py-3 cursor-grab active:cursor-grabbing select-none shrink-0"
             >
-              <div className="w-10 h-1 rounded-full bg-[var(--stone-300)] dark:bg-[var(--stone-600)]" />
+              <div className="w-10 h-1 rounded-full bg-[var(--text-muted)] dark:bg-[var(--text-secondary)]" />
             </div>
 
             {/* Header */}
             {(title || onClose) && (
-              <div className="px-5 pb-3 flex items-center justify-between border-b border-[var(--border-default)] dark:border-[var(--stone-700)] shrink-0">
+              <div className="px-5 pb-3 flex items-center justify-between border-b border-[var(--border-default)] dark:border-[var(--border-emphasis)] shrink-0">
                 {title ? (
                   <h3 className="text-base font-semibold text-[var(--text-primary)] text-start">
                     {title}
@@ -78,7 +78,7 @@ export function BottomSheet({ isOpen, onClose, children, title, className }) {
                 <button
                   type="button"
                   onClick={onClose}
-                  className="rounded-full p-1.5 hover:bg-[var(--stone-100)] text-[var(--stone-500)] hover:text-[var(--text-primary)] dark:hover:bg-[var(--stone-700)] cursor-pointer"
+                  className="rounded-full p-1.5 hover:bg-[var(--bg-page-alt)] text-[var(--text-muted)] hover:text-[var(--text-primary)] dark:hover:bg-[var(--border-emphasis)] cursor-pointer"
                 >
                   <X className="h-4 w-4" />
                 </button>

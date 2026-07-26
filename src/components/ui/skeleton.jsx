@@ -4,7 +4,7 @@ import { cn } from "../../lib/utils"
 function Skeleton({ className, ...props }) {
   return (
     <div
-      className={cn("animate-skeleton rounded-[var(--radius-sm)] bg-[var(--stone-100)] dark:bg-[var(--stone-800)]", className)}
+      className={cn("animate-skeleton rounded-[var(--radius-sm)] bg-[var(--bg-page-alt)] dark:bg-[var(--bg-card-raised)]", className)}
       {...props}
     />
   )

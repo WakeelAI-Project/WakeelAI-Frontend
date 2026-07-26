@@ -13,7 +13,7 @@ const SelectTrigger = React.forwardRef(({ className, children, ...props }, ref) 
   <SelectPrimitive.Trigger
     ref={ref}
     className={cn(
-      "flex h-10 w-full items-center justify-between rounded-[var(--radius-sm)] border border-[var(--border-default)] bg-[var(--stone-0)] px-3 py-2 text-sm text-[var(--text-primary)] focus:outline-none focus:border-[var(--border-focus)] focus:ring-1 focus:ring-[var(--border-focus)] disabled:cursor-not-allowed disabled:bg-[var(--stone-200)] disabled:text-[var(--stone-400)] dark:bg-[var(--stone-900)] dark:border-[var(--stone-700)] cursor-pointer text-start",
+      "flex h-10 w-full items-center justify-between rounded-[var(--radius-sm)] border border-[var(--border-default)] bg-[var(--color-paper)] px-3 py-2 text-sm text-[var(--text-primary)] focus:outline-none focus:border-[var(--border-focus)] focus:ring-1 focus:ring-[var(--border-focus)] disabled:cursor-not-allowed disabled:bg-[var(--bg-disabled)] disabled:text-[var(--text-muted)] dark:bg-[var(--bg-card)] dark:border-[var(--border-emphasis)] cursor-pointer text-start",
       className
     )}
     {...props}
@@ -31,7 +31,7 @@ const SelectContent = React.forwardRef(({ className, children, position = "poppe
     <SelectPrimitive.Content
       ref={ref}
       className={cn(
-        "relative z-50 min-w-[8rem] overflow-hidden rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-paper)] p-1 text-[var(--text-primary)] shadow-[var(--elevation-2)] data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0 data-[state=open]:zoom-in-95 data-[state=closed]:zoom-out-95 dark:bg-[var(--stone-800)] dark:border-[var(--stone-700)]",
+        "relative z-50 min-w-[8rem] overflow-hidden rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-paper)] p-1 text-[var(--text-primary)] shadow-[var(--shadow-2)] data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0 data-[state=open]:zoom-in-95 data-[state=closed]:zoom-out-95 dark:bg-[var(--bg-card-raised)] dark:border-[var(--border-emphasis)]",
         position === "popper" &&
           "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
         className
@@ -66,7 +66,7 @@ const SelectItem = React.forwardRef(({ className, children, ...props }, ref) => 
   <SelectPrimitive.Item
     ref={ref}
     className={cn(
-      "relative flex w-full cursor-pointer select-none items-center rounded-[var(--radius-xs)] py-2 ps-8 pe-2 text-sm text-[var(--text-primary)] outline-none focus:bg-[var(--stone-100)] data-[disabled]:pointer-events-none data-[disabled]:opacity-50 dark:focus:bg-[var(--stone-700)] text-start justify-between",
+      "relative flex w-full cursor-pointer select-none items-center rounded-[var(--radius-xs)] py-2 ps-8 pe-2 text-sm text-[var(--text-primary)] outline-none focus:bg-[var(--bg-page-alt)] data-[disabled]:pointer-events-none data-[disabled]:opacity-50 dark:focus:bg-[var(--border-emphasis)] text-start justify-between",
       className
     )}
     {...props}
@@ -75,7 +75,7 @@ const SelectItem = React.forwardRef(({ className, children, ...props }, ref) => 
       <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
     </span>
 
-    <SelectPrimitive.ItemIndicator className="absolute start-2 flex h-3.5 w-3.5 items-center justify-center text-[var(--teal-600)]">
+    <SelectPrimitive.ItemIndicator className="absolute start-2 flex h-3.5 w-3.5 items-center justify-center text-[var(--ai-primary)]">
       <Check className="h-4 w-4" />
     </SelectPrimitive.ItemIndicator>
   </SelectPrimitive.Item>
@@ -85,7 +85,7 @@ SelectItem.displayName = SelectPrimitive.Item.displayName
 const SelectSeparator = React.forwardRef(({ className, ...props }, ref) => (
   <SelectPrimitive.Separator
     ref={ref}
-    className={cn("-mx-1 my-1 h-px bg-[var(--border-default)] dark:bg-[var(--stone-700)]", className)}
+    className={cn("-mx-1 my-1 h-px bg-[var(--border-default)] dark:bg-[var(--border-emphasis)]", className)}
     {...props}
   />
 ))

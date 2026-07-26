@@ -8,7 +8,7 @@ const Checkbox = React.forwardRef(({ className, label, ...props }, ref) => (
     <CheckboxPrimitive.Root
       ref={ref}
       className={cn(
-        "peer h-5 w-5 shrink-0 rounded-[var(--radius-xs)] border border-[var(--border-emphasis)] bg-[var(--stone-0)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--border-focus)] disabled:cursor-not-allowed disabled:bg-[var(--stone-200)] disabled:text-[var(--stone-400)] data-[state=checked]:bg-[var(--bark-500)] data-[state=checked]:text-[var(--stone-0)] data-[state=checked]:border-none cursor-pointer flex items-center justify-center dark:bg-[var(--stone-900)] dark:border-[var(--stone-700)] dark:data-[state=checked]:bg-[var(--bark-500)]",
+        "peer h-5 w-5 shrink-0 rounded-[var(--radius-xs)] border border-[var(--border-emphasis)] bg-[var(--color-paper)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--border-focus)] disabled:cursor-not-allowed disabled:bg-[var(--bg-disabled)] disabled:text-[var(--text-muted)] data-[state=checked]:bg-[var(--brand-primary)] data-[state=checked]:text-[var(--color-paper)] data-[state=checked]:border-none cursor-pointer flex items-center justify-center dark:bg-[var(--bg-card)] dark:border-[var(--border-emphasis)] dark:data-[state=checked]:bg-[var(--brand-primary)]",
         className
       )}
       {...props}

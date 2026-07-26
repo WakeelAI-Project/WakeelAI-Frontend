@@ -11,7 +11,7 @@ export function Timeline({
       {/* Vertical center axis line */}
       <div
         className={cn(
-          "absolute top-1 bottom-1 w-0.5 bg-[var(--border-default)] dark:bg-[var(--stone-800)]",
+          "absolute top-1 bottom-1 w-0.5 bg-[var(--border-default)] dark:bg-[var(--bg-card-raised)]",
           isRtl ? "right-[17px]" : "left-[17px]"
         )}
       />
@@ -27,10 +27,10 @@ export function Timeline({
           {/* Timeline Dot Marker */}
           <div
             className={cn(
-              "w-9 h-9 rounded-full border-2 border-[var(--color-paper)] bg-[var(--stone-0)] shadow-sm flex items-center justify-center relative z-10 shrink-0 dark:bg-[var(--stone-900)] dark:border-[var(--stone-850)]",
+              "w-9 h-9 rounded-full border-2 border-[var(--color-paper)] bg-[var(--color-paper)] shadow-sm flex items-center justify-center relative z-10 shrink-0 dark:bg-[var(--bg-card)] dark:border-[var(--bg-card-raised)]",
               item.isCompleted
-                ? "border-[var(--bark-500)] text-[var(--bark-500)] dark:border-[var(--bark-500)]"
-                : "border-[var(--border-default)] text-[var(--stone-500)] dark:border-[var(--stone-700)]"
+                ? "border-[var(--brand-primary)] text-[var(--brand-primary)] dark:border-[var(--brand-primary)]"
+                : "border-[var(--border-default)] text-[var(--text-muted)] dark:border-[var(--border-emphasis)]"
             )}
           >
             {item.icon ? (
@@ -39,7 +39,7 @@ export function Timeline({
               <div
                 className={cn(
                   "w-2 h-2 rounded-full",
-                  item.isCompleted ? "bg-[var(--bark-500)]" : "bg-[var(--stone-400)]"
+                  item.isCompleted ? "bg-[var(--brand-primary)]" : "bg-[var(--text-muted)]"
                 )}
               />
             )}
@@ -51,7 +51,7 @@ export function Timeline({
               <span className="font-semibold text-sm text-[var(--text-primary)]">
                 {item.title}
               </span>
-              <span className="text-[10px] text-[var(--stone-500)] font-mono font-medium">
+              <span className="text-[10px] text-[var(--text-muted)] font-mono font-medium">
                 {item.date}
               </span>
             </div>
