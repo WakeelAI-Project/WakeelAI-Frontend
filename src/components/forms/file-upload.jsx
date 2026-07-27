@@ -1,6 +1,6 @@
-import React, { useState, useRef } from "react"
-import { UploadCloud, File, X } from "lucide-react"
-import { cn } from "../../lib/utils"
+﻿import React, { useState, useRef } from "react";
+import { UploadCloud, File, X } from "lucide-react";
+import { cn } from "../../lib/utils";
 
 export function FileUpload({
   label,
@@ -8,50 +8,54 @@ export function FileUpload({
   maxSizeMB = 10,
   acceptedTypes = "*",
   isRtl = true,
-  className
+  className,
 }) {
-  const [isDragActive, setIsDragActive] = useState(false)
-  const [files, setFiles] = useState([])
-  const fileInputRef = useRef(null)
+  const [isDragActive, setIsDragActive] = useState(false);
+  const [files, setFiles] = useState([]);
+  const fileInputRef = useRef(null);
 
   const handleDrag = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
+    e.preventDefault();
+    e.stopPropagation();
     if (e.type === "dragenter" || e.type === "dragover") {
-      setIsDragActive(true)
+      setIsDragActive(true);
     } else if (e.type === "dragleave") {
-      setIsDragActive(false)
+      setIsDragActive(false);
     }
-  }
+  };
 
   const handleDrop = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setIsDragActive(false)
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragActive(false);
 
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      const droppedFiles = Array.from(e.dataTransfer.files)
-      setFiles((prev) => [...prev, ...droppedFiles])
-      if (onFileDrop) onFileDrop(droppedFiles)
+      const droppedFiles = Array.from(e.dataTransfer.files);
+      setFiles((prev) => [...prev, ...droppedFiles]);
+      if (onFileDrop) onFileDrop(droppedFiles);
     }
-  }
+  };
 
   const handleInputChange = (e) => {
     if (e.target.files && e.target.files[0]) {
-      const selectedFiles = Array.from(e.target.files)
-      setFiles((prev) => [...prev, ...selectedFiles])
-      if (onFileDrop) onFileDrop(selectedFiles)
+      const selectedFiles = Array.from(e.target.files);
+      setFiles((prev) => [...prev, ...selectedFiles]);
+      if (onFileDrop) onFileDrop(selectedFiles);
     }
-  }
+  };
 
   const removeFile = (idx) => {
-    setFiles((prev) => prev.filter((_, i) => i !== idx))
-  }
+    setFiles((prev) => prev.filter((_, i) => i !== idx));
+  };
 
   return (
-    <div className={cn("w-full flex flex-col gap-3 select-none text-start", className)}>
+    <div
+      className={cn(
+        "w-full flex flex-col gap-3 select-none text-start",
+        className,
+      )}>
       {label && (
-        <span className="text-sm font-medium text-[var(--text-primary)]">
+        <span className="text-sm font-medium text-(--text-primary)">
           {label}
         </span>
       )}
@@ -64,10 +68,10 @@ export function FileUpload({
         onDrop={handleDrop}
         onClick={() => fileInputRef.current?.click()}
         className={cn(
-          "h-48 border-2 border-dashed rounded-[var(--radius-md)] flex flex-col items-center justify-center p-6 text-center cursor-pointer transition-colors bg-[var(--color-paper)] border-[var(--text-muted)] dark:bg-[var(--bg-card)] dark:border-[var(--bg-card-raised)]",
-          isDragActive && "bg-[var(--accent-surface)] border-[var(--accent-primary)] dark:bg-[var(--accent-primary-active)/20]"
-        )}
-      >
+          "h-48 border-2 border-dashed rounded-md flex flex-col items-center justify-center p-6 text-center cursor-pointer transition-colors bg-paper border-(--text-muted) dark:bg-(--bg-card) dark:border-(--bg-card-raised)",
+          isDragActive &&
+            "bg-(--accent-surface) border-(--accent-primary) dark:bg-(--accent-primary-active)/20",
+        )}>
         <input
           ref={fileInputRef}
           type="file"
@@ -76,12 +80,16 @@ export function FileUpload({
           accept={acceptedTypes}
           onChange={handleInputChange}
         />
-        <UploadCloud className="h-10 w-10 text-[var(--text-muted)] mb-3 shrink-0" />
-        <span className="text-sm font-semibold text-[var(--text-primary)]">
-          {isRtl ? "اسحب الملفات وأفلتها هنا أو اضغط للاختيار" : "Drag and drop files here or click to browse"}
+        <UploadCloud className="h-10 w-10 text-(--text-muted) mb-3 shrink-0" />
+        <span className="text-sm font-semibold text-(--text-primary)">
+          {isRtl
+            ? "اسحب الملفات وأفلتها هنا أو اضغط للاختيار"
+            : "Drag and drop files here or click to browse"}
         </span>
-        <span className="text-xs text-[var(--text-muted)] mt-1.5">
-          {isRtl ? `حجم الملف الأقصى: ${maxSizeMB} ميجابايت` : `Maximum file size: ${maxSizeMB} MB`}
+        <span className="text-xs text-(--text-muted) mt-1.5">
+          {isRtl
+            ? `حجم الملف الأقصى: ${maxSizeMB} ميجابايت`
+            : `Maximum file size: ${maxSizeMB} MB`}
         </span>
       </div>
 
@@ -91,25 +99,23 @@ export function FileUpload({
           {files.map((file, idx) => (
             <div
               key={idx}
-              className="flex items-center justify-between p-3 border border-[var(--border-default)] rounded-[var(--radius-sm)] bg-[var(--bg-card-raised)] dark:bg-[var(--bg-card-raised)] dark:border-[var(--bg-card-raised)] shrink-0"
-            >
+              className="flex items-center justify-between p-3 border border-(--border-default) rounded-sm bg-(--bg-card-raised) dark:bg-(--bg-card-raised) dark:border-(--bg-card-raised) shrink-0">
               <div className="flex items-center gap-2 overflow-hidden flex-1">
-                <File className="h-4 w-4 text-[var(--accent-primary)] shrink-0" />
-                <span className="text-xs text-[var(--text-primary)] truncate">
+                <File className="h-4 w-4 text-(--accent-primary) shrink-0" />
+                <span className="text-xs text-(--text-primary) truncate">
                   {file.name}
                 </span>
-                <span className="text-[10px] text-[var(--text-muted)] shrink-0">
+                <span className="text-[10px] text-(--text-muted) shrink-0">
                   ({(file.size / (1024 * 1024)).toFixed(2)} MB)
                 </span>
               </div>
               <button
                 type="button"
                 onClick={(e) => {
-                  e.stopPropagation()
-                  removeFile(idx)
+                  e.stopPropagation();
+                  removeFile(idx);
                 }}
-                className="p-1 hover:bg-[var(--bg-page-alt)] rounded-full text-[var(--text-muted)] hover:text-[var(--text-primary)] dark:hover:bg-[var(--bg-card-raised)] cursor-pointer"
-              >
+                className="p-1 hover:bg-(--bg-page-alt) rounded-full text-(--text-muted) hover:text-(--text-primary) dark:hover:bg-(--bg-card-raised) cursor-pointer">
                 <X className="h-4 w-4" />
               </button>
             </div>
@@ -117,5 +123,5 @@ export function FileUpload({
         </div>
       )}
     </div>
-  )
+  );
 }

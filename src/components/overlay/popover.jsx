@@ -1,4 +1,4 @@
-import React from "react"
+﻿import React from "react"
 import * as PopoverPrimitive from "@radix-ui/react-popover"
 import { cn } from "../../lib/utils"
 
@@ -13,7 +13,7 @@ const PopoverContent = React.forwardRef(({ className, align = "center", sideOffs
       align={align}
       sideOffset={sideOffset}
       className={cn(
-        "z-50 w-72 rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-paper)] p-4 text-[var(--text-primary)] shadow-[var(--shadow-2)] outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0 data-[state=open]:zoom-in-95 data-[state=closed]:zoom-out-95 dark:bg-[var(--bg-card-raised)] dark:border-[var(--border-emphasis)] text-start",
+        "z-50 w-72 rounded-md border border-(--border-default) bg-paper p-4 text-(--text-primary) shadow-(--shadow-2) outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0 data-[state=open]:zoom-in-95 data-[state=closed]:zoom-out-95 dark:bg-(--bg-card-raised) dark:border-(--border-emphasis) text-start",
         className
       )}
       {...props}

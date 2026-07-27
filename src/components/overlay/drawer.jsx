@@ -1,4 +1,4 @@
-import React from "react"
+﻿import React from "react"
 import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { X } from "lucide-react"
 import { cn } from "../../lib/utils"
@@ -15,7 +15,7 @@ const DrawerOverlay = React.forwardRef(({ className, ...props }, ref) => (
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
-      "fixed inset-0 z-50 bg-[var(--overlay-scrim)] data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0",
+      "fixed inset-0 z-50 bg-(--overlay-scrim) data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0",
       className
     )}
     {...props}
@@ -30,18 +30,18 @@ const DrawerContent = React.forwardRef(({ className, children, side = "end", ...
       <DialogPrimitive.Content
         ref={ref}
         className={cn(
-          "fixed z-50 gap-4 bg-[var(--color-paper)] p-6 shadow-[var(--shadow-3)] transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:duration-300 data-[state=closed]:duration-200 border-[var(--border-default)] dark:bg-[var(--bg-card-raised)] dark:border-[var(--border-emphasis)] flex flex-col h-full",
+          "fixed z-50 gap-4 bg-paper p-6 shadow-(--shadow-3) transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:duration-300 data-[state=closed]:duration-200 border-(--border-default) dark:bg-(--bg-card-raised) dark:border-(--border-emphasis) flex flex-col h-full",
           // Logical side adjustments
           side === "right" && "inset-y-0 right-0 w-3/4 max-w-sm border-l data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right",
           side === "left" && "inset-y-0 left-0 w-3/4 max-w-sm border-r data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left",
-          side === "end" && "inset-y-0 end-0 w-3/4 max-w-sm border-inline-start data-[state=closed]:slide-out-to-end data-[state=open]:slide-in-from-end",
-          side === "start" && "inset-y-0 start-0 w-3/4 max-w-sm border-inline-end data-[state=closed]:slide-out-to-start data-[state=open]:slide-in-from-start",
+          side === "end" && "inset-y-0 inset-e-0 w-3/4 max-w-sm border-inline-start data-[state=closed]:slide-out-to-end data-[state=open]:slide-in-from-end",
+          side === "start" && "inset-y-0 inset-s-0 w-3/4 max-w-sm border-inline-end data-[state=closed]:slide-out-to-start data-[state=open]:slide-in-from-start",
           className
         )}
         {...props}
       >
         {children}
-        <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-1 focus:ring-[var(--border-focus)] disabled:pointer-events-none cursor-pointer text-[var(--text-muted)] hover:text-[var(--text-primary)]">
+        <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-1 focus:ring-(--border-focus) disabled:pointer-events-none cursor-pointer text-(--text-muted) hover:text-(--text-primary)">
           <X className="h-4 w-4" />
           <span className="sr-only">Close</span>
         </DialogPrimitive.Close>
@@ -69,7 +69,7 @@ const DrawerTitle = React.forwardRef(({ className, ...props }, ref) => (
   <DialogPrimitive.Title
     ref={ref}
     className={cn(
-      "text-lg font-semibold leading-none tracking-tight text-[var(--text-primary)] text-start",
+      "text-lg font-semibold leading-none tracking-tight text-(--text-primary) text-start",
       className
     )}
     {...props}
@@ -80,7 +80,7 @@ DrawerTitle.displayName = "DrawerTitle"
 const DrawerDescription = React.forwardRef(({ className, ...props }, ref) => (
   <DialogPrimitive.Description
     ref={ref}
-    className={cn("text-sm text-[var(--text-secondary)] text-start", className)}
+    className={cn("text-sm text-(--text-secondary) text-start", className)}
     {...props}
   />
 ))

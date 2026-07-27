@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react"
+﻿import React, { useState, useRef, useEffect } from "react"
 import { Check, ChevronDown, X, Search } from "lucide-react"
 import { Badge } from "./badge"
 import { cn } from "../../lib/utils"
@@ -37,7 +37,7 @@ export function Combobox({
   return (
     <div ref={containerRef} className={cn("relative w-full flex flex-col gap-1.5 text-start", className)}>
       {label && (
-        <span className="text-sm font-medium text-[var(--text-primary)] select-none">
+        <span className="text-sm font-medium text-(--text-primary) select-none">
           {label}
         </span>
       )}
@@ -46,31 +46,31 @@ export function Combobox({
         disabled={disabled}
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          "flex h-10 w-full items-center justify-between rounded-[var(--radius-sm)] border border-[var(--border-default)] bg-[var(--color-paper)] px-3 py-2 text-sm text-[var(--text-primary)] focus:outline-none focus:border-[var(--border-focus)] focus:ring-1 focus:ring-[var(--border-focus)] disabled:cursor-not-allowed disabled:bg-[var(--bg-disabled)] disabled:text-[var(--text-muted)] dark:bg-[var(--bg-card)] dark:border-[var(--border-emphasis)] cursor-pointer text-start",
-          errorText && "border-[var(--status-error-fg)]"
+          "flex h-10 w-full items-center justify-between rounded-sm border border-(--border-default) bg-paper px-3 py-2 text-sm text-(--text-primary) focus:outline-none focus:border-(--border-focus) focus:ring-1 focus:ring-(--border-focus) disabled:cursor-not-allowed disabled:bg-(--bg-disabled) disabled:text-(--text-muted) dark:bg-(--bg-card) dark:border-(--border-emphasis) cursor-pointer text-start",
+          errorText && "border-(--status-error-fg)"
         )}
       >
-        <span className={cn(!selectedOption && "text-[var(--text-muted)]")}>
+        <span className={cn(!selectedOption && "text-(--text-muted)")}>
           {selectedOption ? selectedOption.label : placeholder}
         </span>
         <ChevronDown className="h-4 w-4 opacity-50 shrink-0" />
       </button>
 
       {isOpen && (
-        <div className="absolute top-[calc(100%+4px)] start-0 z-50 w-full rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-paper)] p-1 text-[var(--text-primary)] shadow-[var(--shadow-2)] dark:bg-[var(--bg-card-raised)] dark:border-[var(--border-emphasis)]">
-          <div className="flex items-center border-b border-[var(--border-default)] px-3 dark:border-[var(--border-emphasis)] pb-1 pt-0.5">
+        <div className="absolute top-[calc(100%+4px)] inset-s-0 z-50 w-full rounded-md border border-(--border-default) bg-paper p-1 text-(--text-primary) shadow-(--shadow-2) dark:bg-(--bg-card-raised) dark:border-(--border-emphasis)">
+          <div className="flex items-center border-b border-(--border-default) px-3 dark:border-(--border-emphasis) pb-1 pt-0.5">
             <Search className="h-4 w-4 opacity-50 me-2 shrink-0" />
             <input
               type="text"
               placeholder={searchPlaceholder}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="flex h-8 w-full bg-transparent py-1 text-sm outline-none placeholder:text-[var(--text-muted)]"
+              className="flex h-8 w-full bg-transparent py-1 text-sm outline-none placeholder:text-(--text-muted)"
             />
           </div>
-          <div className="max-h-[200px] overflow-y-auto pt-1">
+          <div className="max-h-50 overflow-y-auto pt-1">
             {filteredOptions.length === 0 ? (
-              <div className="py-6 text-center text-sm text-[var(--text-secondary)]">
+              <div className="py-6 text-center text-sm text-(--text-secondary)">
                 No results found.
               </div>
             ) : (
@@ -86,8 +86,8 @@ export function Combobox({
                       setSearch("")
                     }}
                     className={cn(
-                      "w-full flex items-center justify-between px-2.5 py-2 text-sm rounded-[var(--radius-xs)] hover:bg-[var(--bg-page-alt)] dark:hover:bg-[var(--border-emphasis)] text-start cursor-pointer",
-                      isSelected && "text-[var(--ai-primary)]"
+                      "w-full flex items-center justify-between px-2.5 py-2 text-sm rounded-xs hover:bg-(--bg-page-alt) dark:hover:bg-(--border-emphasis) text-start cursor-pointer",
+                      isSelected && "text-(--ai-primary)"
                     )}
                   >
                     <span>{opt.label}</span>
@@ -99,7 +99,7 @@ export function Combobox({
           </div>
         </div>
       )}
-      {errorText && <p className="text-xs text-[var(--status-error-fg)]">{errorText}</p>}
+      {errorText && <p className="text-xs text-(--status-error-fg)">{errorText}</p>}
     </div>
   )
 }
@@ -137,17 +137,17 @@ export function MultiSelect({
   return (
     <div ref={containerRef} className={cn("relative w-full flex flex-col gap-1.5 text-start", className)}>
       {label && (
-        <span className="text-sm font-medium text-[var(--text-primary)] select-none">
+        <span className="text-sm font-medium text-(--text-primary) select-none">
           {label}
         </span>
       )}
       <div
         onClick={() => setIsOpen(!isOpen)}
-        className="flex min-h-10 w-full items-center justify-between rounded-[var(--radius-sm)] border border-[var(--border-default)] bg-[var(--color-paper)] px-3 py-1 text-sm text-[var(--text-primary)] focus-within:border-[var(--border-focus)] focus-within:ring-1 focus-within:ring-[var(--border-focus)] dark:bg-[var(--bg-card)] dark:border-[var(--border-emphasis)] cursor-pointer"
+        className="flex min-h-10 w-full items-center justify-between rounded-sm border border-(--border-default) bg-paper px-3 py-1 text-sm text-(--text-primary) focus-within:border-(--border-focus) focus-within:ring-1 focus-within:ring-(--border-focus) dark:bg-(--bg-card) dark:border-(--border-emphasis) cursor-pointer"
       >
         <div className="flex flex-wrap gap-1 items-center">
           {value.length === 0 ? (
-            <span className="text-[var(--text-muted)]">{placeholder}</span>
+            <span className="text-(--text-muted)">{placeholder}</span>
           ) : (
             value.map((v) => {
               const opt = options.find((o) => o.value === v)
@@ -175,8 +175,8 @@ export function MultiSelect({
       </div>
 
       {isOpen && (
-        <div className="absolute top-[calc(100%+4px)] start-0 z-50 w-full rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-paper)] p-1 text-[var(--text-primary)] shadow-[var(--shadow-2)] dark:bg-[var(--bg-card-raised)] dark:border-[var(--border-emphasis)]">
-          <div className="max-h-[200px] overflow-y-auto">
+        <div className="absolute top-[calc(100%+4px)] inset-s-0 z-50 w-full rounded-md border border-(--border-default) bg-paper p-1 text-(--text-primary) shadow-(--shadow-2) dark:bg-(--bg-card-raised) dark:border-(--border-emphasis)">
+          <div className="max-h-50 overflow-y-auto">
             {options.map((opt) => {
               const isSelected = value.includes(opt.value)
               return (
@@ -184,10 +184,10 @@ export function MultiSelect({
                   key={opt.value}
                   type="button"
                   onClick={() => handleSelect(opt.value)}
-                  className="w-full flex items-center justify-between px-2.5 py-2 text-sm rounded-[var(--radius-xs)] hover:bg-[var(--bg-page-alt)] dark:hover:bg-[var(--border-emphasis)] text-start cursor-pointer"
+                  className="w-full flex items-center justify-between px-2.5 py-2 text-sm rounded-xs hover:bg-(--bg-page-alt) dark:hover:bg-(--border-emphasis) text-start cursor-pointer"
                 >
                   <span>{opt.label}</span>
-                  {isSelected && <Check className="h-4 w-4 text-[var(--ai-primary)]" />}
+                  {isSelected && <Check className="h-4 w-4 text-(--ai-primary)" />}
                 </button>
               )
             })}

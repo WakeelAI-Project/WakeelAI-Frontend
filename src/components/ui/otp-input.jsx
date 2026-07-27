@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react"
+﻿import React, { useRef, useState, useEffect } from "react"
 import { cn } from "../../lib/utils"
 
 export function OTPInput({ length = 6, value, onChange, disabled = false, error = false }) {
@@ -78,8 +78,8 @@ export function OTPInput({ length = 6, value, onChange, disabled = false, error 
             onPaste={handlePaste}
             ref={(el) => (inputRefs.current[index] = el)}
             className={cn(
-              "w-12 h-12 text-center text-lg font-semibold rounded-[var(--radius-sm)] border border-[var(--border-default)] bg-[var(--color-paper)] focus-visible:outline-none focus-visible:border-[var(--border-focus)] focus-visible:ring-1 focus-visible:ring-[var(--border-focus)] disabled:bg-[var(--bg-disabled)] disabled:text-[var(--text-muted)] dark:bg-[var(--bg-card)] dark:border-[var(--border-emphasis)]",
-              error && "border-[var(--status-error-fg)] focus-visible:ring-[var(--status-error-fg)] focus-visible:border-[var(--status-error-fg)]"
+              "w-12 h-12 text-center text-lg font-semibold rounded-sm border border-(--border-default) bg-paper focus-visible:outline-none focus-visible:border-(--border-focus) focus-visible:ring-1 focus-visible:ring-(--border-focus) disabled:bg-(--bg-disabled) disabled:text-(--text-muted) dark:bg-(--bg-card) dark:border-(--border-emphasis)",
+              error && "border-(--status-error-fg) focus-visible:ring-(--status-error-fg) focus-visible:border-(--status-error-fg)"
             )}
           />
         ))}

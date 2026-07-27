@@ -1,17 +1,17 @@
-import React from "react"
+﻿import React from "react"
 import { AlertCircle, CheckCircle, Info, AlertTriangle } from "lucide-react"
 import { cva } from "class-variance-authority"
 import { cn } from "../../lib/utils"
 
 const alertVariants = cva(
-  "relative w-full rounded-[var(--radius-md)] border-y border-e border-inline-start-4 p-4 text-start flex gap-3 items-start select-none",
+  "relative w-full rounded-md border-y border-e border-inline-start-4 p-4 text-start flex gap-3 items-start select-none",
   {
     variants: {
       variant: {
-        success: "bg-[var(--status-success-bg)] border-[var(--border-default)] border-inline-start-[var(--status-success-fg)] text-[var(--status-success-fg)]",
-        warning: "bg-[var(--status-warning-bg)] border-[var(--border-default)] border-inline-start-[var(--status-warning-fg)] text-[var(--status-warning-fg)]",
-        error: "bg-[var(--status-error-bg)] border-[var(--border-default)] border-inline-start-[var(--status-error-fg)] text-[var(--status-error-fg)]",
-        info: "bg-[var(--status-info-bg)] border-[var(--border-default)] border-inline-start-[var(--status-info-fg)] text-[var(--status-info-fg)]"
+        success: "bg-(--status-success-bg) border-(--border-default) border-inline-start-(--status-success-fg) text-(--status-success-fg)",
+        warning: "bg-(--status-warning-bg) border-(--border-default) border-inline-start-(--status-warning-fg) text-(--status-warning-fg)",
+        error: "bg-(--status-error-bg) border-(--border-default) border-inline-start-(--status-error-fg) text-(--status-error-fg)",
+        info: "bg-(--status-info-bg) border-(--border-default) border-inline-start-(--status-info-fg) text-(--status-info-fg)"
       }
     },
     defaultVariants: {

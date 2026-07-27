@@ -1,4 +1,4 @@
-import React from "react"
+﻿import React from "react"
 import { FileDown, Sparkles } from "lucide-react"
 import { Badge } from "../ui/badge"
 import { cn } from "../../lib/utils"
@@ -14,19 +14,19 @@ export function DocumentCard({
   return (
     <div
       className={cn(
-        "rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--bg-card)] p-4 flex items-center justify-between gap-4 hover:bg-[var(--bg-card-raised)] transition-colors text-start select-none",
+        "rounded-md border border-(--border-default) bg-(--bg-card) p-4 flex items-center justify-between gap-4 hover:bg-(--bg-card-raised) transition-colors text-start select-none",
         className
       )}
     >
       <div className="flex items-center gap-3 overflow-hidden">
         {/* Document Icon Chip */}
-        <div className="p-3 rounded-[var(--radius-sm)] bg-[var(--legal-surface)] text-[var(--legal-primary)] shrink-0 font-medium">
+        <div className="p-3 rounded-sm bg-(--legal-surface) text-(--legal-primary) shrink-0 font-medium">
           DOC
         </div>
 
         <div className="flex flex-col overflow-hidden">
           <div className="flex items-center gap-2">
-            <span className="font-medium text-sm text-[var(--text-primary)] truncate">
+            <span className="font-medium text-sm text-(--text-primary) truncate">
               {filename}
             </span>
             {isAiGenerated && (
@@ -36,7 +36,7 @@ export function DocumentCard({
               </Badge>
             )}
           </div>
-          <span className="text-xs text-[var(--text-secondary)] mt-1">
+          <span className="text-xs text-(--text-secondary) mt-1">
             {fileSize} • {date}
           </span>
         </div>
@@ -45,7 +45,7 @@ export function DocumentCard({
       <button
         onClick={onDownload}
         type="button"
-        className="p-2 hover:bg-[var(--bg-card-raised)] rounded-full text-[var(--text-secondary)] hover:text-[var(--text-primary)] cursor-pointer transition-colors"
+        className="p-2 hover:bg-(--bg-card-raised) rounded-full text-(--text-secondary) hover:text-(--text-primary) cursor-pointer transition-colors"
       >
         <FileDown className="h-5 w-5" />
       </button>

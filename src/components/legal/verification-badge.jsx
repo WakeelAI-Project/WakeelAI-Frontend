@@ -1,4 +1,4 @@
-import React from "react"
+﻿import React from "react"
 import { Check } from "lucide-react"
 import { cn } from "../../lib/utils"
 
@@ -12,8 +12,8 @@ export function VerificationBadge({
   return (
     <div
       className={cn(
-        "inline-flex items-center gap-2 px-2.5 py-1 rounded-[var(--radius-full)] bg-[var(--legal-surface)] text-[var(--legal-primary)] border border-[var(--border-default)] text-xs font-semibold select-none",
-        !isVerified && "bg-[var(--bg-card-raised)] text-[var(--text-secondary)] border-[var(--border-default)]",
+        "inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-(--legal-surface) text-(--legal-primary) border border-(--border-default) text-xs font-semibold select-none",
+        !isVerified && "bg-(--bg-card-raised) text-(--text-secondary) border-(--border-default)",
         className
       )}
     >
@@ -25,7 +25,7 @@ export function VerificationBadge({
         )}
       >
         {isVerified && (
-          <Check className="h-2.5 w-2.5 -rotate-45 text-[var(--legal-primary)]" strokeWidth={3} />
+          <Check className="h-2.5 w-2.5 -rotate-45 text-(--legal-primary)" strokeWidth={3} />
         )}
       </div>
       <span>{isRtl ? label : labelEn}</span>

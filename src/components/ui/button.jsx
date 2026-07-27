@@ -1,28 +1,28 @@
-import React from "react"
+﻿import React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva } from "class-variance-authority"
 import { Loader2 } from "lucide-react"
 import { cn } from "../../lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-semibold transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--border-focus)] disabled:pointer-events-none disabled:bg-[var(--bg-disabled)] disabled:text-[var(--text-muted)] disabled:border-none select-none cursor-pointer",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-semibold transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--border-focus) disabled:pointer-events-none disabled:bg-(--bg-disabled) disabled:text-(--text-muted) disabled:border-none select-none cursor-pointer",
   {
     variants: {
       variant: {
-        primary: "bg-[var(--brand-primary)] text-[var(--text-on-brand)] hover:bg-[var(--brand-primary-hover)] active:bg-[var(--brand-primary-active)] shadow-[var(--shadow-1)]",
-        legal: "bg-[var(--official-primary)] text-[var(--text-on-brand)] hover:bg-[var(--brand-primary-hover)] active:bg-[var(--brand-primary-active)] shadow-[var(--shadow-1)]",
-        ai: "bg-[var(--ai-primary)] text-[var(--text-on-accent)] hover:bg-[var(--accent-primary-hover)] active:bg-[var(--accent-primary-active)] shadow-[var(--shadow-1)]",
-        secondary: "bg-[var(--bg-card)] text-[var(--text-primary)] border border-[var(--border-default)] hover:bg-[var(--bg-card-raised)] active:bg-[var(--bg-page-alt)]",
-        ghost: "text-[var(--brand-primary)] hover:bg-[var(--bg-page-alt)] active:bg-[var(--bg-card-raised)]",
-        danger: "bg-[var(--status-error-fg)] text-[var(--color-paper)] hover:bg-[#962e2e] active:bg-[#7a2323] shadow-sm",
-        fab: "fixed bottom-6 end-6 bg-[var(--ai-primary)] text-[var(--text-on-accent)] hover:bg-[var(--accent-primary-hover)] active:bg-[var(--accent-primary-active)] shadow-[var(--shadow-3)] z-50 rounded-[var(--radius-2xl)]"
+        primary: "bg-(--brand-primary) text-(--text-on-brand) hover:bg-(--brand-primary-hover) active:bg-(--brand-primary-active) shadow-(--shadow-1)",
+        legal: "bg-(--official-primary) text-(--text-on-brand) hover:bg-(--brand-primary-hover) active:bg-(--brand-primary-active) shadow-(--shadow-1)",
+        ai: "bg-(--ai-primary) text-(--text-on-accent) hover:bg-(--accent-primary-hover) active:bg-(--accent-primary-active) shadow-(--shadow-1)",
+        secondary: "bg-(--bg-card) text-(--text-primary) border border-(--border-default) hover:bg-(--bg-card-raised) active:bg-(--bg-page-alt)",
+        ghost: "text-(--brand-primary) hover:bg-(--bg-page-alt) active:bg-(--bg-card-raised)",
+        danger: "bg-(--status-error-fg) text-(--color-paper) hover:bg-[#962e2e] active:bg-[#7a2323] shadow-sm",
+        fab: "fixed bottom-6 end-6 bg-(--ai-primary) text-(--text-on-accent) hover:bg-(--accent-primary-hover) active:bg-(--accent-primary-active) shadow-(--shadow-3) z-50 rounded-2xl"
       },
       size: {
-        xs: "h-7 px-2 text-xs rounded-[var(--radius-xs)]",
-        sm: "h-8 px-3 text-xs rounded-[var(--radius-sm)]",
-        md: "h-10 px-4 text-sm rounded-[var(--radius-sm)]",
-        lg: "h-12 px-6 text-base rounded-[var(--radius-md)] min-w-[44px] sm:min-w-[48px]",
-        xl: "h-14 px-8 text-base rounded-[var(--radius-lg)] min-w-[48px]"
+        xs: "h-7 px-2 text-xs rounded-xs",
+        sm: "h-8 px-3 text-xs rounded-sm",
+        md: "h-10 px-4 text-sm rounded-sm",
+        lg: "h-12 px-6 text-base rounded-md min-w-[44px] sm:min-w-[48px]",
+        xl: "h-14 px-8 text-base rounded-lg min-w-[48px]"
       }
     },
     defaultVariants: {

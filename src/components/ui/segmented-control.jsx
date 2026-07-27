@@ -1,4 +1,4 @@
-import React from "react"
+﻿import React from "react"
 import { motion } from "framer-motion"
 import { cn } from "../../lib/utils"
 
@@ -12,7 +12,7 @@ export function SegmentedControl({
   return (
     <div
       className={cn(
-        "inline-flex h-10 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--bg-page-alt)] p-1 text-[var(--text-muted)] dark:bg-[var(--bg-card)] border border-[var(--border-default)]",
+        "inline-flex h-10 items-center justify-center rounded-sm bg-(--bg-page-alt) p-1 text-(--text-muted) dark:bg-(--bg-card) border border-(--border-default)",
         className
       )}
     >
@@ -24,14 +24,14 @@ export function SegmentedControl({
             type="button"
             onClick={() => onChange(option.value)}
             className={cn(
-              "relative z-10 flex h-full items-center justify-center px-4 py-1.5 text-sm font-medium transition-all select-none cursor-pointer rounded-[var(--radius-sm)] hover:text-[var(--text-primary)] focus-visible:outline-none",
-              isActive ? "text-[var(--text-primary)]" : "text-[var(--text-secondary)]"
+              "relative z-10 flex h-full items-center justify-center px-4 py-1.5 text-sm font-medium transition-all select-none cursor-pointer rounded-sm hover:text-(--text-primary) focus-visible:outline-none",
+              isActive ? "text-(--text-primary)" : "text-(--text-secondary)"
             )}
           >
             {isActive && (
               <motion.div
                 layoutId={`segmented-active-${name}`}
-                className="absolute inset-0 -z-10 rounded-[var(--radius-sm)] bg-[var(--color-paper)] shadow-[var(--shadow-1)] dark:bg-[var(--bg-card-raised)]"
+                className="absolute inset-0 -z-10 rounded-sm bg-paper shadow-(--shadow-1) dark:bg-(--bg-card-raised)"
                 transition={{ type: "spring", stiffness: 380, damping: 30 }}
               />
             )}

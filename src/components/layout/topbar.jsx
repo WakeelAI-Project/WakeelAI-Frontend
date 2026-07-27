@@ -1,4 +1,4 @@
-import React from "react"
+﻿import React from "react"
 import { Bell, Moon, Search, Sparkles, Sun, ToggleLeft, ToggleRight } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 import { Button } from "../ui/button"
@@ -16,9 +16,9 @@ export function Topbar({
   const { theme, toggleTheme, contrast, toggleContrast } = useTheme()
 
   return (
-    <header className="h-16 w-full bg-[var(--bg-card)] border-b border-[var(--border-default)] px-6 flex items-center justify-between shrink-0">
+    <header className="h-16 w-full bg-(--bg-card) border-b border-(--border-default) px-6 flex items-center justify-between shrink-0">
       <div className="flex min-w-0 items-center gap-3">
-        <h1 className="font-display text-lg font-semibold text-[var(--text-primary)] truncate">
+        <h1 className="font-display text-lg font-semibold text-(--text-primary) truncate">
           {isRtl ? titleAr : title}
         </h1>
       </div>
@@ -26,7 +26,7 @@ export function Topbar({
       <div className="flex-1 max-w-md mx-6 hidden md:block">
         <button
           onClick={onSearchClick}
-          className="w-full flex items-center justify-between px-3 h-10 rounded-[var(--radius-sm)] border border-[var(--border-default)] bg-[var(--bg-card-subtle)] hover:bg-[var(--bg-card-raised)] text-sm text-[var(--text-muted)] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--border-focus)] cursor-pointer text-start"
+          className="w-full flex items-center justify-between px-3 h-10 rounded-sm border border-(--border-default) bg-(--bg-card-subtle) hover:bg-(--bg-card-raised) text-sm text-(--text-muted) transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-(--border-focus) cursor-pointer text-start"
         >
           <span className="flex min-w-0 items-center gap-2">
             <Search className="h-4 w-4 shrink-0" />
@@ -34,7 +34,7 @@ export function Topbar({
               {isRtl ? "بحث عن موظف، عقد، أو امتثال..." : "Search employee, contract, or compliance..."}
             </span>
           </span>
-          <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border border-[var(--border-default)] bg-[var(--bg-page-alt)] px-1.5 font-mono text-[10px] font-medium opacity-100">
+          <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border border-(--border-default) bg-(--bg-page-alt) px-1.5 font-mono text-[10px] font-medium opacity-100">
             Ctrl K
           </kbd>
         </button>
@@ -49,7 +49,7 @@ export function Topbar({
           title={isRtl ? "تبديل التباين العالي" : "Toggle High Contrast"}
         >
           {contrast === "high" ? (
-            <ToggleRight className="h-5 w-5 text-[var(--ai-primary)]" />
+            <ToggleRight className="h-5 w-5 text-(--ai-primary)" />
           ) : (
             <ToggleLeft className="h-5 w-5" />
           )}
@@ -71,7 +71,7 @@ export function Topbar({
             variant="ghost"
             size="xs"
             onClick={onAssistantToggle}
-            className="h-8 w-8 p-0 text-[var(--ai-primary)] hover:text-[var(--accent-primary-active)] hover:bg-[var(--ai-surface)]"
+            className="h-8 w-8 p-0 text-(--ai-primary) hover:text-(--accent-primary-active) hover:bg-(--ai-surface)"
             title={isRtl ? "المساعد الذكي" : "AI Assistant"}
           >
             <Sparkles className="h-4 w-4" />
@@ -87,12 +87,12 @@ export function Topbar({
           >
             <Bell className="h-4 w-4" />
             {notificationsCount > 0 && (
-              <span className="absolute top-1 right-1 flex h-2 w-2 rounded-full bg-[var(--status-error-fg)]" />
+              <span className="absolute top-1 right-1 flex h-2 w-2 rounded-full bg-(--status-error-fg)" />
             )}
           </Button>
         </div>
 
-        <div className="w-px h-5 bg-[var(--border-default)] hidden sm:block" />
+        <div className="w-px h-5 bg-(--border-default) hidden sm:block" />
 
         <Avatar className="h-8 w-8 cursor-pointer select-none">
           <AvatarImage src="" />

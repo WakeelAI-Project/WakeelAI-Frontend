@@ -1,4 +1,4 @@
-import React from "react"
+﻿import React from "react"
 import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react"
 import { Button } from "../ui/button"
 import { cn } from "../../lib/utils"
@@ -42,7 +42,7 @@ export function Pagination({ totalPages, currentPage, onPageChange, className })
           return (
             <div
               key={idx}
-              className="flex h-8 w-8 items-center justify-center text-sm text-[var(--text-secondary)] select-none"
+              className="flex h-8 w-8 items-center justify-center text-sm text-(--text-secondary) select-none"
             >
               <MoreHorizontal className="h-4 w-4" />
             </div>
@@ -59,7 +59,7 @@ export function Pagination({ totalPages, currentPage, onPageChange, className })
             onClick={() => onPageChange(page)}
             className={cn(
               "h-8 w-8 p-0 text-sm font-medium",
-              isCurrent && "bg-[var(--brand-primary)] text-[var(--color-paper)] hover:bg-[var(--brand-primary-hover)]"
+              isCurrent && "bg-(--brand-primary) text-paper hover:bg-(--brand-primary-hover)"
             )}
           >
             {page}

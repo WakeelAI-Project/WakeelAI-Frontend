@@ -1,4 +1,4 @@
-import React from "react"
+﻿import React from "react"
 import { motion } from "framer-motion"
 import { Button } from "../ui/button"
 import { cn } from "../../lib/utils"
@@ -22,61 +22,61 @@ export function EmptyState({
         className="w-32 h-32 flex items-center justify-center relative mb-6 shrink-0"
       >
         {illustrationType === "folder" && (
-          <div className="relative w-20 h-16 bg-[var(--accent-surface)] border-2 border-[var(--border-emphasis)] rounded-[var(--radius-sm)] flex items-center justify-center">
-            <div className="absolute top-[-8px] start-[10px] w-8 h-3.5 bg-[var(--accent-surface)] rounded-t-[var(--radius-xs)] border-t-2 border-x-2 border-[var(--border-emphasis)]" />
-            <div className="w-10 h-1 bg-[var(--border-emphasis)] rounded-full" />
+          <div className="relative w-20 h-16 bg-(--accent-surface) border-2 border-(--border-emphasis) rounded-sm flex items-center justify-center">
+            <div className="absolute -top-2 inset-s-2.5 w-8 h-3.5 bg-(--accent-surface) rounded-t-xs border-t-2 border-x-2 border-(--border-emphasis)" />
+            <div className="w-10 h-1 bg-(--border-emphasis) rounded-full" />
           </div>
         )}
 
         {illustrationType === "document" && (
-          <div className="relative w-16 h-20 bg-[var(--color-paper)] border-2 border-[var(--border-emphasis)] rounded-[var(--radius-sm)] flex flex-col p-2.5 gap-2">
-            <div className="w-8 h-1.5 bg-[var(--accent-surface)] rounded" />
-            <div className="w-10 h-1 bg-[var(--border-default)] rounded" />
-            <div className="w-6 h-1 bg-[var(--border-default)] rounded" />
-            <div className="absolute top-0 end-0 w-4 h-4 bg-[var(--accent-surface)] border-b-2 border-l-2 border-[var(--border-emphasis)]" />
+          <div className="relative w-16 h-20 bg-paper border-2 border-(--border-emphasis) rounded-sm flex flex-col p-2.5 gap-2">
+            <div className="w-8 h-1.5 bg-(--accent-surface) rounded" />
+            <div className="w-10 h-1 bg-(--border-default) rounded" />
+            <div className="w-6 h-1 bg-(--border-default) rounded" />
+            <div className="absolute top-0 inset-e-0 w-4 h-4 bg-(--accent-surface) border-b-2 border-l-2 border-(--border-emphasis)" />
           </div>
         )}
 
         {illustrationType === "calendar" && (
-          <div className="relative w-16 h-16 bg-[var(--color-paper)] border-2 border-[var(--border-emphasis)] rounded-[var(--radius-sm)] flex flex-col overflow-hidden">
-            <div className="h-4 bg-[var(--brand-primary)] border-b border-[var(--border-emphasis)] flex justify-between px-2 items-center">
-              <div className="w-1 h-1 bg-[var(--color-paper)] rounded-full" />
-              <div className="w-1 h-1 bg-[var(--color-paper)] rounded-full" />
+          <div className="relative w-16 h-16 bg-paper border-2 border-(--border-emphasis) rounded-sm flex flex-col overflow-hidden">
+            <div className="h-4 bg-(--brand-primary) border-b border-(--border-emphasis) flex justify-between px-2 items-center">
+              <div className="w-1 h-1 bg-paper rounded-full" />
+              <div className="w-1 h-1 bg-paper rounded-full" />
             </div>
             <div className="flex-1 grid grid-cols-3 gap-1 p-2">
-              <div className="bg-[var(--bg-page-alt)] rounded" />
-              <div className="bg-[var(--bg-page-alt)] rounded" />
-              <div className="bg-[var(--border-emphasis)] rounded" />
+              <div className="bg-(--bg-page-alt) rounded" />
+              <div className="bg-(--bg-page-alt) rounded" />
+              <div className="bg-(--border-emphasis) rounded" />
             </div>
           </div>
         )}
 
         {illustrationType === "search" && (
           <div className="relative flex items-center justify-center">
-            <div className="w-14 h-14 rounded-full border-4 border-[var(--border-emphasis)]" />
-            <div className="w-8 h-2 bg-[var(--border-emphasis)] rounded-full rotate-45 absolute bottom-[-10px] right-[-10px]" />
+            <div className="w-14 h-14 rounded-full border-4 border-(--border-emphasis)" />
+            <div className="w-8 h-2 bg-(--border-emphasis) rounded-full rotate-45 absolute -bottom-2.5 -right-2.5" />
           </div>
         )}
 
         {illustrationType === "envelope" && (
-          <div className="relative w-20 h-14 bg-[var(--bg-page-alt)] border-2 border-[var(--border-emphasis)] rounded-[var(--radius-sm)] flex items-center justify-center overflow-hidden">
+          <div className="relative w-20 h-14 bg-(--bg-page-alt) border-2 border-(--border-emphasis) rounded-sm flex items-center justify-center overflow-hidden">
             {/* Envelope flap lines */}
-            <div className="absolute top-0 inset-x-0 h-0 border-t-[28px] border-t-[var(--bg-disabled)] border-x-[38px] border-x-transparent" />
+            <div className="absolute top-0 inset-x-0 h-0 border-t-28 border-t-(--bg-disabled) border-x-38 border-x-transparent" />
           </div>
         )}
 
         {illustrationType === "offline" && (
-          <div className="relative w-16 h-16 rounded-full border-4 border-dashed border-[var(--status-warning-fg)] flex items-center justify-center">
-            <div className="w-4 h-4 rounded-full bg-[var(--status-warning-fg)]" />
+          <div className="relative w-16 h-16 rounded-full border-4 border-dashed border-(--status-warning-fg) flex items-center justify-center">
+            <div className="w-4 h-4 rounded-full bg-(--status-warning-fg)" />
           </div>
         )}
       </motion.div>
 
       {/* Info texts */}
-      <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-1">
+      <h3 className="text-sm font-semibold text-(--text-primary) mb-1">
         {title}
       </h3>
-      <p className="text-xs text-[var(--text-secondary)] leading-relaxed mb-4">
+      <p className="text-xs text-(--text-secondary) leading-relaxed mb-4">
         {description}
       </p>
 

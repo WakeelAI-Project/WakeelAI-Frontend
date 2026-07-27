@@ -1,4 +1,4 @@
-import React from "react"
+﻿import React from "react"
 import * as AvatarPrimitive from "@radix-ui/react-avatar"
 import { cn } from "../../lib/utils"
 
@@ -6,7 +6,7 @@ const Avatar = React.forwardRef(({ className, ...props }, ref) => (
   <AvatarPrimitive.Root
     ref={ref}
     className={cn(
-      "relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full border border-[var(--border-default)] dark:border-[var(--border-emphasis)] bg-[var(--bg-page-alt)] dark:bg-[var(--bg-card-raised)]",
+      "relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full border border-(--border-default) dark:border-(--border-emphasis) bg-(--bg-page-alt) dark:bg-(--bg-card-raised)",
       className
     )}
     {...props}
@@ -27,7 +27,7 @@ const AvatarFallback = React.forwardRef(({ className, ...props }, ref) => (
   <AvatarPrimitive.Fallback
     ref={ref}
     className={cn(
-      "flex h-full w-full items-center justify-center rounded-full text-sm font-medium text-[var(--text-primary)] bg-[var(--bg-card-raised)] dark:bg-[var(--bg-card-raised)]",
+      "flex h-full w-full items-center justify-center rounded-full text-sm font-medium text-(--text-primary) bg-(--bg-card-raised) dark:bg-(--bg-card-raised)",
       className
     )}
     {...props}

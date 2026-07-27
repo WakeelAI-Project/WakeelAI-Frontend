@@ -11,8 +11,8 @@ export function Timeline({
       {/* Vertical center axis line */}
       <div
         className={cn(
-          "absolute top-1 bottom-1 w-0.5 bg-[var(--border-default)] dark:bg-[var(--bg-card-raised)]",
-          isRtl ? "right-[17px]" : "left-[17px]"
+          "absolute top-1 bottom-1 w-0.5 bg-(--border-default) dark:bg-(--bg-card-raised)",
+          isRtl ? "right-4.25" : "left-4.25"
         )}
       />
 
@@ -27,10 +27,10 @@ export function Timeline({
           {/* Timeline Dot Marker */}
           <div
             className={cn(
-              "w-9 h-9 rounded-full border-2 border-[var(--color-paper)] bg-[var(--color-paper)] shadow-sm flex items-center justify-center relative z-10 shrink-0 dark:bg-[var(--bg-card)] dark:border-[var(--bg-card-raised)]",
+              "w-9 h-9 rounded-full border-2 border-paper bg-paper shadow-sm flex items-center justify-center relative z-10 shrink-0 dark:bg-(--bg-card) dark:border-(--bg-card-raised)",
               item.isCompleted
-                ? "border-[var(--brand-primary)] text-[var(--brand-primary)] dark:border-[var(--brand-primary)]"
-                : "border-[var(--border-default)] text-[var(--text-muted)] dark:border-[var(--border-emphasis)]"
+                ? "border-(--brand-primary) text-(--brand-primary) dark:border-(--brand-primary)"
+                : "border-(--border-default) text-(--text-muted) dark:border-(--border-emphasis)"
             )}
           >
             {item.icon ? (
@@ -39,7 +39,7 @@ export function Timeline({
               <div
                 className={cn(
                   "w-2 h-2 rounded-full",
-                  item.isCompleted ? "bg-[var(--brand-primary)]" : "bg-[var(--text-muted)]"
+                  item.isCompleted ? "bg-(--brand-primary)" : "bg-(--text-muted)"
                 )}
               />
             )}
@@ -48,15 +48,15 @@ export function Timeline({
           {/* Timeline content bubble */}
           <div className="flex-1 flex flex-col pt-1">
             <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1">
-              <span className="font-semibold text-sm text-[var(--text-primary)]">
+              <span className="font-semibold text-sm text-(--text-primary)">
                 {item.title}
               </span>
-              <span className="text-[10px] text-[var(--text-muted)] font-mono font-medium">
+              <span className="text-[10px] text-(--text-muted) font-mono font-medium">
                 {item.date}
               </span>
             </div>
             {item.description && (
-              <span className="text-xs text-[var(--text-secondary)] mt-1 leading-relaxed">
+              <span className="text-xs text-(--text-secondary) mt-1 leading-relaxed">
                 {item.description}
               </span>
             )}

@@ -59,9 +59,9 @@ export function Table({
   }
 
   return (
-    <div className={cn("w-full overflow-x-auto rounded-[var(--radius-md)] border border-[var(--border-default)] dark:border-[var(--bg-card-raised)] bg-[var(--color-paper)] dark:bg-[var(--bg-card)]", className)}>
+    <div className={cn("w-full overflow-x-auto rounded-md border border-(--border-default) dark:border-(--bg-card-raised) bg-paper dark:bg-(--bg-card)", className)}>
       <table className="w-full border-collapse text-sm text-start select-none">
-        <thead className="bg-[var(--bg-card-raised)] dark:bg-[var(--bg-page-alt)] border-b border-[var(--border-default)] dark:border-[var(--bg-card-raised)]">
+        <thead className="bg-(--bg-card-raised) dark:bg-(--bg-page-alt) border-b border-(--border-default) dark:border-(--bg-card-raised)">
           <tr>
             {/* Expand indicator column */}
             {expandableRowRender && <th className="w-10 px-4 py-3" />}
@@ -82,8 +82,8 @@ export function Table({
                 key={col.key}
                 onClick={() => col.sortable && handleSort(col.key)}
                 className={cn(
-                  "px-4 py-3 font-semibold text-[var(--text-secondary)] text-start",
-                  col.sortable && "cursor-pointer hover:text-[var(--text-primary)]",
+                  "px-4 py-3 font-semibold text-(--text-secondary) text-start",
+                  col.sortable && "cursor-pointer hover:text-(--text-primary)",
                   col.isNumeric && "text-end font-mono"
                 )}
               >
@@ -95,7 +95,7 @@ export function Table({
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-[var(--border-default)] dark:divide-[var(--bg-card-raised)]">
+        <tbody className="divide-y divide-(--border-default) dark:divide-(--bg-card-raised)">
           {sortedData.map((row, idx) => {
             const rowId = row.id || idx
             const isSelected = selectedIds.includes(rowId)
@@ -106,8 +106,8 @@ export function Table({
                 <tr
                   onClick={() => onRowClick && onRowClick(row)}
                   className={cn(
-                    "hover:bg-[var(--bg-card-raised)] dark:hover:bg-[var(--bg-card-raised)] transition-colors",
-                    isSelected && "bg-[var(--accent-surface)]/40 hover:bg-[var(--accent-surface)]/60 dark:bg-[var(--accent-primary-active)]/10"
+                    "hover:bg-(--bg-card-raised) dark:hover:bg-(--bg-card-raised) transition-colors",
+                    isSelected && "bg-(--accent-surface)/40 hover:bg-(--accent-surface)/60 dark:bg-(--accent-primary-active)/10"
                   )}
                 >
                   {/* Expand cell */}
@@ -119,7 +119,7 @@ export function Table({
                           e.stopPropagation()
                           toggleRowExpand(rowId)
                         }}
-                        className="p-1 hover:bg-[var(--bg-page-alt)] rounded-full dark:hover:bg-[var(--bg-card-raised)] cursor-pointer"
+                        className="p-1 hover:bg-(--bg-page-alt) rounded-full dark:hover:bg-(--bg-card-raised) cursor-pointer"
                       >
                         {isExpanded ? (
                           <ChevronDown className="h-4 w-4 opacity-75" />
@@ -147,7 +147,7 @@ export function Table({
                       <td
                         key={col.key}
                         className={cn(
-                          "px-4 py-3.5 text-[var(--text-primary)] text-start align-middle",
+                          "px-4 py-3.5 text-(--text-primary) text-start align-middle",
                           col.isNumeric && "text-end font-mono tracking-tight text-xs"
                         )}
                       >
@@ -159,10 +159,10 @@ export function Table({
 
                 {/* Expanded content row */}
                 {expandableRowRender && isExpanded && (
-                  <tr className="bg-[var(--bg-card-subtle)] dark:bg-[var(--bg-page-alt)]">
+                  <tr className="bg-(--bg-card-subtle) dark:bg-(--bg-page-alt)">
                     <td
                       colSpan={columns.length + (enableSelection ? 2 : 1)}
-                      className="px-8 py-4 border-t border-[var(--border-default)] dark:border-[var(--bg-card-raised)] text-start"
+                      className="px-8 py-4 border-t border-(--border-default) dark:border-(--bg-card-raised) text-start"
                     >
                       {expandableRowRender(row)}
                     </td>

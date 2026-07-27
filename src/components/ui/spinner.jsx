@@ -1,4 +1,4 @@
-import React from "react"
+﻿import React from "react"
 import { cn } from "../../lib/utils"
 
 export function Spinner({ size = "md", className, ...props }) {
@@ -13,7 +13,7 @@ export function Spinner({ size = "md", className, ...props }) {
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"
-      className={cn("animate-spin text-[var(--brand-primary)]", sizeClasses[size], className)}
+      className={cn("animate-spin text-(--brand-primary)", sizeClasses[size], className)}
       {...props}
     >
       <circle

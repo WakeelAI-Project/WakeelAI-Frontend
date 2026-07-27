@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from "react"
+﻿import React, { createContext, useContext, useState, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { X, CheckCircle2, AlertTriangle, AlertCircle, Info } from "lucide-react"
 import { cn } from "../../lib/utils"
@@ -13,10 +13,10 @@ const toastIcons = {
 }
 
 const toastBorders = {
-  success: "border-s-[var(--status-success-fg)]",
-  warning: "border-s-[var(--status-warning-fg)]",
-  error: "border-s-[var(--status-error-fg)]",
-  info: "border-s-[var(--status-info-fg)]",
+  success: "border-s-(--status-success-fg)",
+  warning: "border-s-(--status-warning-fg)",
+  error: "border-s-(--status-error-fg)",
+  info: "border-s-(--status-info-fg)",
 }
 
 export function ToastProvider({ children }) {
@@ -50,21 +50,21 @@ export function ToastProvider({ children }) {
                 exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.15 } }}
                 layout
                 className={cn(
-                  "pointer-events-auto w-full bg-[var(--bg-card)] text-[var(--bg-card-raised)] rounded-[var(--radius-md)] p-4 shadow-[var(--shadow-3)] border-s-4 flex items-start gap-3 justify-between",
+                  "pointer-events-auto w-full bg-(--bg-card) text-(--bg-card-raised) rounded-md p-4 shadow-(--shadow-3) border-s-4 flex items-start gap-3 justify-between",
                   toastBorders[t.type || "info"]
                 )}
               >
                 <div className="flex gap-3 text-start">
                   <Icon className={cn("h-5 w-5 shrink-0 mt-0.5", {
-                    "text-[var(--status-success-fg)]": t.type === "success",
-                    "text-[var(--status-warning-fg)]": t.type === "warning",
-                    "text-[var(--status-error-fg)]": t.type === "error",
-                    "text-[var(--status-info-fg)]": t.type === "info",
+                    "text-(--status-success-fg)": t.type === "success",
+                    "text-(--status-warning-fg)": t.type === "warning",
+                    "text-(--status-error-fg)": t.type === "error",
+                    "text-(--status-info-fg)": t.type === "info",
                   })} />
                   <div className="flex flex-col gap-1">
                     <span className="text-sm font-semibold">{t.message}</span>
                     {t.description && (
-                      <span className="text-xs text-[var(--text-muted)] leading-relaxed">
+                      <span className="text-xs text-(--text-muted) leading-relaxed">
                         {t.description}
                       </span>
                     )}
@@ -72,7 +72,7 @@ export function ToastProvider({ children }) {
                 </div>
                 <button
                   onClick={() => removeToast(t.id)}
-                  className="text-[var(--text-muted)] hover:text-[var(--bg-card-raised)] rounded-full p-1 cursor-pointer shrink-0"
+                  className="text-(--text-muted) hover:text-(--bg-card-raised) rounded-full p-1 cursor-pointer shrink-0"
                 >
                   <X className="h-4 w-4" />
                 </button>

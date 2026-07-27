@@ -20,18 +20,18 @@ export function ChartsWrapper({
   return (
     <div
       className={cn(
-        "rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-paper)] p-5 flex flex-col gap-4 dark:bg-[var(--bg-card)] dark:border-[var(--bg-card-raised)] text-start shadow-sm select-none",
+        "rounded-md border border-(--border-default) bg-paper p-5 flex flex-col gap-4 dark:bg-(--bg-card) dark:border-(--bg-card-raised) text-start shadow-sm select-none",
         className
       )}
     >
       {/* Title & Legend Header */}
       <div className="flex items-center justify-between gap-3 shrink-0">
-        <span className="text-sm font-semibold text-[var(--text-primary)]">
+        <span className="text-sm font-semibold text-(--text-primary)">
           {title}
         </span>
         <div className="flex items-center gap-3">
           {series.map((item, idx) => (
-            <div key={idx} className="flex items-center gap-1.5 text-xs text-[var(--text-secondary)]">
+            <div key={idx} className="flex items-center gap-1.5 text-xs text-(--text-secondary)">
               <div
                 className="w-2.5 h-2.5 rounded-full shrink-0"
                 style={{ backgroundColor: chartColors[idx % chartColors.length] }}
@@ -43,18 +43,18 @@ export function ChartsWrapper({
       </div>
 
       {/* Main Plot Area */}
-      <div className="h-[200px] w-full flex items-end justify-between gap-4 border-b border-l border-[var(--border-default)] pb-2 ps-2 relative dark:border-[var(--bg-card-raised)]">
+      <div className="h-50 w-full flex items-end justify-between gap-4 border-b border-l border-(--border-default) pb-2 ps-2 relative dark:border-(--bg-card-raised)">
         {type === "bar" && (
           <div className="w-full h-full flex items-end justify-around pt-4">
             {labels.map((lbl, lIdx) => (
-              <div key={lIdx} className="flex flex-col items-center gap-1 flex-1 max-w-[60px]">
-                <div className="w-full flex items-end gap-1 justify-center h-[140px]">
+              <div key={lIdx} className="flex flex-col items-center gap-1 flex-1 max-w-15">
+                <div className="w-full flex items-end gap-1 justify-center h-35">
                   {series.map((s, sIdx) => {
                     const val = s.data[lIdx] || 10
                     return (
                       <div
                         key={sIdx}
-                        className="w-3 rounded-t-[var(--radius-xs)] transition-all duration-300"
+                        className="w-3 rounded-t-xs transition-all duration-300"
                         style={{
                           height: `${val}%`,
                           backgroundColor: chartColors[sIdx % chartColors.length]
@@ -63,7 +63,7 @@ export function ChartsWrapper({
                     )
                   })}
                 </div>
-                <span className="text-[10px] text-[var(--text-muted)] mt-1 truncate max-w-full">
+                <span className="text-[10px] text-(--text-muted) mt-1 truncate max-w-full">
                   {lbl}
                 </span>
               </div>
@@ -125,10 +125,10 @@ export function ChartsWrapper({
               />
             </svg>
             <div className="absolute flex flex-col text-center leading-none select-none">
-              <span className="text-xl font-bold font-mono text-[var(--text-primary)]">
+              <span className="text-xl font-bold font-mono text-(--text-primary)">
                 {series[0]?.data?.[0] || "100%"}
               </span>
-              <span className="text-[10px] text-[var(--text-muted)] mt-1">إجمالي الحالات</span>
+              <span className="text-[10px] text-(--text-muted) mt-1">إجمالي الحالات</span>
             </div>
           </div>
         )}
@@ -136,7 +136,7 @@ export function ChartsWrapper({
 
       {/* Optional bottom axis labels for area trend */}
       {type === "area" && labels.length > 0 && (
-        <div className="flex justify-between px-2 text-[10px] text-[var(--text-muted)]">
+        <div className="flex justify-between px-2 text-[10px] text-(--text-muted)">
           {labels.map((lbl, idx) => (
             <span key={idx}>{lbl}</span>
           ))}

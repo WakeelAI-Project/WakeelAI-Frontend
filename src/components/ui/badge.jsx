@@ -1,4 +1,4 @@
-import React from "react"
+﻿import React from "react"
 import { cva } from "class-variance-authority"
 import { cn } from "../../lib/utils"
 
@@ -7,18 +7,18 @@ const badgeVariants = cva(
   {
     variants: {
       variant: {
-        ai: "bg-[var(--ai-surface)] text-[var(--ai-primary)] border-[var(--border-default)]",
-        legal: "bg-[var(--legal-surface)] text-[var(--legal-primary)] border-[var(--border-default)]",
-        employee: "bg-[var(--bg-card-raised)] text-[var(--text-secondary)] border-[var(--border-default)]",
-        leave: "bg-[var(--ai-surface)] text-[var(--ai-primary)] border-[var(--border-default)]",
-        document: "bg-[var(--legal-surface)] text-[var(--legal-primary)] border-[var(--border-default)]",
-        success: "bg-[var(--status-success-bg)] text-[var(--status-success-fg)] border-[var(--border-default)]",
-        warning: "bg-[var(--status-warning-bg)] text-[var(--status-warning-fg)] border-[var(--border-default)]",
-        error: "bg-[var(--status-error-bg)] text-[var(--status-error-fg)] border-[var(--border-default)]",
-        info: "bg-[var(--status-info-bg)] text-[var(--status-info-fg)] border-[var(--border-default)]"
+        ai: "bg-(--ai-surface) text-(--ai-primary) border-(--border-default)",
+        legal: "bg-(--legal-surface) text-(--legal-primary) border-(--border-default)",
+        employee: "bg-(--bg-card-raised) text-(--text-secondary) border-(--border-default)",
+        leave: "bg-(--ai-surface) text-(--ai-primary) border-(--border-default)",
+        document: "bg-(--legal-surface) text-(--legal-primary) border-(--border-default)",
+        success: "bg-(--status-success-bg) text-(--status-success-fg) border-(--border-default)",
+        warning: "bg-(--status-warning-bg) text-(--status-warning-fg) border-(--border-default)",
+        error: "bg-(--status-error-bg) text-(--status-error-fg) border-(--border-default)",
+        info: "bg-(--status-info-bg) text-(--status-info-fg) border-(--border-default)"
       },
       shape: {
-        badge: "rounded-[var(--radius-xs)]",
+        badge: "rounded-xs",
         pill: "rounded-full"
       }
     },

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+﻿import React, { useEffect } from "react"
 import { AnimatePresence, motion, useDragControls, useMotionValue } from "framer-motion"
 import { X } from "lucide-react"
 import { cn } from "../../lib/utils"
@@ -36,7 +36,7 @@ export function BottomSheet({ isOpen, onClose, children, title, className }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-[var(--overlay-scrim)]"
+            className="fixed inset-0 bg-(--overlay-scrim)"
           />
 
           {/* Sheet Panel */}
@@ -53,7 +53,7 @@ export function BottomSheet({ isOpen, onClose, children, title, className }) {
             onDragEnd={handleDragEnd}
             style={{ y }}
             className={cn(
-              "relative z-50 w-full max-w-lg bg-[var(--color-paper)] rounded-t-[var(--radius-xl)] shadow-[var(--shadow-4)] border-t border-[var(--border-default)] flex flex-col max-h-[85vh] dark:bg-[var(--bg-card-raised)] dark:border-[var(--border-emphasis)] overflow-hidden",
+              "relative z-50 w-full max-w-lg bg-paper rounded-t-xl shadow-(--shadow-4) border-t border-(--border-default) flex flex-col max-h-[85vh] dark:bg-(--bg-card-raised) dark:border-(--border-emphasis) overflow-hidden",
               className
             )}
           >
@@ -62,14 +62,14 @@ export function BottomSheet({ isOpen, onClose, children, title, className }) {
               onPointerDown={(e) => dragControls.start(e)}
               className="flex justify-center py-3 cursor-grab active:cursor-grabbing select-none shrink-0"
             >
-              <div className="w-10 h-1 rounded-full bg-[var(--text-muted)] dark:bg-[var(--text-secondary)]" />
+              <div className="w-10 h-1 rounded-full bg-(--text-muted) dark:bg-(--text-secondary)" />
             </div>
 
             {/* Header */}
             {(title || onClose) && (
-              <div className="px-5 pb-3 flex items-center justify-between border-b border-[var(--border-default)] dark:border-[var(--border-emphasis)] shrink-0">
+              <div className="px-5 pb-3 flex items-center justify-between border-b border-(--border-default) dark:border-(--border-emphasis) shrink-0">
                 {title ? (
-                  <h3 className="text-base font-semibold text-[var(--text-primary)] text-start">
+                  <h3 className="text-base font-semibold text-(--text-primary) text-start">
                     {title}
                   </h3>
                 ) : (
@@ -78,7 +78,7 @@ export function BottomSheet({ isOpen, onClose, children, title, className }) {
                 <button
                   type="button"
                   onClick={onClose}
-                  className="rounded-full p-1.5 hover:bg-[var(--bg-page-alt)] text-[var(--text-muted)] hover:text-[var(--text-primary)] dark:hover:bg-[var(--border-emphasis)] cursor-pointer"
+                  className="rounded-full p-1.5 hover:bg-(--bg-page-alt) text-(--text-muted) hover:text-(--text-primary) dark:hover:bg-(--border-emphasis) cursor-pointer"
                 >
                   <X className="h-4 w-4" />
                 </button>

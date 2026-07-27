@@ -1,4 +1,4 @@
-import React from "react"
+﻿import React from "react"
 import { Mail, Phone, Calendar } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 import { Badge } from "../ui/badge"
@@ -21,23 +21,23 @@ export function EmployeeCard({
     <div
       onClick={onClick}
       className={cn(
-        "rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--bg-card)] p-5 flex flex-col justify-between gap-4 hover:bg-[var(--bg-card-raised)] transition-all cursor-pointer text-start shadow-sm select-none",
+        "rounded-md border border-(--border-default) bg-(--bg-card) p-5 flex flex-col justify-between gap-4 hover:bg-(--bg-card-raised) transition-all cursor-pointer text-start shadow-sm select-none",
         className
       )}
     >
       {/* Header Info */}
       <div className="flex items-start gap-4">
         {/* Neutral avatar ring */}
-        <Avatar className="h-12 w-12 border-2 border-[var(--border-emphasis)] shrink-0">
+        <Avatar className="h-12 w-12 border-2 border-(--border-emphasis) shrink-0">
           <AvatarImage src={avatarUrl} />
-          <AvatarFallback className="bg-[var(--bg-card-raised)] text-[var(--text-secondary)]">
+          <AvatarFallback className="bg-(--bg-card-raised) text-(--text-secondary)">
             {name.split(" ").map((n) => n[0]).slice(0, 2).join("")}
           </AvatarFallback>
         </Avatar>
 
         <div className="flex flex-col flex-1 overflow-hidden">
           <div className="flex items-center justify-between gap-2">
-            <span className="font-semibold text-sm text-[var(--text-primary)] truncate">
+            <span className="font-semibold text-sm text-(--text-primary) truncate">
               {name}
             </span>
             <Badge
@@ -47,13 +47,13 @@ export function EmployeeCard({
               {statusText || status}
             </Badge>
           </div>
-          <span className="text-xs text-[var(--text-secondary)] mt-0.5">{role}</span>
-          <span className="text-[10px] text-[var(--text-secondary)] mt-1 font-medium">{department}</span>
+          <span className="text-xs text-(--text-secondary) mt-0.5">{role}</span>
+          <span className="text-[10px] text-(--text-secondary) mt-1 font-medium">{department}</span>
         </div>
       </div>
 
       {/* Details contact information */}
-      <div className="border-t border-[var(--border-default)] pt-3 flex flex-col gap-2 text-xs text-[var(--text-secondary)]">
+      <div className="border-t border-(--border-default) pt-3 flex flex-col gap-2 text-xs text-(--text-secondary)">
         {email && (
           <div className="flex items-center gap-2">
             <Mail className="h-3.5 w-3.5 opacity-60" />
@@ -67,7 +67,7 @@ export function EmployeeCard({
           </div>
         )}
         {hireDate && (
-          <div className="flex items-center gap-2 mt-1 pt-1 border-t border-[var(--border-default)] text-[10px] text-[var(--text-secondary)]">
+          <div className="flex items-center gap-2 mt-1 pt-1 border-t border-(--border-default) text-[10px] text-(--text-secondary)">
             <Calendar className="h-3.5 w-3.5 opacity-60" />
             <span>تعيين: {hireDate}</span>
           </div>

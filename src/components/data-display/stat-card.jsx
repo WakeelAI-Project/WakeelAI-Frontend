@@ -1,4 +1,4 @@
-import React from "react"
+﻿import React from "react"
 import { ArrowUpRight, ArrowDownRight } from "lucide-react"
 import { cn } from "../../lib/utils"
 
@@ -11,23 +11,23 @@ export function StatCard({
   className
 }) {
   const domainColors = {
-    neutral: "text-[var(--border-emphasis)] dark:text-[var(--bg-disabled)]",
-    AI: "text-[var(--ai-primary)] dark:text-[var(--ai-primary)]",
-    legal: "text-[var(--accent-primary)] dark:text-[var(--accent-primary-hover)]",
-    employee: "text-[var(--brand-primary)] dark:text-[var(--brand-primary-hover)]",
-    leave: "text-[var(--ai-primary)] dark:text-[var(--ai-primary)]",
-    document: "text-[var(--accent-primary-active)] dark:text-[var(--accent-primary-hover)]",
+    neutral: "text-(--border-emphasis) dark:text-(--bg-disabled)",
+    AI: "text-(--ai-primary) dark:text-(--ai-primary)",
+    legal: "text-(--accent-primary) dark:text-(--accent-primary-hover)",
+    employee: "text-(--brand-primary) dark:text-(--brand-primary-hover)",
+    leave: "text-(--ai-primary) dark:text-(--ai-primary)",
+    document: "text-(--accent-primary-active) dark:text-(--accent-primary-hover)",
   }
 
   return (
     <div
       className={cn(
-        "rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--color-paper)] p-5 flex flex-col gap-3 dark:bg-[var(--bg-card)] dark:border-[var(--bg-card-raised)] text-start shadow-sm select-none",
+        "rounded-md border border-(--border-default) bg-paper p-5 flex flex-col gap-3 dark:bg-(--bg-card) dark:border-(--bg-card-raised) text-start shadow-sm select-none",
         className
       )}
     >
       {/* Title */}
-      <span className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">
+      <span className="text-xs font-semibold text-(--text-secondary) uppercase tracking-wider">
         {title}
       </span>
 
@@ -47,8 +47,8 @@ export function StatCard({
             className={cn(
               "flex items-center gap-0.5 text-xs font-semibold px-2 py-0.5 rounded-full",
               trend.isPositive
-                ? "bg-emerald-50 text-[var(--status-success-fg)] dark:bg-emerald-950/20"
-                : "bg-rose-50 text-[var(--status-error-fg)] dark:bg-rose-950/20"
+                ? "bg-emerald-50 text-(--status-success-fg) dark:bg-emerald-950/20"
+                : "bg-rose-50 text-(--status-error-fg) dark:bg-rose-950/20"
             )}
           >
             {trend.isPositive ? (
@@ -63,7 +63,7 @@ export function StatCard({
 
       {/* Description / Caption */}
       {description && (
-        <span className="text-xs text-[var(--text-muted)] leading-relaxed truncate">
+        <span className="text-xs text-(--text-muted) leading-relaxed truncate">
           {description}
         </span>
       )}
