@@ -1,8 +1,9 @@
-﻿import React from "react"
+import React, { useState, useRef, useEffect } from "react"
 import { Bell, Moon, Search, Sparkles, Sun, ToggleLeft, ToggleRight } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 import { Button } from "../ui/button"
 import { useTheme } from "../providers/theme-provider"
+import { useNavigate } from "react-router"
 
 export function Topbar({
   title,
@@ -11,9 +12,28 @@ export function Topbar({
   onSearchClick,
   onAssistantToggle,
   notificationsCount = 3,
-  userInitials = "MH"
+  userInitials = "MH",
+  onLogout
 }) {
   const { theme, toggleTheme, contrast, toggleContrast } = useTheme()
+  const [showMenu, setShowMenu] = useState(false)
+  const menuRef = useRef(null)
+  const navigate = useNavigate()
+
+  const handleLogout = async () => {
+    await onLogout()
+    navigate("/login", { replace: true })
+  }
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setShowMenu(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
 
   return (
     <header className="h-16 w-full bg-(--bg-card) border-b border-(--border-default) px-6 flex items-center justify-between shrink-0">
@@ -94,10 +114,34 @@ export function Topbar({
 
         <div className="w-px h-5 bg-(--border-default) hidden sm:block" />
 
-        <Avatar className="h-8 w-8 cursor-pointer select-none">
-          <AvatarImage src="" />
-          <AvatarFallback>{userInitials}</AvatarFallback>
-        </Avatar>
+        <div className="relative" ref={menuRef}>
+          <Avatar
+            className="h-8 w-8 cursor-pointer select-none ring-offset-2 ring-blue-500 hover:ring-2 transition-all"
+            onClick={() => setShowMenu(!showMenu)}
+          >
+            <AvatarImage src="" />
+            <AvatarFallback>{userInitials}</AvatarFallback>
+          </Avatar>
+
+          {showMenu && (
+            <div className={`absolute ${isRtl ? "left-0" : "right-0"} mt-2 w-48 rounded-sm border border-(--border-default) bg-(--bg-card) p-1 shadow-md z-50`}>
+              <div className="px-3 py-1.5 text-xs border-b border-(--border-default)">
+                <p className="font-semibold text-(--text-primary)">
+                  {isRtl ? "خيارات الحساب" : "Account Settings"}
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  setShowMenu(false)
+                  handleLogout()
+                }}
+                className="w-full text-start px-3 py-2 text-sm text-red-500 hover:bg-(--bg-card-subtle) rounded-sm transition-colors cursor-pointer"
+              >
+                {isRtl ? "تسجيل الخروج" : "Logout"}
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </header>
   )
