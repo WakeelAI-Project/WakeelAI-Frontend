@@ -13,6 +13,10 @@ import { ContractsPage } from "./pages/contracts"
 import { DocumentsPage } from "./pages/documents"
 import { EmployeesPage } from "./pages/employees"
 import { LeavePage } from "./pages/leave"
+import { LoginPage } from "./pages/auth/login"
+import { RegisterPage } from "./pages/auth/register"
+import { HrDashboardPage } from "./pages/hr-dashboard"
+import { OwnerDashboardPage } from "./pages/owner-dashboard"
 import { ProtectedRoute } from "./features/auth/components/ProtectedRoute"
 import { GuestRoute } from "./features/auth/components/GuestRoute"
 import { useAuth } from "./features/auth/hooks/use-auth"
@@ -54,7 +58,8 @@ function DashboardShell() {
     [activeId]
   )
 
-  const rolePrefix = currentUser?.role?.toLowerCase().includes("hr") ? "/hr" : "/owner"
+  const isHrUser = currentUser?.role?.toLowerCase().includes("hr")
+  const rolePrefix = isHrUser ? "/hr" : "/owner"
 
   const handleNavSelect = (navId, query) => {
     navigate(`${rolePrefix}/${navId}`)
@@ -72,6 +77,7 @@ function DashboardShell() {
         activeId={activeId}
         isRtl={isRtl}
         companyName={isRtl ? activeCompany.name : activeCompany.nameEn}
+        rolePrefix={rolePrefix}
         onNavSelect={(navId) => navigate(`${rolePrefix}/${navId}`)}
       />
 
@@ -81,7 +87,7 @@ function DashboardShell() {
           titleAr={activeItem.labelAr}
           isRtl={isRtl}
           onSearchClick={() => setIsCommandOpen(true)}
-          onAssistantToggle={() => navigate(`${rolePrefix}/assistant`)}
+          onAssistantToggle={isHrUser ? () => navigate(`${rolePrefix}/assistant`) : undefined}
           notificationsCount={notifications.length}
           userInitials={currentUser.initials}
           onLogout={logout}
@@ -119,8 +125,23 @@ const router = createBrowserRouter([
     // Guest Routes (restricted if already authenticated)
     element: <GuestRoute />,
     children: [
-      { path: "/login", element: <div id="login-placeholder">Login Page Placeholder</div> },
+      { path: "/login", element: <LoginPage /> },
+      { path: "/register", element: <RegisterPage /> },
       { path: "/", element: <Navigate to="/login" replace /> }
+    ]
+  },
+  {
+    // Owner Protected Subtree
+    path: "/owner",
+    element: <ProtectedRoute allowedRoles={["Owner"]} />,
+    children: [
+      {
+        element: <DashboardShell />,
+        children: [
+          { path: "", element: <Navigate to="dashboard" replace /> },
+          { path: "dashboard", element: <RouteWrapper Component={OwnerDashboardPage} /> }
+        ]
+      }
     ]
   },
   {
@@ -132,7 +153,7 @@ const router = createBrowserRouter([
         element: <DashboardShell />,
         children: [
           { path: "", element: <Navigate to="dashboard" replace /> },
-          { path: "dashboard", element: <RouteWrapper Component={EmployeesPage} /> },
+          { path: "dashboard", element: <RouteWrapper Component={HrDashboardPage} /> },
           { path: "employees", element: <RouteWrapper Component={EmployeesPage} /> },
           { path: "contracts", element: <RouteWrapper Component={ContractsPage} /> },
           { path: "leave", element: <RouteWrapper Component={LeavePage} /> },

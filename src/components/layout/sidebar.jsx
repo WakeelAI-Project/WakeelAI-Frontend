@@ -16,6 +16,7 @@ import { cn } from "../../lib/utils"
 import { SealMark } from "../brand/seal-mark"
 
 export const NAV_ITEMS = [
+  { id: "dashboard", label: "Dashboard", labelAr: "لوحة التحكم", icon: Building2 },
   { id: "employees", label: "Employees", labelAr: "الموظفون", icon: Users },
   { id: "contracts", label: "Contracts", labelAr: "العقود", icon: FileText },
   { id: "leave", label: "Leave", labelAr: "الإجازات", icon: Calendar },
@@ -30,8 +31,13 @@ export function Sidebar({
   onNavSelect,
   isRtl = true,
   companyName = "الشركة المصرية للمقاولات",
-  onCompanySwitch
+  onCompanySwitch,
+  rolePrefix = ""
 }) {
+  const visibleItems = rolePrefix === "/owner"
+    ? NAV_ITEMS.filter((item) => item.id === "dashboard")
+    : NAV_ITEMS
+
   return (
     <aside className="w-60 xl:w-66 h-screen bg-(--bg-sidebar) text-(--text-on-brand) flex flex-col justify-between select-none border-e border-(--brand-primary-hover) shrink-0">
       <div className="p-6 flex items-center gap-3 border-b border-(--brand-primary-hover)">
@@ -45,14 +51,14 @@ export function Sidebar({
       </div>
 
       <nav className="flex-1 py-4 px-3 overflow-y-auto space-y-1">
-        {NAV_ITEMS.map((item) => {
+        {visibleItems.map((item) => {
           const isActive = item.id === activeId
           const Icon = item.icon
 
           return (
             <NavLink
               key={item.id}
-              to={`/${item.id}`}
+              to={`${rolePrefix}/${item.id}`}
               onClick={() => onNavSelect?.(item.id)}
               className={cn(
                 "relative z-0 w-full flex items-center gap-3 overflow-hidden px-3 py-2.5 rounded-sm text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-paper select-none text-start cursor-pointer",

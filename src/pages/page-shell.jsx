@@ -5,7 +5,7 @@ export function PageShell({ eyebrow, eyebrowAr, title, titleAr, description, des
     <main className="flex-1 overflow-y-auto bg-[var(--bg-page)]">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 p-6 pb-16">
         <header className="flex flex-col gap-2 text-start">
-          <span className="text-xs font-semibold uppercase tracking-wider text-[var(--ai-primary)]">
+          <span className="text-xs font-semibold uppercase tracking-wider text-[var(--brand-primary)]">
             {isRtl ? eyebrowAr : eyebrow}
           </span>
           <h2 className="font-display text-3xl font-semibold text-[var(--text-primary)]">
