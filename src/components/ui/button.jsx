@@ -9,8 +9,8 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        primary: "bg-(--brand-primary) text-(--text-on-brand) hover:bg-(--brand-primary-hover) active:bg-(--brand-primary-active) shadow-(--shadow-1)",
-        legal: "bg-(--official-primary) text-(--text-on-brand) hover:bg-(--brand-primary-hover) active:bg-(--brand-primary-active) shadow-(--shadow-1)",
+        primary: "bg-(--brand-primary) text-(--text-inverse) hover:bg-(--brand-primary-hover) active:bg-(--brand-primary-active) shadow-(--shadow-1)",
+        legal: "bg-(--official-primary) text-(--text-inverse) hover:bg-(--brand-primary-hover) active:bg-(--brand-primary-active) shadow-(--shadow-1)",
         ai: "bg-(--ai-primary) text-(--text-on-accent) hover:bg-(--accent-primary-hover) active:bg-(--accent-primary-active) shadow-(--shadow-1)",
         secondary: "bg-(--bg-card) text-(--text-primary) border border-(--border-default) hover:bg-(--bg-card-raised) active:bg-(--bg-page-alt)",
         ghost: "text-(--brand-primary) hover:bg-(--bg-page-alt) active:bg-(--bg-card-raised)",

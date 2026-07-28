@@ -1,11 +1,11 @@
 import React from "react"
 import { Link } from "react-router"
-import { Scale } from "lucide-react"
+import { Moon, Scale, Sun } from "lucide-react"
 import { SealMark } from "../brand/seal-mark"
 import { useTheme } from "../providers/theme-provider"
 
 export function AuthLayout({ title, titleAr, description, descriptionAr, children }) {
-  const { direction, toggleDirection } = useTheme()
+  const { direction, theme, toggleDirection, toggleTheme } = useTheme()
   const isRtl = direction === "rtl"
 
   return (
@@ -43,6 +43,15 @@ export function AuthLayout({ title, titleAr, description, descriptionAr, childre
               <SealMark className="h-9 w-9" />
               <span className="font-display text-lg font-semibold">Wakeel AI</span>
             </Link>
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className="ms-auto me-2 inline-flex h-8 w-8 items-center justify-center rounded-sm border border-(--border-default) bg-(--bg-card-subtle) text-(--text-secondary) transition-colors hover:text-(--text-primary) lg:ms-0"
+              aria-label={isRtl ? "تبديل المظهر" : "Toggle theme"}
+              title={isRtl ? "تبديل المظهر" : "Toggle theme"}
+            >
+              {theme === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+            </button>
             <button
               type="button"
               onClick={toggleDirection}
