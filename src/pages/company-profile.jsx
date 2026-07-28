@@ -1,5 +1,6 @@
 import React, { useState } from "react"
-import { BookOpen, Briefcase, Building2, Landmark, Mail, Pencil, Save, ShieldCheck, X } from "lucide-react"
+import { BookOpen, Briefcase, Landmark, Mail, Pencil, Save, ShieldCheck, X } from "lucide-react"
+import { LogoUploader } from "../features/company/components/LogoUploader"
 import { useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
 import { Badge } from "../components/ui/badge"
@@ -54,6 +55,7 @@ export function CompanyProfilePage() {
         : {}),
     })
   )
+  const [logo, setLogo] = useState(null) // staged File; null means use company.logoUrl
   const {
     register,
     handleSubmit,
@@ -76,7 +78,7 @@ export function CompanyProfilePage() {
 
   const saveCompany = async (values) => {
     const safeUpdates = await saveMockCompanyProfile(values)
-    setCompany((currentCompany) => ({ ...currentCompany, ...safeUpdates }))
+    setCompany((currentCompany) => ({ ...currentCompany, ...safeUpdates, logoUrl: logo ? URL.createObjectURL(logo) : currentCompany.logoUrl }))
     setIsEditing(false)
     toast({
       type: "success",
@@ -110,13 +112,13 @@ export function CompanyProfilePage() {
     >
       <form className="flex flex-col gap-6" onSubmit={handleSubmit(saveCompany)} noValidate>
         <section className="rounded-md border border-(--border-default) bg-(--bg-card) p-6 text-start shadow-(--shadow-1)">
-          <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-            <div
-              className="flex h-20 w-20 shrink-0 items-center justify-center rounded-lg border border-(--border-default) bg-(--official-surface) text-(--legal-primary)"
-              role="img"
-              aria-label={t("profile.company.logoLabel", { name: displayValue(company.name) })}
-            >
-              <Building2 className="h-9 w-9" aria-hidden="true" />
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
+            <div className="w-full sm:w-52 shrink-0">
+              <LogoUploader
+                currentLogo={company.logoUrl ?? null}
+                value={logo}
+                onChange={setLogo}
+              />
             </div>
 
             <div className="min-w-0 flex-1">
