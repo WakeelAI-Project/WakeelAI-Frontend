@@ -350,7 +350,7 @@ export async function refreshAccessToken(refreshToken) {
     // We decode it minimally — the payload is the second segment.
     try {
       const parts = refreshToken.split(".");
-      if (parts.length !== 3) throw new Error("Invalid mock token");
+      if (parts.length !== 3) throw new Error("Invalid mock token", { cause: error });
 
       // Re-issue a fresh access token for the same sub
       const payloadStr = atob(parts[1].replaceAll("-", "+").replaceAll("_", "/"));
