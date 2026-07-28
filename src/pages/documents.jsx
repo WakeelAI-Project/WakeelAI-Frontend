@@ -3,17 +3,18 @@ import { DocumentCard } from "../components/legal/document-card"
 import { FileUpload } from "../components/forms/file-upload"
 import { documents } from "../data/mock/dashboard"
 import { PageShell } from "./page-shell"
+import { useTranslation } from "react-i18next"
+import { useLocale } from "../hooks/use-locale"
 
-export function DocumentsPage({ isRtl }) {
+export function DocumentsPage() {
+  const { t } = useTranslation()
+  const { isRtl } = useLocale()
+
   return (
     <PageShell
-      isRtl={isRtl}
-      eyebrow="Document Vault"
-      eyebrowAr="خزنة المستندات"
-      title="Documents"
-      titleAr="المستندات"
-      description="A single place for official templates, uploaded files, and AI-generated drafts."
-      descriptionAr="مكان واحد للنماذج الرسمية والملفات المرفوعة والمسودات المولدة بالذكاء الاصطناعي."
+      eyebrow={t("documents.vault")}
+      title={t("documents.title")}
+      description={t("documents.description")}
     >
       <section className="grid grid-cols-1 gap-4">
         {documents.map((document) => (
@@ -27,7 +28,7 @@ export function DocumentsPage({ isRtl }) {
         ))}
       </section>
 
-      <FileUpload label={isRtl ? "إضافة مستند جديد" : "Add New Document"} />
+      <FileUpload label={t("documents.addNewDoc")} />
     </PageShell>
   )
 }

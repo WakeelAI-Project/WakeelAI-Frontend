@@ -1,7 +1,8 @@
-﻿import React from "react"
+import React from "react"
 import { Calendar, User, Clock } from "lucide-react"
 import { Badge } from "../ui/badge"
 import { cn } from "../../lib/utils"
+import { useTranslation } from "react-i18next"
 
 export function LeaveCard({
   employeeName,
@@ -14,6 +15,8 @@ export function LeaveCard({
   onClick,
   className
 }) {
+  const { t } = useTranslation()
+
   return (
     <div
       onClick={onClick}
@@ -48,17 +51,17 @@ export function LeaveCard({
 
       <div className="flex items-center justify-between border-t border-(--border-default) pt-3 text-xs">
         <div className="flex flex-col gap-0.5">
-          <span className="text-(--text-secondary)">الفترة الزمنية</span>
+          <span className="text-(--text-secondary)">{t("leave.periodLabel")}</span>
           <span className="font-medium text-(--text-primary)">
-            {startDate} إلى {endDate}
+            {startDate} {t("leave.to")} {endDate}
           </span>
         </div>
 
         <div className="flex flex-col gap-0.5 text-end">
-          <span className="text-(--text-secondary)">مدة الإجازة</span>
+          <span className="text-(--text-secondary)">{t("leave.durationLabel")}</span>
           <span className="font-medium text-(--ai-primary) flex items-center gap-1">
             <Clock className="h-3.5 w-3.5" />
-            {daysCount} أيام
+            {daysCount} {t("leave.days")}
           </span>
         </div>
       </div>

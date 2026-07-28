@@ -3,14 +3,17 @@ import { motion } from "framer-motion";
 import { AlertTriangle, HelpCircle, Mic, Sparkles, User } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { SealMark } from "../brand/seal-mark";
+import { useTranslation } from "react-i18next";
+import { useLocale } from "../../hooks/use-locale";
 
 export function AiMessageBubble({
   message,
   citation,
   confidence,
   isLowConfidence = false,
-  isRtl = true,
 }) {
+  const { isRtl, t } = useLocale();
+
   return (
     <div className="flex flex-col gap-2 max-w-[85%] text-start self-start">
       <div className="flex items-center gap-2">
@@ -49,9 +52,7 @@ export function AiMessageBubble({
         <div className="flex items-center gap-2 border border-(--status-warning-fg) bg-(--status-warning-bg) p-2.5 rounded-md text-xs text-(--status-warning-fg)">
           <AlertTriangle className="h-4 w-4 shrink-0" />
           <span>
-            {isRtl
-              ? "هذا الجزء يحتاج مراجعة بشرية"
-              : "This section requires human review"}
+            {t("assistant.humanReview")}
           </span>
         </div>
       )}
@@ -59,12 +60,14 @@ export function AiMessageBubble({
   );
 }
 
-export function UserMessageBubble({ message, isRtl = true }) {
+export function UserMessageBubble({ message }) {
+  const { isRtl, t } = useLocale();
+
   return (
     <div className="flex flex-col gap-2 max-w-[85%] text-start self-end">
       <div className="flex items-center gap-2 justify-end">
         <span className="text-[10px] font-semibold text-(--text-secondary)">
-          {isRtl ? "أنت" : "You"}
+          {t("assistant.you")}
         </span>
         <div className="w-6 h-6 rounded-full bg-(--bg-page-alt) text-(--text-primary) flex items-center justify-center border border-(--border-default) shrink-0">
           <User className="h-3.5 w-3.5" />
@@ -82,7 +85,9 @@ export function UserMessageBubble({ message, isRtl = true }) {
   );
 }
 
-export function AiThinkingState({ label, isRtl = true }) {
+export function AiThinkingState({ label }) {
+  const { isRtl, t } = useLocale();
+
   return (
     <div className="flex items-center gap-3 self-start text-start py-2 select-none">
       <div className="w-8 h-8 rounded-full bg-(--ai-surface) flex items-center justify-center relative shrink-0">
@@ -90,10 +95,7 @@ export function AiThinkingState({ label, isRtl = true }) {
         <Sparkles className="h-4 w-4 text-(--ai-primary) relative z-10" />
       </div>
       <span className="text-xs text-(--ai-primary) font-medium">
-        {label ||
-          (isRtl
-            ? "جاري البحث في قانون العمل المصري..."
-            : "Searching Egyptian Labor Law...")}
+        {label || t("assistant.searching")}
       </span>
     </div>
   );

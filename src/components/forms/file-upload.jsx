@@ -1,18 +1,21 @@
-﻿import React, { useState, useRef } from "react";
+import React, { useState, useRef } from "react";
 import { UploadCloud, File, X } from "lucide-react";
 import { cn } from "../../lib/utils";
+import { useTranslation } from "react-i18next";
+import { useLocale } from "../../hooks/use-locale";
 
 export function FileUpload({
   label,
   onFileDrop,
   maxSizeMB = 10,
   acceptedTypes = "*",
-  isRtl = true,
   className,
 }) {
   const [isDragActive, setIsDragActive] = useState(false);
   const [files, setFiles] = useState([]);
   const fileInputRef = useRef(null);
+  const { t } = useTranslation();
+  const { isRtl } = useLocale();
 
   const handleDrag = (e) => {
     e.preventDefault();
@@ -82,14 +85,10 @@ export function FileUpload({
         />
         <UploadCloud className="h-10 w-10 text-(--text-muted) mb-3 shrink-0" />
         <span className="text-sm font-semibold text-(--text-primary)">
-          {isRtl
-            ? "اسحب الملفات وأفلتها هنا أو اضغط للاختيار"
-            : "Drag and drop files here or click to browse"}
+          {t("documents.dragDrop")}
         </span>
         <span className="text-xs text-(--text-muted) mt-1.5">
-          {isRtl
-            ? `حجم الملف الأقصى: ${maxSizeMB} ميجابايت`
-            : `Maximum file size: ${maxSizeMB} MB`}
+          {t("documents.maxSize", { size: maxSizeMB })}
         </span>
       </div>
 

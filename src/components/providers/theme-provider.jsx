@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react"
+import { useLocale } from "../../hooks/use-locale"
 
 const ThemeContext = createContext(undefined)
 
@@ -9,9 +10,9 @@ export function ThemeProvider({ children }) {
   const [contrast, setContrastState] = useState(() => {
     return localStorage.getItem("wakeel-contrast") || "normal"
   })
-  const [direction, setDirectionState] = useState(() => {
-    return localStorage.getItem("wakeel-direction") || "rtl"
-  })
+
+  // Read direction dynamically from centralized i18n hook locale status
+  const { direction, changeLanguage } = useLocale()
 
   useEffect(() => {
     const root = document.documentElement
@@ -25,20 +26,14 @@ export function ThemeProvider({ children }) {
     localStorage.setItem("wakeel-contrast", contrast)
   }, [contrast])
 
-  useEffect(() => {
-    const root = document.documentElement
-    root.setAttribute("dir", direction)
-    root.lang = direction === "rtl" ? "ar" : "en"
-    localStorage.setItem("wakeel-direction", direction)
-  }, [direction])
-
   const setTheme = (t) => setThemeState(t)
   const setContrast = (c) => setContrastState(c)
-  const setDirection = (d) => setDirectionState(d)
-
+  
   const toggleTheme = () => setTheme(theme === "light" ? "dark" : "light")
   const toggleContrast = () => setContrast(contrast === "normal" ? "high" : "normal")
-  const toggleDirection = () => setDirection(direction === "rtl" ? "ltr" : "rtl")
+  const toggleDirection = () => {
+    changeLanguage(direction === "rtl" ? "en" : "ar")
+  }
 
   return (
     <ThemeContext.Provider
@@ -48,7 +43,6 @@ export function ThemeProvider({ children }) {
         direction,
         setTheme,
         setContrast,
-        setDirection,
         toggleTheme,
         toggleContrast,
         toggleDirection,

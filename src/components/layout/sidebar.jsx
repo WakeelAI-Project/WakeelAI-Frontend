@@ -1,4 +1,4 @@
-﻿import React from "react"
+import React from "react"
 import { motion } from "framer-motion"
 import { NavLink } from "react-router"
 import {
@@ -14,26 +14,29 @@ import {
 } from "lucide-react"
 import { cn } from "../../lib/utils"
 import { SealMark } from "../brand/seal-mark"
+import { useTranslation } from "react-i18next"
+import { useLocale } from "../../hooks/use-locale"
 
 export const NAV_ITEMS = [
-  { id: "dashboard", label: "Dashboard", labelAr: "لوحة التحكم", icon: Building2 },
-  { id: "employees", label: "Employees", labelAr: "الموظفون", icon: Users },
-  { id: "contracts", label: "Contracts", labelAr: "العقود", icon: FileText },
-  { id: "leave", label: "Leave", labelAr: "الإجازات", icon: Calendar },
-  { id: "compliance", label: "Compliance", labelAr: "الامتثال", icon: ShieldCheck },
-  { id: "documents", label: "Documents", labelAr: "المستندات", icon: FolderOpen },
-  { id: "assistant", label: "AI Assistant", labelAr: "المساعد الذكي", icon: MessageSquareCode },
-  { id: "audit", label: "Audit Log", labelAr: "سجل التدقيق", icon: History }
+  { id: "dashboard", labelKey: "sidebar.dashboard", icon: Building2 },
+  { id: "employees", labelKey: "sidebar.employees", icon: Users },
+  { id: "contracts", labelKey: "sidebar.contracts", icon: FileText },
+  { id: "leave", labelKey: "sidebar.leave", icon: Calendar },
+  { id: "compliance", labelKey: "sidebar.compliance", icon: ShieldCheck },
+  { id: "documents", labelKey: "sidebar.documents", icon: FolderOpen },
+  { id: "assistant", labelKey: "sidebar.assistant", icon: MessageSquareCode },
+  { id: "audit", labelKey: "sidebar.audit", icon: History }
 ]
 
 export function Sidebar({
   activeId,
   onNavSelect,
-  isRtl = true,
   companyName = "الشركة المصرية للمقاولات",
   onCompanySwitch,
   rolePrefix = ""
 }) {
+  const { t } = useTranslation()
+  const { isRtl } = useLocale()
   const visibleItems = rolePrefix === "/owner"
     ? NAV_ITEMS.filter((item) => item.id === "dashboard")
     : NAV_ITEMS
@@ -43,9 +46,9 @@ export function Sidebar({
       <div className="p-6 flex items-center gap-3 border-b border-(--brand-primary-hover)">
         <SealMark className="shrink-0" />
         <div className="flex flex-col text-start leading-none">
-          <span className="font-display text-lg font-semibold tracking-wide">Wakeel AI</span>
+          <span className="font-display text-lg font-semibold tracking-wide">{t("common.appName")}</span>
           <span className="text-[10px] text-(--text-muted) mt-0.5">
-            وكيل الذكاء الاصطناعي
+            {t("common.subTitle")}
           </span>
         </div>
       </div>
@@ -75,7 +78,7 @@ export function Sidebar({
                 />
               )}
               <Icon className="relative z-10 h-5 w-5 shrink-0" />
-              <span className="relative z-10">{isRtl ? item.labelAr : item.label}</span>
+              <span className="relative z-10">{t(item.labelKey)}</span>
             </NavLink>
           )
         })}
@@ -92,7 +95,7 @@ export function Sidebar({
               <span className="text-xs font-semibold truncate text-paper">
                 {companyName}
               </span>
-              <span className="text-[10px] text-(--text-muted)">حساب مفعل</span>
+              <span className="text-[10px] text-(--text-muted)">{t("common.activeAccount")}</span>
             </div>
           </div>
           <ChevronDown className="h-4 w-4 text-(--text-muted) shrink-0" />

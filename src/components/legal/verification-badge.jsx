@@ -1,14 +1,16 @@
-﻿import React from "react"
+import React from "react"
 import { Check } from "lucide-react"
 import { cn } from "../../lib/utils"
+import { useLocale } from "../../hooks/use-locale"
 
 export function VerificationBadge({
   isVerified = true,
   label = "موثق قانونياً",
   labelEn = "Legally Verified",
-  isRtl = true,
   className
 }) {
+  const { isRtl } = useLocale()
+
   return (
     <div
       className={cn(
@@ -17,7 +19,6 @@ export function VerificationBadge({
         className
       )}
     >
-      {/* Abstracted seal mark */}
       <div
         className={cn(
           "w-4 h-4 rounded-full border border-current border-t-transparent border-r-transparent flex items-center justify-center rotate-45 shrink-0",

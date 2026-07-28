@@ -1,8 +1,7 @@
-
 import React, { useMemo, useState } from "react"
 import { createBrowserRouter, RouterProvider, Navigate, Outlet, useLocation, useNavigate } from "react-router"
 import { CommandPalette } from "./components/layout/command-palette"
-import { Sidebar, NAV_ITEMS } from "./components/layout/sidebar"
+import { Sidebar } from "./components/layout/sidebar"
 import { Topbar } from "./components/layout/topbar"
 import { ThemeProvider, useTheme } from "./components/providers/theme-provider"
 import { ToastProvider, useToast } from "./components/ui/toast"
@@ -23,18 +22,11 @@ import { GuestRoute } from "./features/auth/components/GuestRoute"
 import { useAuth } from "./features/auth/hooks/use-auth"
 import { useAuthStore } from "./features/auth/store/auth-store"
 import { configureAuthStore } from "./lib/api"
+import { useLocale } from "./hooks/use-locale"
+import { useTranslation } from "react-i18next"
+import "./i18n" // Load i18n configuration
 
-// Wire the Zustand store into the Axios layer once at module load time.
-// This breaks the api.js ↔ auth-store.js circular dependency by injecting
-// the store reference lazily (after both modules are fully initialized).
 configureAuthStore(useAuthStore.getState)
-
-// Wrapper to dynamically inject the active isRtl state from theme provider into pages
-function RouteWrapper({ Component }) {
-  const { direction } = useTheme()
-  const isRtl = direction === "rtl"
-  return <Component isRtl={isRtl} />
-}
 
 function DashboardShell() {
   const { direction, toggleDirection } = useTheme()
@@ -44,7 +36,8 @@ function DashboardShell() {
   const [isCommandOpen, setIsCommandOpen] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
-  const isRtl = direction === "rtl"
+  const { isRtl, language, changeLanguage } = useLocale()
+  const { t } = useTranslation()
 
   // Merge dynamic authentication data into user state
   const currentUser = useMemo(() => {
@@ -58,13 +51,8 @@ function DashboardShell() {
     }
   }, [authUser, defaultUser])
 
-  // Supports parsing nested routes under /hr/ or /owner/
   const pathParts = location.pathname.split("/")
   const activeId = pathParts[2] || pathParts[1] || "employees"
-  const activeItem = useMemo(
-    () => NAV_ITEMS.find((item) => item.id === activeId) || NAV_ITEMS[0],
-    [activeId]
-  )
 
   const isHrUser = currentUser?.role?.toLowerCase().includes("hr")
   const rolePrefix = isHrUser ? "/hr" : "/owner"
@@ -83,7 +71,6 @@ function DashboardShell() {
     <div className="flex h-screen w-screen overflow-hidden bg-(--bg-page) text-(--text-primary)">
       <Sidebar
         activeId={activeId}
-        isRtl={isRtl}
         companyName={isRtl ? activeCompany.name : activeCompany.nameEn}
         rolePrefix={rolePrefix}
         onNavSelect={(navId) => navigate(`${rolePrefix}/${navId}`)}
@@ -91,9 +78,7 @@ function DashboardShell() {
 
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar
-          title={activeItem.label}
-          titleAr={activeItem.labelAr}
-          isRtl={isRtl}
+          activeId={activeId}
           onSearchClick={() => setIsCommandOpen(true)}
           onAssistantToggle={isHrUser ? () => navigate(`${rolePrefix}/assistant`) : undefined}
           notificationsCount={notifications.length}
@@ -105,9 +90,9 @@ function DashboardShell() {
           <button
             type="button"
             onClick={toggleDirection}
-            className="rounded-sm border border-(--border-default) bg-(--bg-card) px-3 py-1.5 text-xs font-semibold text-(--text-secondary) hover:text-(--text-primary) transition-colors"
+            className="rounded-sm border border-(--border-default) bg-(--bg-card) px-3 py-1.5 text-xs font-semibold text-(--text-secondary) hover:text-(--text-primary) transition-colors cursor-pointer"
           >
-            {isRtl ? "English layout" : "التخطيط العربي"}
+            {isRtl ? t("topbar.englishLayout") : t("topbar.arabicLayout")}
           </button>
         </div>
 
@@ -121,16 +106,13 @@ function DashboardShell() {
         onClose={() => setIsCommandOpen(false)}
         onOpen={() => setIsCommandOpen(true)}
         onNavSelect={handleNavSelect}
-        isRtl={isRtl}
       />
     </div>
   )
 }
 
-// Router configuration using the React Router v7 Data Router API
 const router = createBrowserRouter([
   {
-    // Guest Routes (restricted if already authenticated)
     element: <GuestRoute />,
     children: [
       { path: "/login", element: <LoginPage /> },
@@ -139,7 +121,6 @@ const router = createBrowserRouter([
     ]
   },
   {
-    // Owner Protected Subtree
     path: "/owner",
     element: <ProtectedRoute allowedRoles={["Owner", "Company_Owner"]} />,
     children: [
@@ -147,13 +128,12 @@ const router = createBrowserRouter([
         element: <DashboardShell />,
         children: [
           { path: "", element: <Navigate to="dashboard" replace /> },
-          { path: "dashboard", element: <RouteWrapper Component={OwnerDashboardPage} /> }
+          { path: "dashboard", element: <OwnerDashboardPage /> }
         ]
       }
     ]
   },
   {
-    // HR Protected Subtree
     path: "/hr",
     element: <ProtectedRoute allowedRoles={["HR", "HR & Compliance Lead"]} />,
     children: [
@@ -161,20 +141,19 @@ const router = createBrowserRouter([
         element: <DashboardShell />,
         children: [
           { path: "", element: <Navigate to="dashboard" replace /> },
-          { path: "dashboard", element: <RouteWrapper Component={HrDashboardPage} /> },
-          { path: "employees", element: <RouteWrapper Component={EmployeesPage} /> },
-          { path: "contracts", element: <RouteWrapper Component={ContractsPage} /> },
-          { path: "leave", element: <RouteWrapper Component={LeavePage} /> },
-          { path: "compliance", element: <RouteWrapper Component={CompliancePage} /> },
-          { path: "documents", element: <RouteWrapper Component={DocumentsPage} /> },
-          { path: "assistant", element: <RouteWrapper Component={AssistantPage} /> },
-          { path: "audit", element: <RouteWrapper Component={AuditPage} /> }
+          { path: "dashboard", element: <HrDashboardPage /> },
+          { path: "employees", element: <EmployeesPage /> },
+          { path: "contracts", element: <ContractsPage /> },
+          { path: "leave", element: <LeavePage /> },
+          { path: "compliance", element: <CompliancePage /> },
+          { path: "documents", element: <DocumentsPage /> },
+          { path: "assistant", element: <AssistantPage /> },
+          { path: "audit", element: <AuditPage /> }
         ]
       }
     ]
   },
   {
-    // Catch all - redirect back to login
     path: "*",
     element: <Navigate to="/login" replace />
   }
@@ -191,4 +170,3 @@ export default function App() {
     </ThemeProvider>
   )
 }
-

@@ -3,10 +3,12 @@ import { Link } from "react-router"
 import { Moon, Scale, Sun } from "lucide-react"
 import { SealMark } from "../brand/seal-mark"
 import { useTheme } from "../providers/theme-provider"
+import { useTranslation } from "react-i18next"
+import { useLocale } from "../../hooks/use-locale"
 
-export function AuthLayout({ title, titleAr, description, descriptionAr, children }) {
-  const { direction, theme, toggleDirection, toggleTheme } = useTheme()
-  const isRtl = direction === "rtl"
+export function AuthLayout({ title, description, children }) {
+  const { theme, toggleDirection, toggleTheme } = useTheme()
+  const { isRtl, t } = useLocale()
 
   return (
     <main className="min-h-screen bg-(--bg-page) text-(--text-primary)">
@@ -25,7 +27,7 @@ export function AuthLayout({ title, titleAr, description, descriptionAr, childre
               <Scale className="h-6 w-6 text-paper" />
             </div>
             <h1 className="font-display text-4xl font-semibold leading-tight">
-              {isRtl ? "منصة هادئة لإدارة شؤون الموظفين والامتثال." : "A focused workspace for HR and compliance operations."}
+              {t("auth.welcomeDesc")}
             </h1>
             <p className="mt-4 max-w-lg text-sm leading-7 text-(--text-muted)">
               {isRtl
@@ -46,18 +48,18 @@ export function AuthLayout({ title, titleAr, description, descriptionAr, childre
             <button
               type="button"
               onClick={toggleTheme}
-              className="ms-auto me-2 inline-flex h-8 w-8 items-center justify-center rounded-sm border border-(--border-default) bg-(--bg-card-subtle) text-(--text-secondary) transition-colors hover:text-(--text-primary) lg:ms-0"
-              aria-label={isRtl ? "تبديل المظهر" : "Toggle theme"}
-              title={isRtl ? "تبديل المظهر" : "Toggle theme"}
+              className="ms-auto me-2 inline-flex h-8 w-8 items-center justify-center rounded-sm border border-(--border-default) bg-(--bg-card-subtle) text-(--text-secondary) transition-colors hover:text-(--text-primary) lg:ms-0 cursor-pointer"
+              aria-label={t("topbar.toggleTheme")}
+              title={t("topbar.toggleTheme")}
             >
               {theme === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
             </button>
             <button
               type="button"
               onClick={toggleDirection}
-              className="rounded-sm border border-(--border-default) bg-(--bg-card-subtle) px-3 py-1.5 text-xs font-semibold text-(--text-secondary) transition-colors hover:text-(--text-primary)"
+              className="rounded-sm border border-(--border-default) bg-(--bg-card-subtle) px-3 py-1.5 text-xs font-semibold text-(--text-secondary) transition-colors hover:text-(--text-primary) cursor-pointer"
             >
-              {isRtl ? "English" : "العربية"}
+              {isRtl ? t("topbar.englishLayout") : t("topbar.arabicLayout")}
             </button>
           </div>
 
@@ -65,10 +67,10 @@ export function AuthLayout({ title, titleAr, description, descriptionAr, childre
             <div className="w-full max-w-sm">
               <div className="mb-8 text-start">
                 <h2 className="font-display text-3xl font-semibold text-(--text-primary)">
-                  {isRtl ? titleAr : title}
+                  {title}
                 </h2>
                 <p className="mt-2 text-sm leading-6 text-(--text-secondary)">
-                  {isRtl ? descriptionAr : description}
+                  {description}
                 </p>
               </div>
               {children}

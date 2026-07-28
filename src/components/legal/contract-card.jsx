@@ -1,8 +1,9 @@
-﻿import React from "react"
+import React from "react"
 import { FileText, ArrowUpRight } from "lucide-react"
 import { Badge } from "../ui/badge"
-import { useDirection } from "../../hooks/use-direction"
+import { useLocale } from "../../hooks/use-locale"
 import { cn } from "../../lib/utils"
+import { useTranslation } from "react-i18next"
 
 export function ContractCard({
   title,
@@ -13,11 +14,9 @@ export function ContractCard({
   onViewDetails,
   className
 }) {
-  const { isRtl } = useDirection()
+  const { isRtl } = useLocale()
+  const { t } = useTranslation()
 
-  // Fold corner clip-path based on LTR/RTL:
-  // LTR: Top-Right is clipped (12px fold)
-  // RTL: Top-Left is clipped (12px fold)
   const clipPathStyle = isRtl
     ? "polygon(12px 0%, 100% 0%, 100% 100%, 0% 100%, 0% 12px)"
     : "polygon(0% 0%, calc(100% - 12px) 0%, 100% 12px, 100% 100%, 0% 100%)"
@@ -56,7 +55,7 @@ export function ContractCard({
                 {title}
               </span>
               <span className="text-xs text-(--text-secondary) mt-0.5">
-                {isRtl ? `الموظف: ${employeeName}` : `Employee: ${employeeName}`}
+                {t("contracts.employeeLabel", { name: employeeName })}
               </span>
             </div>
           </div>
@@ -64,12 +63,12 @@ export function ContractCard({
 
         <div className="flex items-center justify-between border-t border-(--border-default) pt-3 text-xs shrink-0">
           <div className="flex flex-col gap-0.5">
-            <span className="text-(--text-secondary)">{isRtl ? "تاريخ الصدور" : "Issued Date"}</span>
+            <span className="text-(--text-secondary)">{t("contracts.issuedDate")}</span>
             <span className="font-medium text-(--text-primary)">{date}</span>
           </div>
 
           <div className="flex flex-col gap-0.5 text-end">
-            <span className="text-(--text-secondary)">{isRtl ? "الراتب الأساسي" : "Basic Salary"}</span>
+            <span className="text-(--text-secondary)">{t("contracts.basicSalary")}</span>
             <span className="font-mono font-medium text-(--legal-primary)">
               {salary}
             </span>
@@ -86,7 +85,7 @@ export function ContractCard({
           </Badge>
 
           <span className="text-xs font-medium text-(--ai-primary) flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-            {isRtl ? "عرض الوثيقة" : "View Contract"}
+            {t("contracts.viewContract")}
             <ArrowUpRight className="h-3.5 w-3.5" />
           </span>
         </div>

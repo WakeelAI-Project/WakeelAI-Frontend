@@ -4,28 +4,29 @@ import { StatCard } from "../components/data-display/stat-card"
 import { Table } from "../components/data-display/table"
 import { employees } from "../data/mock/dashboard"
 import { PageShell } from "./page-shell"
+import { useTranslation } from "react-i18next"
+import { useLocale } from "../hooks/use-locale"
 
-export function EmployeesPage({ isRtl }) {
+export function EmployeesPage() {
+  const { t } = useTranslation()
+  const { isRtl } = useLocale()
+
   const columns = [
-    { title: isRtl ? "الاسم" : "Name", key: isRtl ? "name" : "nameEn", sortable: true },
-    { title: isRtl ? "القسم" : "Department", key: isRtl ? "department" : "departmentEn", sortable: true },
-    { title: isRtl ? "الراتب" : "Salary", key: "salary", sortable: true, isNumeric: true }
+    { title: t("employees.nameCol"), key: isRtl ? "name" : "nameEn", sortable: true },
+    { title: t("employees.deptCol"), key: isRtl ? "department" : "departmentEn", sortable: true },
+    { title: t("employees.salaryCol"), key: "salary", sortable: true, isNumeric: true }
   ]
 
   return (
     <PageShell
-      isRtl={isRtl}
-      eyebrow="People Operations"
-      eyebrowAr="الموارد البشرية"
-      title="Employees"
-      titleAr="الموظفون"
-      description="A focused view for employee records, pay context, and compliance-sensitive profile data."
-      descriptionAr="عرض تشغيلي لملفات الموظفين والرواتب والبيانات المرتبطة بالامتثال."
+      eyebrow={t("employees.peopleOps")}
+      title={t("employees.title")}
+      description={t("employees.description")}
     >
       <section className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <StatCard title={isRtl ? "الموظفون النشطون" : "Active employees"} value="128" domain="employee" trend={{ value: 8, isPositive: true }} />
-        <StatCard title={isRtl ? "عقود تحتاج تحديثا" : "Contracts to refresh"} value="14" domain="legal" />
-        <StatCard title={isRtl ? "طلبات إجازة مفتوحة" : "Open leave requests"} value="6" domain="leave" />
+        <StatCard title={t("employees.active")} value="128" domain="employee" trend={{ value: 8, isPositive: true }} />
+        <StatCard title={t("employees.toRefresh")} value="14" domain="legal" />
+        <StatCard title={t("employees.openLeave")} value="6" domain="leave" />
       </section>
 
       <section className="grid grid-cols-1 gap-4 lg:grid-cols-3">

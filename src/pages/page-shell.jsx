@@ -1,18 +1,21 @@
 import React from "react"
+import { useTranslation } from "react-i18next"
 
-export function PageShell({ eyebrow, eyebrowAr, title, titleAr, description, descriptionAr, isRtl, children }) {
+export function PageShell({ eyebrow, title, description, children }) {
+  const { t } = useTranslation()
+
   return (
     <main className="flex-1 overflow-y-auto bg-[var(--bg-page)]">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 p-6 pb-16">
         <header className="flex flex-col gap-2 text-start">
           <span className="text-xs font-semibold uppercase tracking-wider text-[var(--brand-primary)]">
-            {isRtl ? eyebrowAr : eyebrow}
+            {eyebrow}
           </span>
           <h2 className="font-display text-3xl font-semibold text-[var(--text-primary)]">
-            {isRtl ? titleAr : title}
+            {title}
           </h2>
           <p className="max-w-2xl text-sm leading-relaxed text-[var(--text-secondary)]">
-            {isRtl ? descriptionAr : description}
+            {description}
           </p>
         </header>
         {children}

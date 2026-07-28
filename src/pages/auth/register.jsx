@@ -1,59 +1,46 @@
-
 import React, { useState } from "react"
 import { useForm } from "react-hook-form"
 import { Link, useNavigate } from "react-router"
 import { AuthLayout } from "../../components/auth/auth-layout"
 import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
-import { useTheme } from "../../components/providers/theme-provider"
 import { useAuth } from "../../features/auth/hooks/use-auth"
 import { registerCompany } from "../../features/auth/services/auth-service"
+import { useTranslation } from "react-i18next"
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export function RegisterPage() {
-  const { direction } = useTheme()
   const { setToken } = useAuth()
   const navigate = useNavigate()
   const [submitError, setSubmitError] = useState("")
-  const isRtl = direction === "rtl"
+  const { t } = useTranslation()
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm()
 
-  const required = isRtl ? "هذا الحقل مطلوب" : "This field is required"
-
   const onSubmit = async ({ company_name, tax_id, owner_full_name, owner_email, password }) => {
     setSubmitError("")
 
     try {
-      // The backend immediately authenticates the owner and returns an access_token.
-      // We must NOT redirect to /login — store the token and go straight to the dashboard.
       const data = await registerCompany({ company_name, tax_id, owner_full_name, owner_email, password })
-
-      // Reuse existing setToken(): calls decodeToken() + syncs the Axios interceptor
       setToken(data.access_token, data.refresh_token)
-
-      // Navigate immediately — the user is already authenticated
       navigate("/owner/dashboard", { replace: true })
     } catch (error) {
-      // Surface backend validation errors; keep the user on the registration page
       const message =
         error?.response?.data?.message ||
         error?.message ||
-        (isRtl ? "تعذر إنشاء الحساب. حاول مرة أخرى." : "Unable to create the account. Please try again.")
+        t("auth.registerFailed")
       setSubmitError(message)
     }
   }
 
   return (
     <AuthLayout
-      title="Create owner account"
-      titleAr="إنشاء حساب المالك"
-      description="Only company owners can register directly. HR users must be invited by an owner."
-      descriptionAr="يمكن لمالك الشركة فقط التسجيل مباشرة. يجب دعوة مستخدمي الموارد البشرية بواسطة المالك."
+      title={t("auth.createOwner")}
+      description={t("auth.createOwnerDesc")}
     >
       <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)} noValidate>
         {submitError && (
@@ -63,73 +50,72 @@ export function RegisterPage() {
         )}
 
         <Input
-          label={isRtl ? "الاسم الكامل للمالك" : "Owner full name"}
+          label={t("auth.ownerFullName")}
           autoComplete="name"
           required
           errorText={errors.owner_full_name?.message}
-          {...register("owner_full_name", { required })}
+          {...register("owner_full_name", { required: t("validation.required") })}
         />
         <Input
-          label={isRtl ? "اسم الشركة" : "Company name"}
+          label={t("auth.companyName")}
           autoComplete="organization"
           required
           errorText={errors.company_name?.message}
-          {...register("company_name", { required })}
+          {...register("company_name", { required: t("validation.required") })}
         />
         <Input
-          label={isRtl ? "الرقم الضريبي" : "Tax ID"}
+          label={t("auth.taxId")}
           autoComplete="off"
           required
-          hintText={isRtl ? "الرقم الضريبي للشركة" : "Company tax identification number"}
+          hintText={t("auth.taxIdHint")}
           errorText={errors.tax_id?.message}
-          {...register("tax_id", { required })}
+          {...register("tax_id", { required: t("validation.required") })}
         />
         <Input
           type="email"
-          label={isRtl ? "البريد الإلكتروني" : "Email"}
+          label={t("auth.email")}
           autoComplete="email"
           required
           errorText={errors.owner_email?.message}
           {...register("owner_email", {
-            required,
-            pattern: { value: EMAIL_PATTERN, message: isRtl ? "أدخل بريداً إلكترونياً صالحاً" : "Enter a valid email address" },
+            required: t("validation.required"),
+            pattern: { value: EMAIL_PATTERN, message: t("validation.invalidEmail") },
           })}
         />
         <Input
           type="password"
-          label={isRtl ? "كلمة المرور" : "Password"}
+          label={t("auth.password")}
           autoComplete="new-password"
           required
-          hintText={isRtl ? "8 أحرف على الأقل" : "At least 8 characters"}
+          hintText={t("auth.passwordHint")}
           errorText={errors.password?.message}
           {...register("password", {
-            required,
-            minLength: { value: 8, message: isRtl ? "استخدم 8 أحرف على الأقل" : "Use at least 8 characters" },
+            required: t("validation.required"),
+            minLength: { value: 8, message: t("validation.passwordLength") },
           })}
         />
         <Input
           type="password"
-          label={isRtl ? "تأكيد كلمة المرور" : "Confirm password"}
+          label={t("auth.confirmPassword")}
           autoComplete="new-password"
           required
           errorText={errors.confirmPassword?.message}
           {...register("confirmPassword", {
-            required,
-            validate: (value, values) => value === values.password || (isRtl ? "كلمتا المرور غير متطابقتين" : "Passwords do not match"),
+            required: t("validation.required"),
+            validate: (value, values) => value === values.password || t("validation.passwordMismatch"),
           })}
         />
-        <Button type="submit" variant="primary" size="lg" className="mt-2 w-full" isLoading={isSubmitting} loadingText={isRtl ? "جارٍ إنشاء الحساب..." : "Creating account..."}>
-          {isRtl ? "إنشاء الحساب" : "Create account"}
+        <Button type="submit" variant="primary" size="lg" className="mt-2 w-full" isLoading={isSubmitting} loadingText={t("auth.creatingAccount")}>
+          {t("auth.createAccount")}
         </Button>
       </form>
 
       <p className="mt-6 text-center text-sm text-(--text-secondary)">
-        {isRtl ? "لديك حساب بالفعل؟ " : "Already have an account? "}
+        {t("auth.alreadyHaveAccount")}{" "}
         <Link className="font-semibold text-(--brand-primary) underline-offset-4 hover:underline" to="/login">
-          {isRtl ? "سجّل الدخول" : "Log in"}
+          {t("auth.logIn")}
         </Link>
       </p>
     </AuthLayout>
   )
 }
-

@@ -1,7 +1,8 @@
-﻿import React from "react"
+import React from "react"
 import { motion } from "framer-motion"
 import { Button } from "../ui/button"
 import { cn } from "../../lib/utils"
+import { useLocale } from "../../hooks/use-locale"
 
 export function EmptyState({
   title,
@@ -9,12 +10,12 @@ export function EmptyState({
   illustrationType = "folder", // folder, document, calendar, search, envelope, offline
   actionText,
   onActionClick,
-  isRtl: _isRtl = true,
   className
 }) {
+  const { isRtl } = useLocale()
+
   return (
     <div className={cn("flex flex-col items-center justify-center p-8 text-center select-none max-w-sm mx-auto", className)}>
-      {/* Paper-cutout vector representation using CSS/HTML shapes */}
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
@@ -60,7 +61,6 @@ export function EmptyState({
 
         {illustrationType === "envelope" && (
           <div className="relative w-20 h-14 bg-(--bg-page-alt) border-2 border-(--border-emphasis) rounded-sm flex items-center justify-center overflow-hidden">
-            {/* Envelope flap lines */}
             <div className="absolute top-0 inset-x-0 h-0 border-t-28 border-t-(--bg-disabled) border-x-38 border-x-transparent" />
           </div>
         )}
@@ -72,7 +72,6 @@ export function EmptyState({
         )}
       </motion.div>
 
-      {/* Info texts */}
       <h3 className="text-sm font-semibold text-(--text-primary) mb-1">
         {title}
       </h3>
@@ -80,7 +79,6 @@ export function EmptyState({
         {description}
       </p>
 
-      {/* Action Button */}
       {actionText && onActionClick && (
         <Button variant="primary" size="sm" onClick={onActionClick} className="px-5">
           {actionText}

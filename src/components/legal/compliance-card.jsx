@@ -1,4 +1,4 @@
-﻿import React from "react"
+import React from "react"
 import { ShieldCheck, ShieldAlert, ShieldX } from "lucide-react"
 import { Badge } from "../ui/badge"
 import { cn } from "../../lib/utils"

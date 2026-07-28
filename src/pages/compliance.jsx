@@ -3,37 +3,38 @@ import { ComplianceCard } from "../components/legal/compliance-card"
 import { Timeline } from "../components/data-display/timeline"
 import { complianceItems } from "../data/mock/dashboard"
 import { PageShell } from "./page-shell"
+import { useTranslation } from "react-i18next"
+import { useLocale } from "../hooks/use-locale"
 
-export function CompliancePage({ isRtl }) {
+export function CompliancePage() {
+  const { t } = useTranslation()
+  const { isRtl } = useLocale()
+
   const steps = [
     {
-      title: isRtl ? "فحص ساعات العمل" : "Working-hours scan",
-      description: isRtl ? "تمت مطابقة السجلات مع المادة 84." : "Matched attendance logs against Article 84.",
+      title: t("compliance.scanTitle"),
+      description: t("compliance.scanDesc"),
       date: "09:30",
       isCompleted: true
     },
     {
-      title: isRtl ? "مراجعة الإجازات" : "Leave review",
-      description: isRtl ? "توجد حالتان تحتاجان مراجعة قبل نهاية الشهر." : "Two cases need review before month end.",
+      title: t("compliance.reviewTitle"),
+      description: t("compliance.reviewDesc"),
       date: "11:10",
       isActive: true
     },
     {
-      title: isRtl ? "تصدير التقرير" : "Export report",
-      description: isRtl ? "جاهز بعد اعتماد المراجعة." : "Ready after review approval.",
+      title: t("compliance.exportTitle"),
+      description: t("compliance.exportDesc"),
       date: "Pending"
     }
   ]
 
   return (
     <PageShell
-      isRtl={isRtl}
-      eyebrow="Visible Grounding"
-      eyebrowAr="الإسناد القانوني المرئي"
-      title="Compliance"
-      titleAr="الامتثال"
-      description="Every recommendation stays tied to the exact labor-law article behind it."
-      descriptionAr="كل توصية مرتبطة بالمادة القانونية التي تستند إليها."
+      eyebrow={t("compliance.grounding")}
+      title={t("compliance.title")}
+      description={t("compliance.description")}
     >
       <section className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         {complianceItems.map((item) => (

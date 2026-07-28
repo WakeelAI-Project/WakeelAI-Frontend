@@ -1,8 +1,9 @@
-﻿import React from "react"
+import React from "react"
 import { Mail, Phone, Calendar } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 import { Badge } from "../ui/badge"
 import { cn } from "../../lib/utils"
+import { useTranslation } from "react-i18next"
 
 export function EmployeeCard({
   name,
@@ -17,6 +18,8 @@ export function EmployeeCard({
   onClick,
   className
 }) {
+  const { t } = useTranslation()
+
   return (
     <div
       onClick={onClick}
@@ -27,7 +30,6 @@ export function EmployeeCard({
     >
       {/* Header Info */}
       <div className="flex items-start gap-4">
-        {/* Neutral avatar ring */}
         <Avatar className="h-12 w-12 border-2 border-(--border-emphasis) shrink-0">
           <AvatarImage src={avatarUrl} />
           <AvatarFallback className="bg-(--bg-card-raised) text-(--text-secondary)">
@@ -69,7 +71,7 @@ export function EmployeeCard({
         {hireDate && (
           <div className="flex items-center gap-2 mt-1 pt-1 border-t border-(--border-default) text-[10px] text-(--text-secondary)">
             <Calendar className="h-3.5 w-3.5 opacity-60" />
-            <span>تعيين: {hireDate}</span>
+            <span>{t("employees.hireDate")} {hireDate}</span>
           </div>
         )}
       </div>

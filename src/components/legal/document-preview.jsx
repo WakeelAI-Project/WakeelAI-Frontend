@@ -1,17 +1,21 @@
-﻿import React from "react"
+import React from "react"
 import { Sparkles, FileText } from "lucide-react"
 import { VerificationBadge } from "./verification-badge"
 import { Button } from "../ui/button"
 import { cn } from "../../lib/utils"
+import { useTranslation } from "react-i18next"
+import { useLocale } from "../../hooks/use-locale"
 
 export function DocumentPreview({
   title,
   content,
   citation,
   isAiGenerated = false,
-  isRtl = true,
   className
 }) {
+  const { t } = useTranslation()
+  const { isRtl } = useLocale()
+
   return (
     <div
       className={cn(
@@ -29,10 +33,10 @@ export function DocumentPreview({
           {isAiGenerated && (
             <div className="hidden sm:flex items-center gap-1 text-(--ai-primary) bg-(--ai-surface) px-2 py-0.5 rounded-xs text-xs border border-(--border-emphasis)">
               <Sparkles className="h-3.5 w-3.5" />
-              <span>مستودع بالذكاء الاصطناعي</span>
+              <span>{t("documents.aiBadge")}</span>
             </div>
           )}
-          <VerificationBadge isRtl={isRtl} />
+          <VerificationBadge />
         </div>
       </div>
 
@@ -41,7 +45,7 @@ export function DocumentPreview({
         {content || (
           <div className="h-full flex flex-col items-center justify-center text-(--text-muted) gap-2">
             <FileText className="h-10 w-10 opacity-30" />
-            <span>{isRtl ? "لا يوجد محتوى للمستند" : "No document content"}</span>
+            <span>{t("common.noContent")}</span>
           </div>
         )}
       </div>
@@ -51,14 +55,14 @@ export function DocumentPreview({
         <div className="border-t border-(--border-emphasis) dark:border-(--accent-primary-active) pt-4 bg-(--ai-surface)/40 p-4 rounded-md flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
           <div className="flex flex-col gap-0.5">
             <span className="text-[10px] text-(--accent-primary-active) dark:text-(--ai-primary) uppercase font-semibold tracking-wider">
-              {isRtl ? "مرجع السند القانوني" : "Legal Citation Reference"}
+              {t("contracts.issuedDate")}
             </span>
             <span className="text-xs text-(--text-primary) font-medium">
-              {citation || (isRtl ? "المادة ١٠٣ من قانون العمل رقم ١٤ لسنة ٢٠٢٥" : "Article 103 of Labor Law No. 14 of 2025")}
+              {citation || t("contracts.citation")}
             </span>
           </div>
           <Button variant="ai" size="xs" className="h-8 shrink-0">
-            {isRtl ? "عرض السند في القانون" : "View Article"}
+            {t("contracts.viewContract")}
           </Button>
         </div>
       )}

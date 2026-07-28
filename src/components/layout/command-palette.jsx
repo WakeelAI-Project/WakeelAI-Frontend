@@ -1,10 +1,14 @@
-﻿import React, { useEffect, useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import { ArrowRight, Calendar, FileText, Search, ShieldCheck, Sparkles, User } from "lucide-react"
+import { useTranslation } from "react-i18next"
+import { useLocale } from "../../hooks/use-locale"
 
-export function CommandPalette({ isOpen, onClose, onOpen, onNavSelect, isRtl = true }) {
+export function CommandPalette({ isOpen, onClose, onOpen, onNavSelect }) {
   const [query, setQuery] = useState("")
   const inputRef = useRef(null)
+  const { t } = useTranslation()
+  const { isRtl } = useLocale()
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -42,14 +46,14 @@ export function CommandPalette({ isOpen, onClose, onOpen, onNavSelect, isRtl = t
     query.toLowerCase().startsWith("calculate")
 
   const navigationResults = [
-    { label: "الموظفون - أحمد محمد", labelEn: "Employees - Ahmed Mohamed", icon: User, id: "employees" },
-    { label: "العقود - عقد عمل موحد", labelEn: "Contracts - Unified Work Contract", icon: FileText, id: "contracts" },
-    { label: "الإجازات - رصيد سنوي", labelEn: "Leave - Annual Balance", icon: Calendar, id: "leave" },
-    { label: "الامتثال - الحد الأقصى لساعات العمل", labelEn: "Compliance - Working Hours Limit", icon: ShieldCheck, id: "compliance" }
+    { labelKey: "sidebar.employees", labelText: "الموظفون - أحمد محمد", labelTextEn: "Employees - Ahmed Mohamed", icon: User, id: "employees" },
+    { labelKey: "sidebar.contracts", labelText: "العقود - عقد عمل موحد", labelTextEn: "Contracts - Unified Work Contract", icon: FileText, id: "contracts" },
+    { labelKey: "sidebar.leave", labelText: "الإجازات - رصيد سنوي", labelTextEn: "Leave - Annual Balance", icon: Calendar, id: "leave" },
+    { labelKey: "sidebar.compliance", labelText: "الامتثال - الحد الأقصى لساعات العمل", labelTextEn: "Compliance - Working Hours Limit", icon: ShieldCheck, id: "compliance" }
   ].filter(
     (item) =>
-      item.label.includes(query) ||
-      item.labelEn.toLowerCase().includes(query.toLowerCase())
+      item.labelText.includes(query) ||
+      item.labelTextEn.toLowerCase().includes(query.toLowerCase())
   )
 
   return (
@@ -134,7 +138,7 @@ export function CommandPalette({ isOpen, onClose, onOpen, onNavSelect, isRtl = t
                       >
                         <Icon className="h-5 w-5 text-(--text-muted) shrink-0" />
                         <span className="text-sm font-medium text-(--text-primary)">
-                          {isRtl ? item.label : item.labelEn}
+                          {isRtl ? item.labelText : item.labelTextEn}
                         </span>
                       </button>
                     )
