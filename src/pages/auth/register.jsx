@@ -1,3 +1,4 @@
+
 import React, { useState } from "react"
 import { useForm } from "react-hook-form"
 import { Link, useNavigate } from "react-router"
@@ -5,14 +6,14 @@ import { AuthLayout } from "../../components/auth/auth-layout"
 import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
 import { useTheme } from "../../components/providers/theme-provider"
-import { useToast } from "../../components/ui/toast"
-import { register as registerAccount } from "../../features/auth/services/auth-service"
+import { useAuth } from "../../features/auth/hooks/use-auth"
+import { registerCompany } from "../../features/auth/services/auth-service"
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export function RegisterPage() {
   const { direction } = useTheme()
-  const { toast } = useToast()
+  const { setToken } = useAuth()
   const navigate = useNavigate()
   const [submitError, setSubmitError] = useState("")
   const isRtl = direction === "rtl"
@@ -24,19 +25,26 @@ export function RegisterPage() {
 
   const required = isRtl ? "هذا الحقل مطلوب" : "This field is required"
 
-  const onSubmit = async ({ ownerName, companyName, email, password }) => {
+  const onSubmit = async ({ company_name, tax_id, owner_full_name, owner_email, password }) => {
     setSubmitError("")
 
     try {
-      await registerAccount({ ownerName, companyName, email, password })
-      toast({
-        type: "success",
-        message: isRtl ? "تم إنشاء الحساب" : "Account created",
-        description: isRtl ? "يمكنك الآن تسجيل الدخول كمالك الشركة." : "You can now sign in as the company owner.",
-      })
-      navigate("/login", { replace: true, state: { email } })
+      // The backend immediately authenticates the owner and returns an access_token.
+      // We must NOT redirect to /login — store the token and go straight to the dashboard.
+      const data = await registerCompany({ company_name, tax_id, owner_full_name, owner_email, password })
+
+      // Reuse existing setToken(): calls decodeToken() + syncs the Axios interceptor
+      setToken(data.access_token, data.refresh_token)
+
+      // Navigate immediately — the user is already authenticated
+      navigate("/owner/dashboard", { replace: true })
     } catch (error) {
-      setSubmitError(error?.message || (isRtl ? "تعذر إنشاء الحساب. حاول مرة أخرى." : "Unable to create the account. Please try again."))
+      // Surface backend validation errors; keep the user on the registration page
+      const message =
+        error?.response?.data?.message ||
+        error?.message ||
+        (isRtl ? "تعذر إنشاء الحساب. حاول مرة أخرى." : "Unable to create the account. Please try again.")
+      setSubmitError(message)
     }
   }
 
@@ -54,15 +62,35 @@ export function RegisterPage() {
           </div>
         )}
 
-        <Input label={isRtl ? "اسم المالك" : "Owner name"} autoComplete="name" required errorText={errors.ownerName?.message} {...register("ownerName", { required })} />
-        <Input label={isRtl ? "اسم الشركة" : "Company name"} autoComplete="organization" required errorText={errors.companyName?.message} {...register("companyName", { required })} />
+        <Input
+          label={isRtl ? "الاسم الكامل للمالك" : "Owner full name"}
+          autoComplete="name"
+          required
+          errorText={errors.owner_full_name?.message}
+          {...register("owner_full_name", { required })}
+        />
+        <Input
+          label={isRtl ? "اسم الشركة" : "Company name"}
+          autoComplete="organization"
+          required
+          errorText={errors.company_name?.message}
+          {...register("company_name", { required })}
+        />
+        <Input
+          label={isRtl ? "الرقم الضريبي" : "Tax ID"}
+          autoComplete="off"
+          required
+          hintText={isRtl ? "الرقم الضريبي للشركة" : "Company tax identification number"}
+          errorText={errors.tax_id?.message}
+          {...register("tax_id", { required })}
+        />
         <Input
           type="email"
           label={isRtl ? "البريد الإلكتروني" : "Email"}
           autoComplete="email"
           required
-          errorText={errors.email?.message}
-          {...register("email", {
+          errorText={errors.owner_email?.message}
+          {...register("owner_email", {
             required,
             pattern: { value: EMAIL_PATTERN, message: isRtl ? "أدخل بريداً إلكترونياً صالحاً" : "Enter a valid email address" },
           })}
@@ -104,3 +132,4 @@ export function RegisterPage() {
     </AuthLayout>
   )
 }
+

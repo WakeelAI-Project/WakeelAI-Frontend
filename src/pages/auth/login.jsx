@@ -1,3 +1,4 @@
+
 import React, { useState } from "react"
 import { useForm } from "react-hook-form"
 import { Link, useLocation } from "react-router"
@@ -31,9 +32,9 @@ export function LoginPage() {
 
     try {
       const data = await loginRequest(email, password)
-      const decoded = decodeToken(data?.token)
+      const decoded = decodeToken(data?.access_token)
       const role = (decoded?.role || "").toLowerCase()
-      const matchesRole = selectedRole === "Owner" ? role.includes("owner") : role.includes("hr")
+      const matchesRole = selectedRole === "Owner" ? (role.includes("owner")) : role.includes("hr")
 
       if (!matchesRole) {
         resetField("password")
@@ -45,7 +46,7 @@ export function LoginPage() {
         return
       }
 
-      setToken(data.token)
+      setToken(data.access_token, data.refresh_token)
     } catch (error) {
       setSubmitError(error?.message || (isRtl ? "تعذر تسجيل الدخول. حاول مرة أخرى." : "Unable to log in. Please try again."))
     }
@@ -114,3 +115,4 @@ export function LoginPage() {
     </AuthLayout>
   )
 }
+

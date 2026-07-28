@@ -1,3 +1,4 @@
+
 import React, { useMemo, useState } from "react"
 import { createBrowserRouter, RouterProvider, Navigate, Outlet, useLocation, useNavigate } from "react-router"
 import { CommandPalette } from "./components/layout/command-palette"
@@ -20,6 +21,13 @@ import { OwnerDashboardPage } from "./pages/owner-dashboard"
 import { ProtectedRoute } from "./features/auth/components/ProtectedRoute"
 import { GuestRoute } from "./features/auth/components/GuestRoute"
 import { useAuth } from "./features/auth/hooks/use-auth"
+import { useAuthStore } from "./features/auth/store/auth-store"
+import { configureAuthStore } from "./lib/api"
+
+// Wire the Zustand store into the Axios layer once at module load time.
+// This breaks the api.js ↔ auth-store.js circular dependency by injecting
+// the store reference lazily (after both modules are fully initialized).
+configureAuthStore(useAuthStore.getState)
 
 // Wrapper to dynamically inject the active isRtl state from theme provider into pages
 function RouteWrapper({ Component }) {
@@ -133,7 +141,7 @@ const router = createBrowserRouter([
   {
     // Owner Protected Subtree
     path: "/owner",
-    element: <ProtectedRoute allowedRoles={["Owner"]} />,
+    element: <ProtectedRoute allowedRoles={["Owner", "Company_Owner"]} />,
     children: [
       {
         element: <DashboardShell />,
@@ -183,3 +191,4 @@ export default function App() {
     </ThemeProvider>
   )
 }
+
