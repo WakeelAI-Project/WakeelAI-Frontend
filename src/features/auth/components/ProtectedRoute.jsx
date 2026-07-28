@@ -25,10 +25,10 @@ export function ProtectedRoute({ allowedRoles, redirectTo = "/login" }) {
 
     if (!hasRole) {
       // Redirect to unauthorized or fallback route depending on role
-      if (currentUser?.role?.toLowerCase() === "hr") {
+      if (currentUser?.role?.toLowerCase().includes("hr")) {
         return <Navigate to="/hr/dashboard" replace />;
       }
-      if (currentUser?.role?.toLowerCase() === "owner") {
+      if (currentUser?.role?.toLowerCase().includes("owner")) {
         return <Navigate to="/owner/dashboard" replace />;
       }
       return <Navigate to={redirectTo} replace />;

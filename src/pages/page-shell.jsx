@@ -1,9 +1,6 @@
 import React from "react"
-import { useTranslation } from "react-i18next"
 
 export function PageShell({ eyebrow, title, description, children }) {
-  const { t } = useTranslation()
-
   return (
     <main className="flex-1 overflow-y-auto bg-[var(--bg-page)]">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 p-6 pb-16">

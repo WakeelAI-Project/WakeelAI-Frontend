@@ -1,13 +1,11 @@
 import React, { useEffect, useRef, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import { ArrowRight, Calendar, FileText, Search, ShieldCheck, Sparkles, User } from "lucide-react"
-import { useTranslation } from "react-i18next"
 import { useLocale } from "../../hooks/use-locale"
 
 export function CommandPalette({ isOpen, onClose, onOpen, onNavSelect }) {
   const [query, setQuery] = useState("")
   const inputRef = useRef(null)
-  const { t } = useTranslation()
   const { isRtl } = useLocale()
 
   useEffect(() => {

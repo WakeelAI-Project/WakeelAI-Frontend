@@ -3,7 +3,6 @@ import { motion } from "framer-motion";
 import { AlertTriangle, HelpCircle, Mic, Sparkles, User } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { SealMark } from "../brand/seal-mark";
-import { useTranslation } from "react-i18next";
 import { useLocale } from "../../hooks/use-locale";
 
 export function AiMessageBubble({

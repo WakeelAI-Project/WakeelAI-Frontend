@@ -3,7 +3,6 @@ import { Link } from "react-router"
 import { Moon, Scale, Sun } from "lucide-react"
 import { SealMark } from "../brand/seal-mark"
 import { useTheme } from "../providers/theme-provider"
-import { useTranslation } from "react-i18next"
 import { useLocale } from "../../hooks/use-locale"
 
 export function AuthLayout({ title, description, children }) {

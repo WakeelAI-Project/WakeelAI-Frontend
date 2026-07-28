@@ -49,6 +49,8 @@
   },
   "sidebar": {
     "dashboard": "لوحة التحكم",
+    "companyProfile": "ملف الشركة",
+    "myProfile": "ملفي الشخصي",
     "employees": "الموظفون",
     "contracts": "العقود",
     "leave": "الإجازات",
@@ -167,6 +169,120 @@
     "inputPlaceholder": "اسأل وكيل عن أي بند أو قانون...",
     "you": "أنت",
     "humanReview": "هذا الجزء يحتاج مراجعة بشرية"
+  },
+  "profile": {
+    "notProvided": "غير متوفر",
+    "readOnlyBadge": "للقراءة فقط",
+    "editableBadge": "قابل للتعديل بواسطة المالك",
+    "editingBadge": "وضع التعديل",
+    "actions": {
+      "edit": "تعديل الملف",
+      "save": "حفظ التغييرات",
+      "saving": "جارٍ الحفظ...",
+      "cancel": "إلغاء"
+    },
+    "company": {
+      "eyebrow": "حساب الشركة",
+      "title": "ملف الشركة",
+      "description": "راجع بيانات المؤسسة ومعلومات التواصل وحالة الحساب لمساحة العمل هذه.",
+      "logoLabel": "عنصر نائب لشعار {{name}}",
+      "mockHelper": "بيانات الملف تجريبية مؤقتًا، وتُحفظ تغييرات المالك خلال هذه الجلسة فقط.",
+      "readOnlyHelper": "تتيح لك صلاحيات الموارد البشرية عرضًا واضحًا لبيانات الشركة للقراءة فقط.",
+      "saveSuccess": "تم تحديث ملف الشركة",
+      "saveSuccessDescription": "تم حفظ تغييرات الملف التجريبي خلال هذه الجلسة."
+    },
+    "user": {
+      "eyebrow": "نظرة عامة على الحساب",
+      "title": "ملفي الشخصي",
+      "description": "عرض للقراءة فقط لهويتك وبيانات عملك وصلاحياتك الحالية في مساحة العمل.",
+      "avatarLabel": "عنصر نائب للصورة الشخصية لـ {{name}}",
+      "readOnlyHelper": "سيتاح تعديل الملف الشخصي عند ربط واجهة برمجية مدعومة للحساب."
+    },
+    "sections": {
+      "companyIdentity": "هوية الشركة",
+      "companyIdentityDescription": "المعرّفات الرسمية وبيانات المؤسسة المسجلة.",
+      "contact": "معلومات التواصل",
+      "contactDescription": "قنوات التواصل الأساسية والموقع المسجل للشركة.",
+      "operations": "المعلومات التشغيلية",
+      "operationsDescription": "حجم المؤسسة وقطاعها وملكيتها وتواريخ الانضمام.",
+      "policy": "السياسة ودليل الموظفين",
+      "account": "صلاحيات الحساب",
+      "personalDetails": "البيانات الشخصية",
+      "personalDetailsDescription": "معلومات التواصل المرتبطة بحسابك المسجل حاليًا.",
+      "workDetails": "بيانات العمل",
+      "workDetailsDescription": "منصبك وعلاقتك بالشركة النشطة.",
+      "permissions": "ملخص الصلاحيات",
+      "permissionsDescription": "ملخص واضح لصلاحياتك الحالية في مساحة العمل.",
+      "recentActivity": "النشاط الأخير"
+    },
+    "fields": {
+      "companyName": "اسم الشركة",
+      "legalName": "الاسم القانوني",
+      "taxId": "الرقم الضريبي",
+      "industry": "القطاع",
+      "companySize": "حجم الشركة",
+      "headquarters": "المقر الرئيسي / الدولة",
+      "companyEmail": "البريد الإلكتروني للشركة",
+      "companyPhone": "هاتف الشركة",
+      "website": "الموقع الإلكتروني",
+      "createdAt": "تاريخ الإنشاء / الانضمام",
+      "ownerName": "اسم المالك",
+      "policyStatus": "حالة السياسة / الدليل",
+      "lastUpdated": "آخر تحديث",
+      "accountStatus": "حالة الحساب",
+      "accessLevel": "مستوى الصلاحية",
+      "fullName": "الاسم الكامل",
+      "initials": "الأحرف الأولى",
+      "role": "الدور",
+      "email": "البريد الإلكتروني",
+      "phone": "الهاتف",
+      "jobTitle": "المسمى الوظيفي",
+      "department": "القسم",
+      "joinDate": "تاريخ الانضمام",
+      "lastLogin": "آخر تسجيل دخول"
+    },
+    "values": {
+      "active": "نشط",
+      "indexed": "مفهرس للذكاء الاصطناعي",
+      "ownerAccess": "إدارة كاملة لملف الشركة",
+      "hrReadOnlyAccess": "ملف الشركة للقراءة فقط"
+    },
+    "validation": {
+      "companyNameRequired": "اسم الشركة مطلوب",
+      "legalNameRequired": "الاسم القانوني مطلوب",
+      "invalidEmail": "أدخل بريدًا إلكترونيًا صالحًا",
+      "invalidWebsite": "أدخل رابطًا كاملًا يبدأ بـ http:// أو https://"
+    },
+    "roles": {
+      "companyOwner": "مالك الشركة",
+      "owner": "المالك",
+      "hrManager": "مدير الموارد البشرية",
+      "hrComplianceLead": "مسؤول الموارد البشرية والامتثال",
+      "hr": "الموارد البشرية"
+    },
+    "jobTitles": {
+      "founder": "الشريك المؤسس والرئيس التنفيذي",
+      "hrManager": "مدير الموارد البشرية"
+    },
+    "departments": {
+      "executive": "المكتب التنفيذي",
+      "peopleOperations": "عمليات الموارد البشرية"
+    },
+    "permissions": {
+      "manageCompany": "عرض ملف الشركة وتحديثه",
+      "manageHr": "إدارة صلاحيات مستخدمي الموارد البشرية",
+      "workspaceOversight": "الإشراف على مساحة عمل الشركة",
+      "viewCompany": "عرض معلومات ملف الشركة",
+      "manageEmployees": "إدارة سجلات الموظفين",
+      "manageDocuments": "إدارة مستندات مساحة العمل",
+      "reviewCompliance": "مراجعة معلومات الامتثال"
+    },
+    "activity": {
+      "loggedIn": "تم تسجيل الدخول",
+      "viewedDashboard": "تم عرض لوحة التحكم",
+      "today": "اليوم",
+      "recently": "مؤخرًا"
+    }
   },
   "audit": {
     "trail": "مسار التدقيق",

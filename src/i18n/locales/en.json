@@ -49,6 +49,8 @@
   },
   "sidebar": {
     "dashboard": "Dashboard",
+    "companyProfile": "Company Profile",
+    "myProfile": "My Profile",
     "employees": "Employees",
     "contracts": "Contracts",
     "leave": "Leave",
@@ -167,6 +169,120 @@
     "inputPlaceholder": "Ask Wakeel about any regulation...",
     "you": "You",
     "humanReview": "This section requires human review"
+  },
+  "profile": {
+    "notProvided": "Not provided",
+    "readOnlyBadge": "Read only",
+    "editableBadge": "Owner editable",
+    "editingBadge": "Editing",
+    "actions": {
+      "edit": "Edit profile",
+      "save": "Save changes",
+      "saving": "Saving...",
+      "cancel": "Cancel"
+    },
+    "company": {
+      "eyebrow": "Company account",
+      "title": "Company Profile",
+      "description": "Review the organization details, contact information, and account standing for this workspace.",
+      "logoLabel": "Logo placeholder for {{name}}",
+      "mockHelper": "Profile data is temporarily mocked. Owner changes are kept for this session only.",
+      "readOnlyHelper": "Your HR access includes a clear, read-only view of company information.",
+      "saveSuccess": "Company profile updated",
+      "saveSuccessDescription": "Your mock profile changes were saved for this session."
+    },
+    "user": {
+      "eyebrow": "Account overview",
+      "title": "My Profile",
+      "description": "A read-only view of your identity, work details, and current workspace access.",
+      "avatarLabel": "Avatar placeholder for {{name}}",
+      "readOnlyHelper": "Personal profile editing will be available when a supported account API is connected."
+    },
+    "sections": {
+      "companyIdentity": "Company identity",
+      "companyIdentityDescription": "Official identifiers and registered organization details.",
+      "contact": "Contact information",
+      "contactDescription": "Primary company channels and registered location.",
+      "operations": "Operational information",
+      "operationsDescription": "Organization scale, sector, ownership, and membership dates.",
+      "policy": "Policy and handbook",
+      "account": "Account access",
+      "personalDetails": "Personal details",
+      "personalDetailsDescription": "The contact information associated with your signed-in account.",
+      "workDetails": "Work details",
+      "workDetailsDescription": "Your position and relationship to the active company.",
+      "permissions": "Permissions summary",
+      "permissionsDescription": "A plain-language summary of your current workspace access.",
+      "recentActivity": "Recent activity"
+    },
+    "fields": {
+      "companyName": "Company name",
+      "legalName": "Legal name",
+      "taxId": "Tax ID",
+      "industry": "Industry",
+      "companySize": "Company size",
+      "headquarters": "Headquarters / country",
+      "companyEmail": "Company email",
+      "companyPhone": "Company phone",
+      "website": "Website",
+      "createdAt": "Created / join date",
+      "ownerName": "Owner name",
+      "policyStatus": "Policy / handbook status",
+      "lastUpdated": "Last updated",
+      "accountStatus": "Account status",
+      "accessLevel": "Access level",
+      "fullName": "Full name",
+      "initials": "Initials",
+      "role": "Role",
+      "email": "Email",
+      "phone": "Phone",
+      "jobTitle": "Job title",
+      "department": "Department",
+      "joinDate": "Join date",
+      "lastLogin": "Last login"
+    },
+    "values": {
+      "active": "Active",
+      "indexed": "Indexed for AI",
+      "ownerAccess": "Full profile management",
+      "hrReadOnlyAccess": "Company profile read only"
+    },
+    "validation": {
+      "companyNameRequired": "Company name is required",
+      "legalNameRequired": "Legal name is required",
+      "invalidEmail": "Enter a valid email address",
+      "invalidWebsite": "Enter a full URL beginning with http:// or https://"
+    },
+    "roles": {
+      "companyOwner": "Company Owner",
+      "owner": "Owner",
+      "hrManager": "HR Manager",
+      "hrComplianceLead": "HR & Compliance Lead",
+      "hr": "HR"
+    },
+    "jobTitles": {
+      "founder": "Co-founder & CEO",
+      "hrManager": "HR Manager"
+    },
+    "departments": {
+      "executive": "Executive Office",
+      "peopleOperations": "People Operations"
+    },
+    "permissions": {
+      "manageCompany": "View and update the company profile",
+      "manageHr": "Manage HR user access",
+      "workspaceOversight": "Oversee the company workspace",
+      "viewCompany": "View company profile information",
+      "manageEmployees": "Manage employee records",
+      "manageDocuments": "Manage workspace documents",
+      "reviewCompliance": "Review compliance information"
+    },
+    "activity": {
+      "loggedIn": "Logged in",
+      "viewedDashboard": "Viewed dashboard",
+      "today": "Today",
+      "recently": "Recently"
+    }
   },
   "audit": {
     "trail": "Audit Trail",

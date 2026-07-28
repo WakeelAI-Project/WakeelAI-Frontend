@@ -17,6 +17,8 @@ import { LoginPage } from "./pages/auth/login"
 import { RegisterPage } from "./pages/auth/register"
 import { HrDashboardPage } from "./pages/hr-dashboard"
 import { OwnerDashboardPage } from "./pages/owner-dashboard"
+import { CompanyProfilePage } from "./pages/company-profile"
+import { UserProfilePage } from "./pages/user-profile"
 import { ProtectedRoute } from "./features/auth/components/ProtectedRoute"
 import { GuestRoute } from "./features/auth/components/GuestRoute"
 import { useAuth } from "./features/auth/hooks/use-auth"
@@ -29,14 +31,14 @@ import "./i18n" // Load i18n configuration
 configureAuthStore(useAuthStore.getState)
 
 function DashboardShell() {
-  const { direction, toggleDirection } = useTheme()
+  const { toggleDirection } = useTheme()
   const { toast } = useToast()
   const { activeCompany, currentUser: defaultUser, notifications } = useApp()
   const { currentUser: authUser, logout } = useAuth()
   const [isCommandOpen, setIsCommandOpen] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
-  const { isRtl, language, changeLanguage } = useLocale()
+  const { isRtl } = useLocale()
   const { t } = useTranslation()
 
   // Merge dynamic authentication data into user state
@@ -128,14 +130,16 @@ const router = createBrowserRouter([
         element: <DashboardShell />,
         children: [
           { path: "", element: <Navigate to="dashboard" replace /> },
-          { path: "dashboard", element: <OwnerDashboardPage /> }
+          { path: "dashboard", element: <OwnerDashboardPage /> },
+          { path: "company-profile", element: <CompanyProfilePage /> },
+          { path: "profile", element: <UserProfilePage /> }
         ]
       }
     ]
   },
   {
     path: "/hr",
-    element: <ProtectedRoute allowedRoles={["HR", "HR & Compliance Lead"]} />,
+    element: <ProtectedRoute allowedRoles={["HR", "HR_Manager", "HR & Compliance Lead"]} />,
     children: [
       {
         element: <DashboardShell />,
@@ -148,7 +152,9 @@ const router = createBrowserRouter([
           { path: "compliance", element: <CompliancePage /> },
           { path: "documents", element: <DocumentsPage /> },
           { path: "assistant", element: <AssistantPage /> },
-          { path: "audit", element: <AuditPage /> }
+          { path: "audit", element: <AuditPage /> },
+          { path: "company-profile", element: <CompanyProfilePage /> },
+          { path: "profile", element: <UserProfilePage /> }
         ]
       }
     ]

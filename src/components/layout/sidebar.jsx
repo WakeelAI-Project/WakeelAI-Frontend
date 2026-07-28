@@ -8,8 +8,10 @@ import {
   FileText,
   FolderOpen,
   History,
+  Landmark,
   MessageSquareCode,
   ShieldCheck,
+  UserRound,
   Users
 } from "lucide-react"
 import { cn } from "../../lib/utils"
@@ -19,6 +21,8 @@ import { useLocale } from "../../hooks/use-locale"
 
 export const NAV_ITEMS = [
   { id: "dashboard", labelKey: "sidebar.dashboard", icon: Building2 },
+  { id: "company-profile", labelKey: "sidebar.companyProfile", icon: Landmark },
+  { id: "profile", labelKey: "sidebar.myProfile", icon: UserRound },
   { id: "employees", labelKey: "sidebar.employees", icon: Users },
   { id: "contracts", labelKey: "sidebar.contracts", icon: FileText },
   { id: "leave", labelKey: "sidebar.leave", icon: Calendar },
@@ -38,7 +42,9 @@ export function Sidebar({
   const { t } = useTranslation()
   const { isRtl } = useLocale()
   const visibleItems = rolePrefix === "/owner"
-    ? NAV_ITEMS.filter((item) => item.id === "dashboard")
+    ? NAV_ITEMS.filter((item) =>
+        ["dashboard", "company-profile", "profile"].includes(item.id)
+      )
     : NAV_ITEMS
 
   return (

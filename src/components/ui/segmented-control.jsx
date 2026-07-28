@@ -31,7 +31,7 @@ export function SegmentedControl({
             {isActive && (
               <motion.div
                 layoutId={`segmented-active-${name}`}
-                className="absolute inset-0 -z-10 rounded-sm bg-paper shadow-(--shadow-1) dark:bg-(--bg-card-raised)"
+                className="absolute inset-0 -z-10 rounded-sm bg-(--bg-card-raised)/85 shadow-(--shadow-4) backdrop-blur-2xl"
                 transition={{ type: "spring", stiffness: 380, damping: 30 }}
               />
             )}

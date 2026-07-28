@@ -19,6 +19,7 @@ const MOCK_ACCOUNTS = {
       name: "Mariam Hassan",
       nameEn: "Mariam Hassan",
       initials: "MH",
+      email: "owner@wakeel.ai",
     },
   },
   "hr@wakeel.ai": {
@@ -30,6 +31,7 @@ const MOCK_ACCOUNTS = {
       name: "Nour Ali",
       nameEn: "Nour Ali",
       initials: "NA",
+      email: "hr@wakeel.ai",
     },
   },
   "mohamedtarek@gmail.com": {
@@ -41,6 +43,7 @@ const MOCK_ACCOUNTS = {
       name: "Mohamed Tarek",
       nameEn: "Mohamed Tarek",
       initials: "MT",
+      email: "mohamedtarek@gmail.com",
     },
   },
 };
@@ -237,6 +240,7 @@ export async function register({ ownerName, companyName, email, password }) {
         nameEn: ownerName,
         initials: createInitials(ownerName),
         companyName,
+        email: normalizedEmail,
       },
     };
     writeRegisteredAccounts(registeredAccounts);
@@ -294,6 +298,7 @@ export async function registerCompany(data) {
         nameEn: data.owner_full_name,
         initials,
         companyName: data.company_name,
+        email: normalizedEmail,
       },
     };
     writeRegisteredAccounts(registeredAccounts);
