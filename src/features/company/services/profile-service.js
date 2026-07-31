@@ -135,27 +135,72 @@ export async function updateCompanyProfile(updates) {
   try {
     const formData = new FormData();
 
-    // Map camelCase component fields → PascalCase backend field names
-    if (updates.headquarters != null) formData.append("Address", updates.headquarters);
-    if (updates.phone != null) formData.append("PhoneNumber", updates.phone);
-    if (updates.email != null) formData.append("Email", updates.email);
-    if (updates.industry != null) formData.append("Industry", updates.industry);
-    if (updates.workingHours != null) formData.append("WorkingHours", updates.workingHours);
+    formData.append(
+      "Address",
+      updates.headquarters ?? ""
+    );
 
-    // Binary logo file — only append when a new file is staged
+    formData.append(
+      "PhoneNumber",
+      updates.phone ?? ""
+    );
+
+    formData.append(
+      "Email",
+      updates.email ?? ""
+    );
+
+    formData.append(
+      "Industry",
+      updates.industry ?? ""
+    );
+
+    formData.append(
+      "WorkingHours",
+      updates.workingHours ?? ""
+    );
+
     if (updates.logo instanceof File) {
-      formData.append("logo", updates.logo, updates.logo.name);
+      formData.append(
+        "logo",
+        updates.logo,
+        updates.logo.name
+      );
     }
 
-    // Bug 3 fix: do NOT manually set Content-Type when sending FormData.
-    // Axios must set it automatically so the multipart boundary parameter is
-    // included (e.g. "multipart/form-data; boundary=----XXX"). Without the
-    // boundary the ASP.NET Core [FromForm] model binder cannot parse the body
-    // and returns 400 Bad Request.
-    const response = await api.put("/company/profile", formData);
+    console.log(
+      "=== COMPANY PROFILE PUT ==="
+    );
+
+    for (const [key, value] of formData.entries()) {
+      console.log(
+        key,
+        value instanceof File
+          ? `FILE: ${value.name}`
+          : JSON.stringify(value)
+      );
+    }
+
+    const response = await api.put(
+      "/company/profile",
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
 
     return normalizeCompanyProfile(response.data);
   } catch (error) {
-    throw new Error(mapProfileError(error), { cause: error });
+    console.error(
+      "Company profile update error:",
+      error.response?.data
+    );
+
+    throw new Error(
+      mapProfileError(error),
+      { cause: error }
+    );
   }
 }
