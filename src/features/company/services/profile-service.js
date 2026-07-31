@@ -21,7 +21,6 @@ import api from "../../../lib/api";
  *
  * Backend fields (from PUT /company/profile schema):
  *   Address, PhoneNumber, Email, Industry, WorkingHours, logo (binary)
- * GET response may return additional fields — mapped defensively.
  *
  * @param {object} raw - Raw backend response
  * @returns {object} Normalized company profile
@@ -33,26 +32,17 @@ export function normalizeCompanyProfile(raw) {
     // Core identity
     id: raw.id ?? raw.company_id ?? null,
     name: raw.name ?? raw.company_name ?? "",
-    legalName: raw.legal_name ?? raw.legalName ?? "",
-    taxId: raw.tax_id ?? raw.taxId ?? "",
     industry: raw.Industry ?? raw.industry ?? "",
-    size: raw.size ?? raw.company_size ?? "",
 
     // Contact
     email: raw.Email ?? raw.email ?? "",
     phone: raw.PhoneNumber ?? raw.phone ?? raw.phone_number ?? "",
     headquarters: raw.Address ?? raw.address ?? raw.headquarters ?? "",
-    website: raw.website ?? "",
 
     // Operational
     workingHours: raw.WorkingHours ?? raw.working_hours ?? "",
-    createdAt: raw.created_at ?? raw.createdAt ?? null,
-    ownerName: raw.owner_name ?? raw.ownerName ?? "",
-
-    // Status
-    policyStatus: raw.policy_status ?? raw.policyStatus ?? "",
-    policyUpdatedAt: raw.policy_updated_at ?? raw.policyUpdatedAt ?? null,
-    accountStatus: raw.account_status ?? raw.accountStatus ?? "active",
+    // Bug 2a fix: backend DTO uses "registered_at", not "created_at"
+    createdAt: raw.registered_at ?? raw.created_at ?? raw.createdAt ?? null,
 
     // Logo
     logoUrl: raw.logo_url ?? raw.logoUrl ?? raw.logo ?? null,
@@ -103,11 +93,6 @@ function mapProfileError(error) {
  * @status BACKEND ENDPOINT NOT IMPLEMENTED
  */
 export async function getUserProfile() {
-  // TODO: Uncomment when GET /profile/me is available.
-  // const response = await api.get("/profile/me");
-  // return response.data;
-
-  // ⚠️  Backend endpoint not implemented — return null (caller falls back to JWT claims)
   return null;
 }
 
@@ -162,12 +147,12 @@ export async function updateCompanyProfile(updates) {
       formData.append("logo", updates.logo, updates.logo.name);
     }
 
-    const response = await api.put("/company/profile", formData, {
-      headers: {
-        // Let the browser set Content-Type with the correct multipart boundary
-        "Content-Type": "multipart/form-data",
-      },
-    });
+    // Bug 3 fix: do NOT manually set Content-Type when sending FormData.
+    // Axios must set it automatically so the multipart boundary parameter is
+    // included (e.g. "multipart/form-data; boundary=----XXX"). Without the
+    // boundary the ASP.NET Core [FromForm] model binder cannot parse the body
+    // and returns 400 Bad Request.
+    const response = await api.put("/company/profile", formData);
 
     return normalizeCompanyProfile(response.data);
   } catch (error) {

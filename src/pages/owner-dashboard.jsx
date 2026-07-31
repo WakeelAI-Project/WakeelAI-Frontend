@@ -18,9 +18,9 @@ export function OwnerDashboardPage() {
 
   const onInvite = async ({ name, email }) => {
     try {
-      // POST /users/invite — sends { full_name, email, role: "HR" }
-      // Role is hardcoded to "HR" since this form is specifically for inviting HR users
-      await inviteEmployee({ full_name: name, email, role: "HR" })
+      // POST /users/invite — sends { full_name, email, role: "HR_Manager" }
+      // Backend requires the exact string "HR_Manager" (case-insensitive checked against enum)
+      await inviteEmployee({ full_name: name, email, role: "HR_Manager" })
       toast({
         type: "success",
         message: t("dashboard.inviteSentMsg", { defaultValue: "Invitation sent" }),

@@ -12,6 +12,11 @@ import {
   setUserCookie,
 } from "../../../lib/cookies";
 
+// Bug 3c fix: the backend refresh token is an opaque random string, not a JWT.
+// Attempting to JWT-decode it always throws and logs a console.error.
+// Use a fixed 30-day TTL instead.
+const REFRESH_TOKEN_DEFAULT_TTL_SECONDS = 60 * 60 * 24 * 30; // 30 days
+
 // ---------------------------------------------------------------------------
 // Auth state is held in Zustand (live React tree) AND persisted in cookies
 // so it survives hard reloads.
@@ -56,12 +61,8 @@ export const useAuthStore = create((set, get) => ({
 
     const newRefreshToken = refreshToken ?? get().refreshToken;
     if (newRefreshToken) {
-      // Derive refresh token expiry from its JWT exp claim (longer-lived)
-      const refreshDecoded = decodeToken(newRefreshToken);
-      const refreshExpiresIn = refreshDecoded?.exp
-        ? Math.max(0, refreshDecoded.exp - Math.floor(Date.now() / 1000))
-        : null;
-      setRefreshTokenCookie(newRefreshToken, refreshExpiresIn);
+      // Refresh token is opaque (not a JWT) — use a fixed 30-day TTL
+      setRefreshTokenCookie(newRefreshToken, REFRESH_TOKEN_DEFAULT_TTL_SECONDS);
     }
 
     set({
@@ -81,11 +82,8 @@ export const useAuthStore = create((set, get) => ({
    */
   setRefreshToken: (refreshToken) => {
     if (refreshToken) {
-      const decoded = decodeToken(refreshToken);
-      const expiresIn = decoded?.exp
-        ? Math.max(0, decoded.exp - Math.floor(Date.now() / 1000))
-        : null;
-      setRefreshTokenCookie(refreshToken, expiresIn);
+      // Refresh token is opaque (not a JWT) — use a fixed 30-day TTL
+      setRefreshTokenCookie(refreshToken, REFRESH_TOKEN_DEFAULT_TTL_SECONDS);
     }
     set({ refreshToken });
   },

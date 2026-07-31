@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { BookOpen, Briefcase, Landmark, Mail, Pencil, Save, ShieldCheck, X } from "lucide-react"
+import { Briefcase, Landmark, Mail, Pencil, Save, X } from "lucide-react"
 import { LogoUploader } from "../features/company/components/LogoUploader"
 import { useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
@@ -13,24 +13,11 @@ import { useAuth } from "../features/auth/hooks/use-auth"
 import {
   DetailGrid,
   DetailItem,
-  formatProfileDate,
   ProfileSection,
 } from "../features/profile/components/profile-details"
-import { useLocale } from "../hooks/use-locale"
 import { PageShell } from "./page-shell"
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-
-function isValidWebsite(value) {
-  if (!value) return true
-
-  try {
-    const url = new URL(value)
-    return url.protocol === "http:" || url.protocol === "https:"
-  } catch {
-    return false
-  }
-}
 
 function isOwnerRole(role) {
   return ["owner", "company_owner"].includes(role?.toLowerCase())
@@ -40,26 +27,16 @@ function isOwnerRole(role) {
 const EMPTY_COMPANY = {
   id: null,
   name: "",
-  legalName: "",
-  taxId: "",
   industry: "",
-  size: "",
   headquarters: "",
   email: "",
   phone: "",
-  website: "",
   workingHours: "",
-  createdAt: null,
-  ownerName: "",
-  policyStatus: "",
-  policyUpdatedAt: null,
-  accountStatus: "active",
   logoUrl: null,
 }
 
 export function CompanyProfilePage() {
   const { t } = useTranslation()
-  const { language } = useLocale()
   const { toast } = useToast()
   const { currentUser: authUser } = useAuth()
   const { activeCompany, currentUser: defaultUser } = useApp()
@@ -78,10 +55,6 @@ export function CompanyProfilePage() {
     name:
       authUser?.companyName ||
       (activeCompany?.nameEn || activeCompany?.name || ""),
-    ownerName:
-      canEdit
-        ? authUser?.nameEn || authUser?.name || defaultUser?.nameEn || defaultUser?.name || ""
-        : "",
   })
 
   const [company, setCompany] = useState(buildCompanyFromJwt)
@@ -106,8 +79,6 @@ export function CompanyProfilePage() {
         }
       })
       .catch((err) => {
-        // Surface the error so the user knows data may be incomplete,
-        // but keep the JWT-derived fallback visible rather than showing nothing
         setFetchError(err?.message || t("common.error"))
       })
       .finally(() => {
@@ -167,17 +138,6 @@ export function CompanyProfilePage() {
     </a>
   ) : fallback
 
-  const websiteValue = company.website ? (
-    <a
-      className="text-(--brand-primary) hover:underline"
-      href={company.website}
-      target="_blank"
-      rel="noreferrer"
-    >
-      {company.website}
-    </a>
-  ) : fallback
-
   return (
     <PageShell
       eyebrow={t("profile.company.eyebrow")}
@@ -197,7 +157,6 @@ export function CompanyProfilePage() {
               </div>
             </div>
           </div>
-          <div className="h-48 rounded-md animate-skeleton" />
           <div className="h-48 rounded-md animate-skeleton" />
         </div>
       )}
@@ -222,6 +181,7 @@ export function CompanyProfilePage() {
                   currentLogo={company.logoUrl ?? null}
                   value={logo}
                   onChange={setLogo}
+                  disabled={!isEditing}
                 />
               </div>
 
@@ -230,20 +190,12 @@ export function CompanyProfilePage() {
                   <h3 className="font-display text-2xl font-semibold text-(--text-primary)">
                     {displayValue(company.name)}
                   </h3>
-                  <Badge variant="success" shape="pill">
-                    {t(`profile.values.${company.accountStatus}`, {
-                      defaultValue: displayValue(company.accountStatus),
-                    })}
-                  </Badge>
                   <Badge variant="info" shape="pill">
                     {canEdit
                       ? t(isEditing ? "profile.editingBadge" : "profile.editableBadge")
                       : t("profile.readOnlyBadge")}
                   </Badge>
                 </div>
-                <p className="mt-1 text-sm text-(--text-secondary)">
-                  {displayValue(company.legalName)}
-                </p>
                 <p className="mt-2 text-xs leading-relaxed text-(--text-muted)">
                   {canEdit ? t("profile.company.ownerHelper") : t("profile.company.readOnlyHelper")}
                 </p>
@@ -277,7 +229,7 @@ export function CompanyProfilePage() {
             </div>
           </section>
 
-          <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(260px,1fr)]">
+          <div className="grid gap-6">
             <div className="flex min-w-0 flex-col gap-6">
               <ProfileSection
                 icon={Landmark}
@@ -294,21 +246,12 @@ export function CompanyProfilePage() {
                         required: t("profile.validation.companyNameRequired"),
                       })}
                     />
-                    <Input
-                      label={t("profile.fields.legalName")}
-                      required
-                      errorText={errors.legalName?.message}
-                      {...register("legalName", {
-                        required: t("profile.validation.legalNameRequired"),
-                      })}
-                    />
-                    <Input label={t("profile.fields.taxId")} {...register("taxId")} />
+                    <Input label={t("profile.fields.industry")} {...register("industry")} />
                   </div>
                 ) : (
                   <DetailGrid>
                     <DetailItem label={t("profile.fields.companyName")} value={displayValue(company.name)} />
-                    <DetailItem label={t("profile.fields.legalName")} value={displayValue(company.legalName)} />
-                    <DetailItem label={t("profile.fields.taxId")} value={displayValue(company.taxId)} />
+                    <DetailItem label={t("profile.fields.industry")} value={displayValue(company.industry)} />
                   </DetailGrid>
                 )}
               </ProfileSection>
@@ -332,22 +275,12 @@ export function CompanyProfilePage() {
                       })}
                     />
                     <Input label={t("profile.fields.companyPhone")} {...register("phone")} />
-                    <Input
-                      className="font-mono"
-                      label={t("profile.fields.website")}
-                      errorText={errors.website?.message}
-                      {...register("website", {
-                        validate: (value) =>
-                          isValidWebsite(value) || t("profile.validation.invalidWebsite"),
-                      })}
-                    />
                     <Input label={t("profile.fields.headquarters")} {...register("headquarters")} />
                   </div>
                 ) : (
                   <DetailGrid>
                     <DetailItem label={t("profile.fields.companyEmail")} value={emailValue} />
                     <DetailItem label={t("profile.fields.companyPhone")} value={displayValue(company.phone)} />
-                    <DetailItem label={t("profile.fields.website")} value={websiteValue} />
                     <DetailItem label={t("profile.fields.headquarters")} value={displayValue(company.headquarters)} />
                   </DetailGrid>
                 )}
@@ -360,69 +293,15 @@ export function CompanyProfilePage() {
               >
                 {isEditing ? (
                   <div className="grid gap-4 sm:grid-cols-2">
-                    <Input label={t("profile.fields.industry")} {...register("industry")} />
-                    <Input label={t("profile.fields.companySize")} {...register("size")} />
-                    <DetailGrid className="sm:col-span-2">
-                      <DetailItem
-                        label={t("profile.fields.createdAt")}
-                        value={formatProfileDate(company.createdAt, language, fallback)}
-                      />
-                      <DetailItem label={t("profile.fields.ownerName")} value={displayValue(company.ownerName)} />
-                    </DetailGrid>
+                    <Input label={t("profile.fields.workingHours", { defaultValue: "Working Hours" })} {...register("workingHours")} />
                   </div>
                 ) : (
                   <DetailGrid>
-                    <DetailItem label={t("profile.fields.industry")} value={displayValue(company.industry)} />
-                    <DetailItem label={t("profile.fields.companySize")} value={displayValue(company.size)} />
-                    <DetailItem
-                      label={t("profile.fields.createdAt")}
-                      value={formatProfileDate(company.createdAt, language, fallback)}
-                    />
-                    <DetailItem label={t("profile.fields.ownerName")} value={displayValue(company.ownerName)} />
+                    <DetailItem label={t("profile.fields.workingHours", { defaultValue: "Working Hours" })} value={displayValue(company.workingHours)} />
                   </DetailGrid>
                 )}
               </ProfileSection>
             </div>
-
-            <aside className="flex min-w-0 flex-col gap-6">
-              <ProfileSection icon={BookOpen} title={t("profile.sections.policy")}>
-                <DetailGrid className="sm:grid-cols-1">
-                  <DetailItem
-                    label={t("profile.fields.policyStatus")}
-                    value={
-                      company.policyStatus ? (
-                        <Badge variant="success">
-                          {t(`profile.values.${company.policyStatus}`, {
-                            defaultValue: displayValue(company.policyStatus),
-                          })}
-                        </Badge>
-                      ) : (
-                        fallback
-                      )
-                    }
-                  />
-                  <DetailItem
-                    label={t("profile.fields.lastUpdated")}
-                    value={formatProfileDate(company.policyUpdatedAt, language, fallback)}
-                  />
-                </DetailGrid>
-              </ProfileSection>
-
-              <ProfileSection icon={ShieldCheck} title={t("profile.sections.account")}>
-                <DetailGrid className="sm:grid-cols-1">
-                  <DetailItem
-                    label={t("profile.fields.accountStatus")}
-                    value={t(`profile.values.${company.accountStatus}`, {
-                      defaultValue: displayValue(company.accountStatus),
-                    })}
-                  />
-                  <DetailItem
-                    label={t("profile.fields.accessLevel")}
-                    value={canEdit ? t("profile.values.ownerAccess") : t("profile.values.hrReadOnlyAccess")}
-                  />
-                </DetailGrid>
-              </ProfileSection>
-            </aside>
           </div>
         </form>
       )}
