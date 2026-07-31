@@ -1,5 +1,6 @@
 
 import axios from "axios";
+import Cookies from "js-cookie";
 
 // ---------------------------------------------------------------------------
 // In-memory auth token
@@ -7,12 +8,17 @@ import axios from "axios";
 //   auth-store → api (setAuthToken)  ✅
 //   api → auth-store                 ❌ would create a cycle
 // The store reference is injected lazily via configureAuthStore().
+//
+// On module init we pre-populate from the cookie so the interceptor has a token
+// immediately, before bootstrapAuth() (which is async) finishes its work.
+// This prevents unauthenticated requests during the startup window.
 // ---------------------------------------------------------------------------
-let authToken = null;
+let authToken = Cookies.get("wkl_access_token") ?? null;
 
 export const setAuthToken = (token) => {
   authToken = token;
 };
+
 
 // ---------------------------------------------------------------------------
 // Lazy store reference — injected once from App.jsx at module load time.
@@ -38,8 +44,14 @@ export function configureAuthStore(getStateFn) {
 // ---------------------------------------------------------------------------
 // Shared Axios instance
 // ---------------------------------------------------------------------------
+if (!import.meta.env.VITE_API_URL) {
+  console.error(
+    "[api] VITE_API_URL is not defined. Add it to your .env file:\n  VITE_API_URL=http://localhost:5032/api"
+  );
+}
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "",
+  baseURL: import.meta.env.VITE_API_URL,
   headers: {
     "Content-Type": "application/json",
   },

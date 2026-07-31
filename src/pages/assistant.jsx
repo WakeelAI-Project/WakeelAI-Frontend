@@ -1,17 +1,22 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { Send } from "lucide-react"
-import { AiMessageBubble, AiSuggestions, AiThinkingState, UserMessageBubble, VoiceButton } from "../components/ai/ai-chat"
+import { AiMessageBubble, AiSuggestions, UserMessageBubble, VoiceButton } from "../components/ai/ai-chat"
 import { Button } from "../components/ui/button"
 import { Input } from "../components/ui/input"
-import { assistantThread } from "../data/mock/dashboard"
+import { getAssistantThread } from "../features/company/services/assistant-service"
 import { PageShell } from "./page-shell"
 import { useTranslation } from "react-i18next"
 import { useLocale } from "../hooks/use-locale"
 
 export function AssistantPage() {
   const [isVoiceRecording, setIsVoiceRecording] = useState(false)
+  const [thread, setThread] = useState([])
   const { t } = useTranslation()
   const { isRtl } = useLocale()
+
+  useEffect(() => {
+    getAssistantThread().then(setThread).catch(() => setThread([]))
+  }, [])
 
   return (
     <PageShell
@@ -21,7 +26,7 @@ export function AssistantPage() {
     >
       <section className="mx-auto flex h-[620px] w-full max-w-3xl flex-col rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--bg-card)] shadow-[var(--shadow-2)]">
         <div className="flex-1 overflow-y-auto p-4 space-y-4 flex flex-col">
-          {assistantThread.map((message) =>
+          {thread.map((message) =>
             message.role === "ai" ? (
               <AiMessageBubble
                 key={message.id}
@@ -36,7 +41,6 @@ export function AssistantPage() {
               />
             )
           )}
-          <AiThinkingState label={t("assistant.thinking")} />
         </div>
 
         <div className="p-4 border-t border-[var(--border-default)] flex flex-col gap-3 shrink-0">

@@ -1,7 +1,7 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { DocumentCard } from "../components/legal/document-card"
 import { FileUpload } from "../components/forms/file-upload"
-import { documents } from "../data/mock/dashboard"
+import { getDocuments } from "../features/company/services/document-service"
 import { PageShell } from "./page-shell"
 import { useTranslation } from "react-i18next"
 import { useLocale } from "../hooks/use-locale"
@@ -9,6 +9,11 @@ import { useLocale } from "../hooks/use-locale"
 export function DocumentsPage() {
   const { t } = useTranslation()
   const { isRtl } = useLocale()
+  const [documents, setDocuments] = useState([])
+
+  useEffect(() => {
+    getDocuments().then(setDocuments).catch(() => setDocuments([]))
+  }, [])
 
   return (
     <PageShell

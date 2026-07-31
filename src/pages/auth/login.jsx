@@ -6,7 +6,7 @@ import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
 import { SegmentedControl } from "../../components/ui/segmented-control"
 import { useAuth } from "../../features/auth/hooks/use-auth"
-import { login as loginRequest } from "../../features/auth/services/auth-service"
+import { login as loginRequest, normalizeAuthResponse } from "../../features/auth/services/auth-service"
 import { decodeToken } from "../../features/auth/utils/jwt"
 import { useLocale } from "../../hooks/use-locale"
 import { useTranslation } from "react-i18next"
@@ -31,10 +31,19 @@ export function LoginPage() {
     setSubmitError("")
 
     try {
-      const data = await loginRequest(email, password)
-      const decoded = decodeToken(data?.access_token)
+      const raw = await loginRequest(email, password)
+      // normalizeAuthResponse handles both { token } and { access_token } backend shapes
+      const normalized = normalizeAuthResponse(raw)
+
+      if (!normalized.token) {
+        setSubmitError(t("auth.loginFailed"))
+        return
+      }
+
+      const decoded = decodeToken(normalized.token)
       const role = (decoded?.role || "").toLowerCase()
-      const matchesRole = selectedRole === "Owner" ? (role.includes("owner")) : role.includes("hr")
+      const matchesRole =
+        selectedRole === "Owner" ? role.includes("owner") : role.includes("hr")
 
       if (!matchesRole) {
         resetField("password")
@@ -42,7 +51,7 @@ export function LoginPage() {
         return
       }
 
-      setToken(data.access_token, data.refresh_token)
+      setToken(normalized.token, normalized.refreshToken)
     } catch (error) {
       setSubmitError(error?.message || t("auth.loginFailed"))
     }

@@ -5,7 +5,7 @@ import { AuthLayout } from "../../components/auth/auth-layout"
 import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
 import { useAuth } from "../../features/auth/hooks/use-auth"
-import { registerCompany } from "../../features/auth/services/auth-service"
+import { registerCompany, normalizeAuthResponse } from "../../features/auth/services/auth-service"
 import { useTranslation } from "react-i18next"
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -25,8 +25,9 @@ export function RegisterPage() {
     setSubmitError("")
 
     try {
-      const data = await registerCompany({ company_name, tax_id, owner_full_name, owner_email, password })
-      setToken(data.access_token, data.refresh_token)
+      const raw = await registerCompany({ company_name, tax_id, owner_full_name, owner_email, password })
+      const normalized = normalizeAuthResponse(raw)
+      setToken(normalized.token, normalized.refreshToken)
       navigate("/owner/dashboard", { replace: true })
     } catch (error) {
       const message =

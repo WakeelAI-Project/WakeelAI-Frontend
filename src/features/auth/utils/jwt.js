@@ -13,10 +13,13 @@ export function decodeToken(token) {
 
   try {
     const payload = jwtDecode(token);
+    // ASP.NET Core Identity role claim URI
+    const aspNetRoleClaim = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role";
+    const roleValue = payload.role || payload[aspNetRoleClaim] || null;
 
     // Extract expected properties
     return {
-      role: payload.role || null,
+      role: roleValue,
       companyId: payload.companyId || null,
       sub: payload.sub || null,
       ...payload,

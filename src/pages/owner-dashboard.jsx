@@ -7,6 +7,7 @@ import { Badge } from "../components/ui/badge"
 import { useToast } from "../components/ui/toast"
 import { PageShell } from "./page-shell"
 import { useTranslation } from "react-i18next"
+import { inviteEmployee } from "../features/company/services/employee-service"
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -16,13 +17,23 @@ export function OwnerDashboardPage() {
   const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm()
 
   const onInvite = async ({ name, email }) => {
-    await new Promise((resolve) => window.setTimeout(resolve, 250))
-    toast({
-      type: "info",
-      message: t("dashboard.inviteDemoMsg"),
-      description: t("dashboard.inviteDemoDesc", { name, email })
-    })
-    reset({ name: "", email: "" })
+    try {
+      // POST /users/invite — sends { full_name, email, role: "HR_Manager" }
+      // Backend requires the exact string "HR_Manager" (case-insensitive checked against enum)
+      await inviteEmployee({ full_name: name, email, role: "HR_Manager" })
+      toast({
+        type: "success",
+        message: t("dashboard.inviteSentMsg", { defaultValue: "Invitation sent" }),
+        description: t("dashboard.inviteSentDesc", { defaultValue: "An invitation email has been sent to {{email}}.", email }),
+      })
+      reset({ name: "", email: "" })
+    } catch (err) {
+      toast({
+        type: "error",
+        message: t("dashboard.inviteFailedMsg", { defaultValue: "Failed to send invitation" }),
+        description: err?.message || t("common.error"),
+      })
+    }
   }
 
   return (
@@ -34,7 +45,7 @@ export function OwnerDashboardPage() {
       <div className="grid gap-4 md:grid-cols-3">
         {[
           [Building2, t("dashboard.company"), t("dashboard.activeWorkspace")],
-          [Users, t("dashboard.hrTeam"), "4"],
+          [Users, t("dashboard.hrTeam"), "—"],
           [ShieldCheck, t("dashboard.access"), t("dashboard.owner")],
         ].map(([Icon, label, value]) => (
           <div key={label} className="rounded-md border border-(--border-default) bg-(--bg-card) p-5 text-start shadow-(--shadow-1)">

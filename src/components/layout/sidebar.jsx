@@ -98,7 +98,7 @@ export function Sidebar({
           <div className="flex items-center gap-3">
             <Building2 className="h-5 w-5 text-(--text-muted) shrink-0" />
             <div className="flex flex-col overflow-hidden max-w-32.5 xl:max-w-37.5">
-              <span className="text-xs font-semibold truncate text-paper">
+              <span className="text-xs font-semibold truncate text-(--text-on-brand)">
                 {companyName}
               </span>
               <span className="text-[10px] text-(--text-muted)">{t("common.activeAccount")}</span>

@@ -1,7 +1,7 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { ActivityFeed } from "../components/data-display/activity-feed"
 import { Table } from "../components/data-display/table"
-import { auditEvents } from "../data/mock/dashboard"
+import { getAuditEvents } from "../features/company/services/audit-service"
 import { PageShell } from "./page-shell"
 import { useTranslation } from "react-i18next"
 import { useLocale } from "../hooks/use-locale"
@@ -9,6 +9,11 @@ import { useLocale } from "../hooks/use-locale"
 export function AuditPage() {
   const { t } = useTranslation()
   const { isRtl } = useLocale()
+  const [auditEvents, setAuditEvents] = useState([])
+
+  useEffect(() => {
+    getAuditEvents().then(setAuditEvents).catch(() => setAuditEvents([]))
+  }, [])
 
   const rows = auditEvents.map((event) => ({
     ...event,

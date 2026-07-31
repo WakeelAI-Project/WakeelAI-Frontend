@@ -45,7 +45,7 @@ export function DetailItem({ label, value, className }) {
       <dt className="text-xs font-semibold uppercase tracking-wide text-(--text-muted)">
         {label}
       </dt>
-      <dd className="mt-1.5 break-words text-sm font-medium leading-relaxed text-(--text-primary)">
+      <dd className="mt-1.5 wrap-break-word text-sm font-medium leading-relaxed text-(--text-primary)">
         {value}
       </dd>
     </div>
