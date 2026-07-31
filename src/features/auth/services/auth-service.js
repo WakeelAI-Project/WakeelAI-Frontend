@@ -144,16 +144,18 @@ export async function refreshAccessToken(refreshToken) {
 }
 
 /**
- * Calls POST /auth/logout with the current Authorization header.
+ * Calls POST /Auth/logout with the refresh token in the request body.
  *
+ * The backend requires `{ "refresh_token": "string" }` and returns 204 No Content.
  * Always resolves — never throws. Network failures are silently swallowed
  * because logout must always clear local state regardless of backend response.
  *
+ * @param {string|null} refreshToken - The current refresh token to invalidate server-side
  * @returns {Promise<void>}
  */
-export async function logoutApi() {
+export async function logoutApi(refreshToken) {
   try {
-    await api.post("/auth/logout");
+    await api.post("/Auth/logout", { refresh_token: refreshToken });
   } catch (error) {
     // Swallow all errors — logout must always succeed locally
     console.warn("[auth] Logout request failed (ignored):", error?.message);

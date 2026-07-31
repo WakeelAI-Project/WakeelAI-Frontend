@@ -18,20 +18,21 @@ export function OwnerDashboardPage() {
 
   const onInvite = async ({ name, email }) => {
     try {
-      await inviteEmployee({ name, email })
+      // POST /users/invite — sends { full_name, email, role: "HR" }
+      // Role is hardcoded to "HR" since this form is specifically for inviting HR users
+      await inviteEmployee({ full_name: name, email, role: "HR" })
       toast({
-        type: "info",
-        message: t("dashboard.inviteDemoMsg"),
-        description: t("dashboard.inviteDemoDesc", { name, email })
+        type: "success",
+        message: t("dashboard.inviteSentMsg", { defaultValue: "Invitation sent" }),
+        description: t("dashboard.inviteSentDesc", { defaultValue: "An invitation email has been sent to {{email}}.", email }),
       })
       reset({ name: "", email: "" })
-    } catch {
+    } catch (err) {
       toast({
-        type: "info",
-        message: t("dashboard.inviteDemoMsg"),
-        description: t("dashboard.inviteDemoDesc", { name, email })
+        type: "error",
+        message: t("dashboard.inviteFailedMsg", { defaultValue: "Failed to send invitation" }),
+        description: err?.message || t("common.error"),
       })
-      reset({ name: "", email: "" })
     }
   }
 
@@ -44,7 +45,7 @@ export function OwnerDashboardPage() {
       <div className="grid gap-4 md:grid-cols-3">
         {[
           [Building2, t("dashboard.company"), t("dashboard.activeWorkspace")],
-          [Users, t("dashboard.hrTeam"), "4"],
+          [Users, t("dashboard.hrTeam"), "—"],
           [ShieldCheck, t("dashboard.access"), t("dashboard.owner")],
         ].map(([Icon, label, value]) => (
           <div key={label} className="rounded-md border border-(--border-default) bg-(--bg-card) p-5 text-start shadow-(--shadow-1)">

@@ -1,12 +1,24 @@
 import { create } from "zustand";
 import { decodeToken, isTokenExpired } from "../utils/jwt";
-import { login as apiLogin, logoutApi, normalizeAuthResponse } from "../services/auth-service";
+import { login as apiLogin, logoutApi, normalizeAuthResponse, refreshAccessToken } from "../services/auth-service";
 import { setAuthToken } from "../../../lib/api";
+import {
+  getAccessTokenCookie,
+  getRefreshTokenCookie,
+  getUserCookie,
+  removeAllAuthCookies,
+  setAccessTokenCookie,
+  setRefreshTokenCookie,
+  setUserCookie,
+} from "../../../lib/cookies";
 
 // ---------------------------------------------------------------------------
-// Token is stored ONLY in Zustand in-memory state.
-// No localStorage, no sessionStorage, no cookies.
-// Refreshing the page will clear auth and redirect to /login — by design.
+// Auth state is held in Zustand (live React tree) AND persisted in cookies
+// so it survives hard reloads.
+//
+// ⚠️  SECURITY NOTE: Cookies are JS-readable (not httpOnly). This is the
+// accepted tradeoff for a pure-frontend SPA — same exposure as localStorage,
+// but with cross-reload persistence and explicit logout clearing. See cookies.js.
 // ---------------------------------------------------------------------------
 
 const initialStoreState = {
@@ -20,24 +32,41 @@ export const useAuthStore = create((set, get) => ({
   ...initialStoreState,
 
   /**
-   * Stores the access token (and optionally the refresh token) in the store.
-   * Also decodes the JWT to populate currentUser and syncs the Axios interceptor.
+   * Stores the access token (and optionally the refresh token) in the store,
+   * syncs the Axios interceptor, and persists both to cookies.
    *
    * @param {string} token - JWT access token
    * @param {string|null} [refreshToken] - Refresh token (optional)
+   * @param {number|null} [expiresIn] - Access token TTL in seconds (from auth response)
    */
-  setToken: (token, refreshToken) => {
+  setToken: (token, refreshToken, expiresIn) => {
     if (!token) {
       get().clearAuth();
       return;
     }
 
     const decoded = decodeToken(token);
+
     // Sync the access token with the Axios request interceptor
     setAuthToken(token);
+
+    // Persist to cookies — align expiry with token lifetime where known
+    setAccessTokenCookie(token, expiresIn ?? null);
+    setUserCookie(decoded, expiresIn ?? null);
+
+    const newRefreshToken = refreshToken ?? get().refreshToken;
+    if (newRefreshToken) {
+      // Derive refresh token expiry from its JWT exp claim (longer-lived)
+      const refreshDecoded = decodeToken(newRefreshToken);
+      const refreshExpiresIn = refreshDecoded?.exp
+        ? Math.max(0, refreshDecoded.exp - Math.floor(Date.now() / 1000))
+        : null;
+      setRefreshTokenCookie(newRefreshToken, refreshExpiresIn);
+    }
+
     set({
       token,
-      refreshToken: refreshToken ?? get().refreshToken,
+      refreshToken: newRefreshToken,
       currentUser: decoded,
       isAuthenticated: true,
     });
@@ -46,16 +75,24 @@ export const useAuthStore = create((set, get) => ({
   /**
    * Stores only the refresh token without touching the access token or user state.
    * Used by the Axios auto-refresh interceptor after a silent token exchange.
+   * Also persists the new refresh token to the cookie.
    *
    * @param {string|null} refreshToken
    */
   setRefreshToken: (refreshToken) => {
+    if (refreshToken) {
+      const decoded = decodeToken(refreshToken);
+      const expiresIn = decoded?.exp
+        ? Math.max(0, decoded.exp - Math.floor(Date.now() / 1000))
+        : null;
+      setRefreshTokenCookie(refreshToken, expiresIn);
+    }
     set({ refreshToken });
   },
 
   /**
    * Performs a login via credentials. Normalizes the backend response and
-   * stores both the access token and refresh token.
+   * stores both the access token and refresh token (in memory + cookies).
    *
    * @param {string} email
    * @param {string} password
@@ -70,7 +107,8 @@ export const useAuthStore = create((set, get) => ({
         throw new Error("Invalid response format: missing access_token");
       }
 
-      get().setToken(normalized.token, normalized.refreshToken);
+      // Pass expiresIn so cookies are stamped with the right TTL
+      get().setToken(normalized.token, normalized.refreshToken, normalized.expiresIn);
       return normalized;
     } catch (error) {
       get().clearAuth();
@@ -80,41 +118,71 @@ export const useAuthStore = create((set, get) => ({
 
   /**
    * Logs the user out.
-   * Calls POST /auth/logout on the backend (fire-and-forget, errors swallowed),
-   * then always clears local auth state.
+   * Calls POST /Auth/logout on the backend with the refresh token (fire-and-forget,
+   * errors swallowed), then always clears local auth state and cookies.
    */
   logout: async () => {
+    const { refreshToken } = get();
     try {
-      await logoutApi();
+      await logoutApi(refreshToken);
     } finally {
       get().clearAuth();
     }
   },
 
   /**
-   * Resets all auth state to initial values and clears the Axios token.
+   * Resets all auth state to initial values, clears the Axios token,
+   * and removes all auth cookies.
    */
   clearAuth: () => {
     setAuthToken(null);
+    removeAllAuthCookies();
     set(initialStoreState);
   },
 
   /**
    * Called once on application bootstrap.
-   * Since tokens are in-memory only, after a hard reload the token is always
-   * null — the user must log in again. This is the intended behavior.
-   * The function is kept for API compatibility with existing call-sites.
+   *
+   * Reads persisted auth cookies on page load:
+   *  1. If a valid (non-expired) access token cookie exists → restore state + re-arm Axios.
+   *  2. If the access token is expired but a refresh token cookie exists → attempt a silent
+   *     refresh before falling back to logged-out state.
+   *  3. No usable cookie → no-op, user must log in.
    */
-  bootstrapAuth: () => {
-    const { token } = get();
+  bootstrapAuth: async () => {
+    const cookieToken = getAccessTokenCookie();
+    const cookieRefreshToken = getRefreshTokenCookie();
+    const cookieUser = getUserCookie();
 
-    if (token && !isTokenExpired(token)) {
-      // Token is valid in memory (same session) — re-arm the Axios interceptor
-      setAuthToken(token);
-    } else if (token) {
-      // Token exists but has expired — clear everything
-      get().clearAuth();
+    // Case 1: valid access token in cookie
+    if (cookieToken && !isTokenExpired(cookieToken)) {
+      const decoded = cookieUser ?? decodeToken(cookieToken);
+      setAuthToken(cookieToken);
+      set({
+        token: cookieToken,
+        refreshToken: cookieRefreshToken ?? null,
+        currentUser: decoded,
+        isAuthenticated: true,
+      });
+      return;
     }
-    // No token → no-op, stays unauthenticated
+
+    // Case 2: expired access token but refresh token available → silent refresh
+    if (cookieRefreshToken) {
+      try {
+        const raw = await refreshAccessToken(cookieRefreshToken);
+        const normalized = normalizeAuthResponse(raw);
+
+        if (normalized.token) {
+          get().setToken(normalized.token, normalized.refreshToken ?? cookieRefreshToken, normalized.expiresIn);
+          return;
+        }
+      } catch {
+        // Silent refresh failed — fall through to logged-out state
+      }
+    }
+
+    // Case 3: no valid token — clear stale cookies and stay unauthenticated
+    get().clearAuth();
   },
 }));

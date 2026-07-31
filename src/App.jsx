@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import { createBrowserRouter, RouterProvider, Navigate, Outlet, useLocation, useNavigate } from "react-router"
 import { CommandPalette } from "./components/layout/command-palette"
 import { Sidebar } from "./components/layout/sidebar"
@@ -28,6 +28,7 @@ import { useLocale } from "./hooks/use-locale"
 import { useTranslation } from "react-i18next"
 import "./i18n" // Load i18n configuration
 
+// Inject Zustand store reference into the Axios layer once at module load
 configureAuthStore(useAuthStore.getState)
 
 function DashboardShell() {
@@ -165,11 +166,24 @@ const router = createBrowserRouter([
   }
 ])
 
+function AuthBootstrap() {
+  useEffect(() => {
+    // Restore cookie-persisted auth state on every page load.
+    // bootstrapAuth is async: it attempts a silent token refresh when the
+    // access token cookie is expired but a refresh token cookie is present.
+    // We call it via getState() to avoid binding to the React render cycle.
+    useAuthStore.getState().bootstrapAuth()
+  }, [])
+
+  return null
+}
+
 export default function App() {
   return (
     <ThemeProvider>
       <ToastProvider>
         <AppProvider>
+          <AuthBootstrap />
           <RouterProvider router={router} />
         </AppProvider>
       </ToastProvider>

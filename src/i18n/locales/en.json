@@ -82,8 +82,8 @@
     "access": "Access",
     "owner": "Owner",
     "inviteHrUser": "Invite HR user",
-    "inviteHrDesc": "This is frontend-only for now. Sending real invitations needs backend support.",
-    "demo": "Demo",
+    "inviteHrDesc": "Send an email invitation to a new HR user. They will receive a link to set their password and access the workspace.",
+    "demo": "Live",
     "stub": "Stub",
     "hrNameLabel": "HR name",
     "hrEmailLabel": "HR email",
@@ -186,10 +186,10 @@
       "title": "Company Profile",
       "description": "Review the organization details, contact information, and account standing for this workspace.",
       "logoLabel": "Logo placeholder for {{name}}",
-      "mockHelper": "Profile data is temporarily mocked. Owner changes are kept for this session only.",
+      "ownerHelper": "As the company owner you can update the profile details, contact information, and upload a new logo.",
       "readOnlyHelper": "Your HR access includes a clear, read-only view of company information.",
       "saveSuccess": "Company profile updated",
-      "saveSuccessDescription": "Your mock profile changes were saved for this session."
+      "saveSuccessDescription": "Your changes have been saved successfully."
     },
     "user": {
       "eyebrow": "Account overview",
