@@ -38,8 +38,14 @@ export function configureAuthStore(getStateFn) {
 // ---------------------------------------------------------------------------
 // Shared Axios instance
 // ---------------------------------------------------------------------------
+if (!import.meta.env.VITE_API_URL) {
+  console.error(
+    "[api] VITE_API_URL is not defined. Add it to your .env file:\n  VITE_API_URL=http://localhost:5032/api"
+  );
+}
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "",
+  baseURL: import.meta.env.VITE_API_URL,
   headers: {
     "Content-Type": "application/json",
   },

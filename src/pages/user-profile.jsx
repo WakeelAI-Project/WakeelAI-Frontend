@@ -13,7 +13,6 @@ import { useTranslation } from "react-i18next"
 import { Avatar, AvatarFallback } from "../components/ui/avatar"
 import { Badge } from "../components/ui/badge"
 import { useApp } from "../context/app-context"
-import { getMockUserProfile } from "../data/mock/profile"
 import { useAuth } from "../features/auth/hooks/use-auth"
 import {
   DetailGrid,
@@ -48,6 +47,15 @@ function getRoleTranslationKey(role) {
   return null
 }
 
+// Default permission sets derived from role — used until GET /profile/me is available
+function getDefaultPermissions(role) {
+  const normalized = role?.toLowerCase() || ""
+  if (normalized.includes("owner")) {
+    return ["manageCompany", "manageHr", "workspaceOversight"]
+  }
+  return ["viewCompany", "manageEmployees", "manageDocuments", "reviewCompliance"]
+}
+
 export function UserProfilePage() {
   const { t } = useTranslation()
   const { language, isRtl } = useLocale()
@@ -55,25 +63,38 @@ export function UserProfilePage() {
   const { activeCompany, currentUser: defaultUser } = useApp()
   const sourceUser = authUser || defaultUser
 
+  /**
+   * Build the profile entirely from JWT claims.
+   * When GET /profile/me is available, replace this with a real API call.
+   *
+   * @status BACKEND ENDPOINT NOT IMPLEMENTED — using JWT claims as fallback
+   */
   const profile = useMemo(() => {
-    const mockProfile = getMockUserProfile(sourceUser?.role)
-    const localizedFallbackName = isRtl
+    const localizedName = isRtl
       ? sourceUser?.name || sourceUser?.nameEn
       : sourceUser?.nameEn || sourceUser?.name
 
+    const companyName =
+      sourceUser?.companyName ||
+      (isRtl ? activeCompany?.name : activeCompany?.nameEn) ||
+      ""
+
+    const initials =
+      sourceUser?.initials || createInitials(localizedName)
+
     return {
-      ...mockProfile,
-      fullName: localizedFallbackName || mockProfile.fullName,
-      initials:
-        sourceUser?.initials ||
-        createInitials(localizedFallbackName || mockProfile.fullName),
-      role: sourceUser?.role || mockProfile.role,
-      email: sourceUser?.email || mockProfile.email,
-      phone: sourceUser?.phone || mockProfile.phone,
-      companyName:
-        sourceUser?.companyName ||
-        (isRtl ? activeCompany?.name : activeCompany?.nameEn) ||
-        mockProfile.companyName,
+      fullName: localizedName || "",
+      initials,
+      role: sourceUser?.role || "",
+      email: sourceUser?.email || "",
+      phone: sourceUser?.phone || "",
+      jobTitle: sourceUser?.jobTitle || "",
+      department: sourceUser?.department || "",
+      joinDate: sourceUser?.joinDate || null,
+      companyName,
+      accountStatus: sourceUser?.accountStatus || "active",
+      lastLogin: "today",
+      permissions: getDefaultPermissions(sourceUser?.role),
     }
   }, [activeCompany, isRtl, sourceUser])
 

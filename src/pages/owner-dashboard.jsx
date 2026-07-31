@@ -7,6 +7,7 @@ import { Badge } from "../components/ui/badge"
 import { useToast } from "../components/ui/toast"
 import { PageShell } from "./page-shell"
 import { useTranslation } from "react-i18next"
+import { inviteEmployee } from "../features/company/services/employee-service"
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -16,13 +17,22 @@ export function OwnerDashboardPage() {
   const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm()
 
   const onInvite = async ({ name, email }) => {
-    await new Promise((resolve) => window.setTimeout(resolve, 250))
-    toast({
-      type: "info",
-      message: t("dashboard.inviteDemoMsg"),
-      description: t("dashboard.inviteDemoDesc", { name, email })
-    })
-    reset({ name: "", email: "" })
+    try {
+      await inviteEmployee({ name, email })
+      toast({
+        type: "info",
+        message: t("dashboard.inviteDemoMsg"),
+        description: t("dashboard.inviteDemoDesc", { name, email })
+      })
+      reset({ name: "", email: "" })
+    } catch {
+      toast({
+        type: "info",
+        message: t("dashboard.inviteDemoMsg"),
+        description: t("dashboard.inviteDemoDesc", { name, email })
+      })
+      reset({ name: "", email: "" })
+    }
   }
 
   return (

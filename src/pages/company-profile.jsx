@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { BookOpen, Briefcase, Landmark, Mail, Pencil, Save, ShieldCheck, X } from "lucide-react"
 import { LogoUploader } from "../features/company/components/LogoUploader"
 import { useForm } from "react-hook-form"
@@ -8,7 +8,7 @@ import { Button } from "../components/ui/button"
 import { Input } from "../components/ui/input"
 import { useToast } from "../components/ui/toast"
 import { useApp } from "../context/app-context"
-import { getMockCompanyProfile, saveMockCompanyProfile } from "../data/mock/profile"
+import { getCompanyProfile, updateCompanyProfile } from "../features/company/services/profile-service"
 import { useAuth } from "../features/auth/hooks/use-auth"
 import {
   DetailGrid,
@@ -36,6 +36,26 @@ function isOwnerRole(role) {
   return ["owner", "company_owner"].includes(role?.toLowerCase())
 }
 
+// Default empty company shape — populated from backend when available
+const EMPTY_COMPANY = {
+  id: null,
+  name: "",
+  legalName: "",
+  taxId: "",
+  industry: "",
+  size: "",
+  headquarters: "",
+  email: "",
+  phone: "",
+  website: "",
+  createdAt: null,
+  ownerName: "",
+  policyStatus: "",
+  policyUpdatedAt: null,
+  accountStatus: "active",
+  logoUrl: null,
+}
+
 export function CompanyProfilePage() {
   const { t } = useTranslation()
   const { language } = useLocale()
@@ -45,23 +65,44 @@ export function CompanyProfilePage() {
   const currentUser = authUser || defaultUser
   const canEdit = isOwnerRole(currentUser?.role)
   const [isEditing, setIsEditing] = useState(false)
-  const [company, setCompany] = useState(() =>
-    getMockCompanyProfile({
-      ...(authUser?.companyName || activeCompany?.nameEn
-        ? { name: authUser?.companyName || activeCompany?.nameEn }
-        : {}),
-      ...(canEdit && (currentUser?.nameEn || currentUser?.name)
-        ? { ownerName: currentUser?.nameEn || currentUser?.name }
-        : {}),
-    })
-  )
   const [logo, setLogo] = useState(null) // staged File; null means use company.logoUrl
+
+  // Build initial company state from JWT claims as a best-effort fallback
+  // until GET /company/profile is implemented on the backend.
+  const buildCompanyFromJwt = () => ({
+    ...EMPTY_COMPANY,
+    name:
+      authUser?.companyName ||
+      (activeCompany?.nameEn || activeCompany?.name || ""),
+    ownerName:
+      canEdit
+        ? authUser?.nameEn || authUser?.name || defaultUser?.nameEn || defaultUser?.name || ""
+        : "",
+  })
+
+  const [company, setCompany] = useState(buildCompanyFromJwt)
+
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
   } = useForm({ defaultValues: company })
+
+  // Try to load real company profile from backend; fall back silently to JWT data
+  useEffect(() => {
+    getCompanyProfile()
+      .then((data) => {
+        if (data) {
+          setCompany((prev) => ({ ...prev, ...data }))
+          reset({ ...company, ...data })
+        }
+      })
+      .catch(() => {
+        // Backend endpoint not yet implemented — using JWT-derived data silently
+      })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const fallback = t("profile.notProvided")
   const displayValue = (value) => value || fallback
@@ -77,14 +118,28 @@ export function CompanyProfilePage() {
   }
 
   const saveCompany = async (values) => {
-    const safeUpdates = await saveMockCompanyProfile(values)
-    setCompany((currentCompany) => ({ ...currentCompany, ...safeUpdates, logoUrl: logo ? URL.createObjectURL(logo) : currentCompany.logoUrl }))
-    setIsEditing(false)
-    toast({
-      type: "success",
-      message: t("profile.company.saveSuccess"),
-      description: t("profile.company.saveSuccessDescription"),
-    })
+    try {
+      // Attempt real API update; ignore response if endpoint not yet available
+      const updated = await updateCompanyProfile(values)
+      const safeUpdates = updated ?? values
+
+      setCompany((current) => ({
+        ...current,
+        ...safeUpdates,
+        logoUrl: logo ? URL.createObjectURL(logo) : current.logoUrl,
+      }))
+      setIsEditing(false)
+      toast({
+        type: "success",
+        message: t("profile.company.saveSuccess"),
+        description: t("profile.company.saveSuccessDescription"),
+      })
+    } catch {
+      toast({
+        type: "error",
+        message: t("profile.company.saveError", { defaultValue: "Failed to save. Please try again." }),
+      })
+    }
   }
 
   const emailValue = company.email ? (
@@ -286,11 +341,15 @@ export function CompanyProfilePage() {
                 <DetailItem
                   label={t("profile.fields.policyStatus")}
                   value={
-                    <Badge variant="success">
-                      {t(`profile.values.${company.policyStatus}`, {
-                        defaultValue: displayValue(company.policyStatus),
-                      })}
-                    </Badge>
+                    company.policyStatus ? (
+                      <Badge variant="success">
+                        {t(`profile.values.${company.policyStatus}`, {
+                          defaultValue: displayValue(company.policyStatus),
+                        })}
+                      </Badge>
+                    ) : (
+                      fallback
+                    )
                   }
                 />
                 <DetailItem
