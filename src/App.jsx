@@ -17,6 +17,7 @@ import { LoginPage } from "./pages/auth/login"
 import { RegisterPage } from "./pages/auth/register"
 import { HrDashboardPage } from "./pages/hr-dashboard"
 import { OwnerDashboardPage } from "./pages/owner-dashboard"
+import { DepartmentsPage } from "./pages/departments"
 import { CompanyProfilePage } from "./pages/company-profile"
 import { UserProfilePage } from "./pages/user-profile"
 import { ProtectedRoute } from "./features/auth/components/ProtectedRoute"
@@ -134,7 +135,8 @@ const router = createBrowserRouter([
           { path: "", element: <Navigate to="dashboard" replace /> },
           { path: "dashboard", element: <OwnerDashboardPage /> },
           { path: "company-profile", element: <CompanyProfilePage /> },
-          { path: "profile", element: <UserProfilePage /> }
+          { path: "profile", element: <UserProfilePage /> },
+          { path: "departments", element: <DepartmentsPage /> }
         ]
       }
     ]

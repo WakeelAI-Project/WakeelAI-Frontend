@@ -26,26 +26,22 @@ const SelectTrigger = React.forwardRef(({ className, children, ...props }, ref) 
 ))
 SelectTrigger.displayName = SelectPrimitive.Trigger.displayName
 
-const SelectContent = React.forwardRef(({ className, children, position = "popper", ...props }, ref) => (
+const SelectContent = React.forwardRef(({ className, children, position = "popper", side = "bottom", sideOffset = 4, ...props }, ref) => (
   <SelectPrimitive.Portal>
     <SelectPrimitive.Content
       ref={ref}
+      side={side}
+      sideOffset={sideOffset}
       className={cn(
-        "relative z-50 min-w-32 overflow-hidden rounded-md border border-(--border-default) bg-paper p-1 text-(--text-primary) shadow-(--shadow-2) data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0 data-[state=open]:zoom-in-95 data-[state=closed]:zoom-out-95 dark:bg-(--bg-card-raised) dark:border-(--border-emphasis)",
+        "relative z-50 overflow-hidden rounded-md border border-(--border-default) bg-paper p-1 text-(--text-primary) shadow-(--shadow-2) data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0 data-[state=open]:zoom-in-95 data-[state=closed]:zoom-out-95 dark:bg-(--bg-card-raised) dark:border-(--border-emphasis)",
         position === "popper" &&
-          "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
+          "w-(--radix-select-trigger-width) min-w-(--radix-select-trigger-width)",
         className
       )}
       position={position}
       {...props}
     >
-      <SelectPrimitive.Viewport
-        className={cn(
-          "p-1",
-          position === "popper" &&
-            "h-(--radix-select-trigger-height) w-full min-w-(--radix-select-trigger-width)"
-        )}
-      >
+      <SelectPrimitive.Viewport className="p-1">
         {children}
       </SelectPrimitive.Viewport>
     </SelectPrimitive.Content>
@@ -66,18 +62,17 @@ const SelectItem = React.forwardRef(({ className, children, ...props }, ref) => 
   <SelectPrimitive.Item
     ref={ref}
     className={cn(
-      "relative flex w-full cursor-pointer select-none items-center rounded-xs py-2 ps-8 pe-2 text-sm text-(--text-primary) outline-none focus:bg-(--bg-page-alt) data-disabled:pointer-events-none data-disabled:opacity-50 dark:focus:bg-(--border-emphasis) text-start justify-between",
+      "relative flex w-full cursor-pointer select-none items-center rounded-xs px-2.5 py-2 ps-8 text-sm text-(--text-primary) outline-none transition-colors focus:bg-(--bg-page-alt) data-highlighted:bg-(--bg-page-alt) data-[state=checked]:text-(--ai-primary) data-disabled:pointer-events-none data-disabled:opacity-50 dark:focus:bg-(--border-emphasis) dark:data-[highlighted]:bg-(--border-emphasis) text-start",
       className
     )}
     {...props}
   >
     <span className="absolute inset-s-2 flex h-3.5 w-3.5 items-center justify-center">
-      <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
+      <SelectPrimitive.ItemIndicator>
+        <Check className="h-4 w-4 text-(--ai-primary)" />
+      </SelectPrimitive.ItemIndicator>
     </span>
-
-    <SelectPrimitive.ItemIndicator className="absolute inset-s-2 flex h-3.5 w-3.5 items-center justify-center text-(--ai-primary)">
-      <Check className="h-4 w-4" />
-    </SelectPrimitive.ItemIndicator>
+    <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
   </SelectPrimitive.Item>
 ))
 SelectItem.displayName = SelectPrimitive.Item.displayName
