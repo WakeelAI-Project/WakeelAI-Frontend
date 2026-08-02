@@ -174,3 +174,18 @@ export async function updateUserStatus(userId, isActive) {
     throw new Error(mapEmployeeError(error), { cause: error });
   }
 }
+
+/**
+ * @param {{ page?: number, limit?: number, status?: "Active" | "Inactive" }} params
+ * @returns {Promise<{ data: Array, page: number, total: number }>}
+ */
+export async function listEmployees({ page = 1, limit = 20, status } = {}) {
+  const params = { page, limit };
+
+  if (status) {
+    params.status = status;
+  }
+
+  const { data } = await api.get("/employees", { params });
+  return data;
+}
