@@ -26,14 +26,16 @@ const SelectTrigger = React.forwardRef(({ className, children, ...props }, ref) 
 ))
 SelectTrigger.displayName = SelectPrimitive.Trigger.displayName
 
-const SelectContent = React.forwardRef(({ className, children, position = "popper", ...props }, ref) => (
+const SelectContent = React.forwardRef(({ className, children, position = "popper", side = "bottom", sideOffset = 4, ...props }, ref) => (
   <SelectPrimitive.Portal>
     <SelectPrimitive.Content
       ref={ref}
+      side={side}
+      sideOffset={sideOffset}
       className={cn(
-        "relative z-50 min-w-32 overflow-hidden rounded-md border border-(--border-default) bg-paper p-1 text-(--text-primary) shadow-(--shadow-2) data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0 data-[state=open]:zoom-in-95 data-[state=closed]:zoom-out-95 dark:bg-(--bg-card-raised) dark:border-(--border-emphasis)",
+        "relative z-50 overflow-hidden rounded-md border border-(--border-default) bg-paper p-1 text-(--text-primary) shadow-(--shadow-2) data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in-0 data-[state=closed]:fade-out-0 data-[state=open]:zoom-in-95 data-[state=closed]:zoom-out-95 dark:bg-(--bg-card-raised) dark:border-(--border-emphasis)",
         position === "popper" &&
-          "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
+          "w-(--radix-select-trigger-width) min-w-(--radix-select-trigger-width)",
         className
       )}
       position={position}

@@ -9,6 +9,7 @@ import {
   FolderOpen,
   History,
   Landmark,
+  Layers,
   MessageSquareCode,
   ShieldCheck,
   UserRound,
@@ -22,6 +23,7 @@ import { useLocale } from "../../hooks/use-locale"
 export const NAV_ITEMS = [
   { id: "dashboard", labelKey: "sidebar.dashboard", icon: Building2 },
   { id: "company-profile", labelKey: "sidebar.companyProfile", icon: Landmark },
+  { id: "departments", labelKey: "sidebar.departments", icon: Layers },
   { id: "profile", labelKey: "sidebar.myProfile", icon: UserRound },
   { id: "employees", labelKey: "sidebar.employees", icon: Users },
   { id: "contracts", labelKey: "sidebar.contracts", icon: FileText },
@@ -43,7 +45,7 @@ export function Sidebar({
   const { isRtl } = useLocale()
   const visibleItems = rolePrefix === "/owner"
     ? NAV_ITEMS.filter((item) =>
-        ["dashboard", "company-profile", "profile"].includes(item.id)
+        ["dashboard", "company-profile", "departments", "profile"].includes(item.id)
       )
     : NAV_ITEMS
 
