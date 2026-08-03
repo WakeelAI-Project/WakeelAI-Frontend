@@ -1,4 +1,4 @@
-﻿import React from "react"
+import React from "react"
 import * as SelectPrimitive from "@radix-ui/react-select"
 import { Check, ChevronDown } from "lucide-react"
 import { cn } from "../../lib/utils"
@@ -41,7 +41,13 @@ const SelectContent = React.forwardRef(({ className, children, position = "poppe
       position={position}
       {...props}
     >
-      <SelectPrimitive.Viewport className="p-1">
+      <SelectPrimitive.Viewport
+        className={cn(
+          "p-1",
+          position === "popper" &&
+            "w-full min-w-(--radix-select-trigger-width)"
+        )}
+      >
         {children}
       </SelectPrimitive.Viewport>
     </SelectPrimitive.Content>
@@ -62,16 +68,17 @@ const SelectItem = React.forwardRef(({ className, children, ...props }, ref) => 
   <SelectPrimitive.Item
     ref={ref}
     className={cn(
-      "relative flex w-full cursor-pointer select-none items-center rounded-xs px-2.5 py-2 ps-8 text-sm text-(--text-primary) outline-none transition-colors focus:bg-(--bg-page-alt) data-highlighted:bg-(--bg-page-alt) data-[state=checked]:text-(--ai-primary) data-disabled:pointer-events-none data-disabled:opacity-50 dark:focus:bg-(--border-emphasis) dark:data-highlighted:bg-(--border-emphasis) text-start",
+      "relative flex w-full cursor-pointer select-none items-center rounded-xs py-2 ps-8 pe-2 text-sm text-(--text-primary) outline-none focus:bg-(--bg-page-alt) data-[state=checked]:bg-(--bg-page-alt) data-[state=checked]:text-(--ai-primary) data-disabled:pointer-events-none data-disabled:opacity-50 dark:focus:bg-(--border-emphasis) text-start justify-between",
       className
     )}
     {...props}
   >
     <span className="absolute inset-s-2 flex h-3.5 w-3.5 items-center justify-center">
-      <SelectPrimitive.ItemIndicator>
-        <Check className="h-4 w-4 text-(--ai-primary)" />
+      <SelectPrimitive.ItemIndicator className="text-(--ai-primary)">
+        <Check className="h-4 w-4" />
       </SelectPrimitive.ItemIndicator>
     </span>
+
     <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
   </SelectPrimitive.Item>
 ))
