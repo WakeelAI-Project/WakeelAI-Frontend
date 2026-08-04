@@ -1,11 +1,16 @@
 import React, { useCallback, useEffect, useState } from "react"
+import { Plus } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { EmployeeTable } from "../features/company/components/employee-table"
+import { EmployeeFormModal } from "../features/company/components/employee-form-modal"
 import { listEmployees } from "../features/company/services/employee-service"
+import { listDepartments } from "../features/company/services/department-service"
 import { EmptyState } from "../components/layout/empty-state"
 import { Pagination } from "../components/navigation/pagination"
+import { Button } from "../components/ui/button"
 import { Input } from "../components/ui/input"
 import { Spinner } from "../components/ui/spinner"
+import { useToast } from "../components/ui/toast"
 import {
   Select,
   SelectContent,
@@ -19,13 +24,17 @@ const PAGE_SIZE = 20
 
 export function EmployeesPage() {
   const { t } = useTranslation()
+  const { toast } = useToast()
   const [page, setPage] = useState(1)
   const [statusFilter, setStatusFilter] = useState("all")
   const [searchQuery, setSearchQuery] = useState("")
   const [employees, setEmployees] = useState([])
+  const [departments, setDepartments] = useState([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [createOpen, setCreateOpen] = useState(false)
+  const [editTarget, setEditTarget] = useState(null)
 
   const totalPages = total > 0 ? Math.ceil(total / PAGE_SIZE) : 0
 
@@ -55,9 +64,68 @@ export function EmployeesPage() {
     loadEmployees()
   }, [loadEmployees])
 
+  useEffect(() => {
+    let ignore = false
+
+    async function loadDepartments() {
+      try {
+        const response = await listDepartments()
+        if (!ignore) setDepartments(response.data ?? [])
+      } catch (err) {
+        if (!ignore) {
+          toast({
+            type: "error",
+            message: t("departmentsPage.loadError"),
+            description: err?.message,
+          })
+        }
+      }
+    }
+
+    loadDepartments()
+
+    return () => {
+      ignore = true
+    }
+  }, [t, toast])
+
   const handleStatusChange = (value) => {
     setStatusFilter(value)
     setPage(1)
+  }
+
+  const handleCreateSuccess = (result) => {
+    if (result?.error) {
+      toast({
+        type: "error",
+        message: t("common.error"),
+        description: result.error.message,
+      })
+      return
+    }
+    setCreateOpen(false)
+    loadEmployees()
+    toast({
+      type: "success",
+      message: t("employees.createSuccess"),
+    })
+  }
+
+  const handleEditSuccess = (result) => {
+    if (result?.error) {
+      toast({
+        type: "error",
+        message: t("common.error"),
+        description: result.error.message,
+      })
+      return
+    }
+    setEditTarget(null)
+    loadEmployees()
+    toast({
+      type: "success",
+      message: t("employees.updateSuccess"),
+    })
   }
 
   return (
@@ -78,20 +146,27 @@ export function EmployeesPage() {
             />
           </div>
 
-          <div className="w-full sm:w-48">
-            <label className="mb-1.5 block text-sm font-medium text-(--text-primary)">
-              {t("employees.statusFilter")}
-            </label>
-            <Select value={statusFilter} onValueChange={handleStatusChange}>
-              <SelectTrigger aria-label={t("employees.statusFilter")}>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{t("employees.statusAll")}</SelectItem>
-                <SelectItem value="Active">{t("employees.statusActive")}</SelectItem>
-                <SelectItem value="Inactive">{t("employees.statusInactive")}</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-end">
+            <div className="w-full sm:w-48">
+              <label className="mb-1.5 block text-sm font-medium text-(--text-primary)">
+                {t("employees.statusFilter")}
+              </label>
+              <Select value={statusFilter} onValueChange={handleStatusChange}>
+                <SelectTrigger aria-label={t("employees.statusFilter")}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t("employees.statusAll")}</SelectItem>
+                  <SelectItem value="Active">{t("employees.statusActive")}</SelectItem>
+                  <SelectItem value="Inactive">{t("employees.statusInactive")}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <Button type="button" onClick={() => setCreateOpen(true)}>
+              <Plus className="h-4 w-4" aria-hidden="true" />
+              {t("employees.createButton")}
+            </Button>
           </div>
         </div>
 
@@ -114,7 +189,7 @@ export function EmployeesPage() {
           />
         ) : (
           <>
-            <EmployeeTable employees={employees} />
+            <EmployeeTable employees={employees} onEdit={(row) => setEditTarget(row)} />
 
             {totalPages > 1 && (
               <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-between">
@@ -131,6 +206,25 @@ export function EmployeesPage() {
           </>
         )}
       </section>
+
+      <EmployeeFormModal
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+        mode="create"
+        departments={departments}
+        onSuccess={handleCreateSuccess}
+      />
+
+      <EmployeeFormModal
+        open={!!editTarget}
+        onOpenChange={(open) => {
+          if (!open) setEditTarget(null)
+        }}
+        mode="edit"
+        employee={editTarget}
+        departments={departments}
+        onSuccess={handleEditSuccess}
+      />
     </PageShell>
   )
 }
