@@ -34,6 +34,19 @@ export const NAV_ITEMS = [
   { id: "audit", labelKey: "sidebar.audit", icon: History }
 ]
 
+const HR_VISIBLE_IDS = [
+  "dashboard",
+  "employees",
+  "contracts",
+  "leave",
+  "compliance",
+  "documents",
+  "assistant",
+  "audit",
+  "company-profile",
+  "profile"
+]
+
 export function Sidebar({
   activeId,
   onNavSelect,
@@ -47,7 +60,7 @@ export function Sidebar({
     ? NAV_ITEMS.filter((item) =>
         ["dashboard", "company-profile", "departments", "profile"].includes(item.id)
       )
-    : NAV_ITEMS
+    : NAV_ITEMS.filter((item) => HR_VISIBLE_IDS.includes(item.id))
 
   return (
     <aside className="w-60 xl:w-66 h-screen bg-(--bg-sidebar) text-(--text-on-brand) flex flex-col justify-between select-none border-e border-(--brand-primary-hover) shrink-0">

@@ -306,6 +306,23 @@
       "saving": "Saving...",
       "cancel": "Cancel"
     },
+    "security": {
+      "title": "Change Password",
+      "description": "Update the password used to sign in to your account.",
+      "currentPassword": "Current password",
+      "newPassword": "New password",
+      "newPasswordHint": "At least {{min}} characters",
+      "confirmPassword": "Confirm new password",
+      "submit": "Update password",
+      "currentRequired": "Current password is required",
+      "newRequired": "New password is required",
+      "newMinLength": "New password must be at least {{min}} characters",
+      "confirmRequired": "Please confirm your new password",
+      "confirmMismatch": "Passwords do not match",
+      "successTitle": "Password updated",
+      "successDesc": "Your password has been changed successfully.",
+      "failTitle": "Failed to change password"
+    },
     "company": {
       "eyebrow": "Company account",
       "title": "Company Profile",
@@ -314,7 +331,9 @@
       "mockHelper": "Profile data is temporarily mocked. Owner changes are kept for this session only.",
       "readOnlyHelper": "Your HR access includes a clear, read-only view of company information.",
       "saveSuccess": "Company profile updated",
-      "saveSuccessDescription": "Your mock profile changes were saved for this session."
+      "saveSuccessDescription": "Your mock profile changes were saved for this session.",
+      "forbiddenTitle": "You don't have access to this page",
+      "forbiddenDesc": "Company profile details are only visible to the company owner."
     },
     "user": {
       "eyebrow": "Account overview",

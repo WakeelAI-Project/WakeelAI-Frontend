@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useMemo, useState } from "react"
+import React, { createContext, useContext, useMemo, useState, useCallback } from "react"
 
 const AppContext = createContext(undefined)
 
@@ -16,21 +16,24 @@ const notifications = [
   { id: "n-3", type: "info", message: "Payroll audit exported" }
 ]
 
+const EMPTY_COMPANY = { id: null, name: "", nameEn: "" }
+
 export function AppProvider({ children }) {
-  const [activeCompany, setActiveCompany] = useState({
-    id: "eg-contracting",
-    name: "الشركة المصرية للمقاولات",
-    nameEn: "Egyptian Contracting Co."
-  })
+  const [activeCompany, setActiveCompany] = useState(EMPTY_COMPANY)
+
+  const clearActiveCompany = useCallback(() => {
+    setActiveCompany(EMPTY_COMPANY)
+  }, [])
 
   const value = useMemo(
     () => ({
       activeCompany,
       setActiveCompany,
+      clearActiveCompany,
       currentUser,
       notifications
     }),
-    [activeCompany]
+    [activeCompany, clearActiveCompany]
   )
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>
