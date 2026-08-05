@@ -18,6 +18,7 @@ import {
   DetailItem,
   ProfileSection,
 } from "../features/profile/components/profile-details";
+import { EmptyState } from "../components/layout/empty-state";
 import { PageShell } from "./page-shell";
 import { getImageUrl } from "../utils/get-image-url";
 
@@ -27,7 +28,6 @@ function isOwnerRole(role) {
   return ["owner", "company_owner"].includes(role?.toLowerCase());
 }
 
-// Default empty company shape — populated from backend on load
 const EMPTY_COMPANY = {
   id: null,
   name: "",
@@ -43,56 +43,55 @@ export function CompanyProfilePage() {
   const { t } = useTranslation();
   const { toast } = useToast();
   const { currentUser: authUser } = useAuth();
-  const { activeCompany, currentUser: defaultUser } = useApp();
+  const { currentUser: defaultUser } = useApp();
   const currentUser = authUser || defaultUser;
   const canEdit = isOwnerRole(currentUser?.role);
   const [isEditing, setIsEditing] = useState(false);
-  const [logo, setLogo] = useState(null); // staged File; null means use company.logoUrl
+  const [logo, setLogo] = useState(null);
 
-  // Loading / error state for initial profile fetch
   const [isLoading, setIsLoading] = useState(true);
   const [fetchError, setFetchError] = useState(null);
+  const [isForbidden, setIsForbidden] = useState(false);
 
-  // Build initial company state from JWT claims as a best-effort fallback
-  const buildCompanyFromJwt = () => ({
-    ...EMPTY_COMPANY,
-    name:
-      authUser?.companyName ||
-      activeCompany?.nameEn ||
-      activeCompany?.name ||
-      "",
-  });
-
-  const [company, setCompany] = useState(buildCompanyFromJwt);
+  const [company, setCompany] = useState(EMPTY_COMPANY);
 
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
-  } = useForm({ defaultValues: company });
-
-  // Load real company profile from backend; fall back to JWT data on error
+  } = useForm({ defaultValues: EMPTY_COMPANY });
+  // Loads exactly once per mount. On 403, no company data (real, JWT-derived,
+  // or mock) is ever set — isForbidden gates the entire form.
   useEffect(() => {
+    let ignore = false;
     setIsLoading(true);
     setFetchError(null);
+    setIsForbidden(false);
 
     getCompanyProfile()
       .then((data) => {
+        if (ignore) return;
         if (data) {
-          setCompany((prev) => {
-            const mergedCompany = { ...prev, ...data };
-            reset(mergedCompany);
-            return mergedCompany;
-          });
+          setCompany(data);
+          reset(data);
         }
       })
       .catch((err) => {
-        setFetchError(err?.message || t("common.error"));
+        if (ignore) return;
+        if (err?.status === 403) {
+          setIsForbidden(true);
+        } else {
+          setFetchError(err?.message || t("common.error"));
+        }
       })
       .finally(() => {
-        setIsLoading(false);
+        if (!ignore) setIsLoading(false);
       });
+
+    return () => {
+      ignore = true;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -120,14 +119,8 @@ export function CompanyProfilePage() {
         logo: logo instanceof File ? logo : null,
       };
 
-      console.log("Company PUT payload:", updatePayload);
-
       const updated = await updateCompanyProfile(updatePayload);
-
-      const safeUpdates = updated ?? {
-        ...company,
-        ...updatePayload,
-      };
+      const safeUpdates = updated ?? { ...company, ...updatePayload };
 
       setCompany((current) => ({
         ...current,
@@ -146,8 +139,6 @@ export function CompanyProfilePage() {
         description: t("profile.company.saveSuccessDescription"),
       });
     } catch (err) {
-      console.error("Company profile update failed:", err);
-
       toast({
         type: "error",
         message: t("profile.company.saveError", {
@@ -171,7 +162,6 @@ export function CompanyProfilePage() {
       eyebrow={t("profile.company.eyebrow")}
       title={t("profile.company.title")}
       description={t("profile.company.description")}>
-      {/* Loading skeleton */}
       {isLoading && (
         <div
           className="flex flex-col gap-6"
@@ -191,8 +181,21 @@ export function CompanyProfilePage() {
         </div>
       )}
 
-      {/* Fetch error banner — shown alongside JWT-derived fallback data */}
-      {!isLoading && fetchError && (
+      {!isLoading && isForbidden && (
+        <section className="rounded-md border border-(--border-default) bg-(--bg-card) shadow-(--shadow-1)">
+          <EmptyState
+            illustrationType="offline"
+            title={t("profile.company.forbiddenTitle", {
+              defaultValue: "You don't have access to this page",
+            })}
+            description={t("profile.company.forbiddenDesc", {
+              defaultValue: "Company profile details are only visible to the company owner.",
+            })}
+          />
+        </section>
+      )}
+
+      {!isLoading && !isForbidden && fetchError && (
         <div
           role="alert"
           className="rounded-md border border-(--status-error-fg) bg-(--status-error-bg) px-4 py-3 text-sm text-(--status-error-fg) mb-4">
@@ -200,8 +203,7 @@ export function CompanyProfilePage() {
         </div>
       )}
 
-      {/* Main form — shown after loading completes */}
-      {!isLoading && (
+      {!isLoading && !isForbidden && !fetchError && (
         <form
           className="flex flex-col gap-6"
           onSubmit={handleSubmit(saveCompany)}

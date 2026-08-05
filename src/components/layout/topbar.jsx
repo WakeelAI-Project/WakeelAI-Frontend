@@ -1,12 +1,20 @@
-import React, { useState, useRef, useEffect } from "react"
-import { Bell, Moon, Search, Sparkles, Sun, ToggleLeft, ToggleRight } from "lucide-react"
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
-import { Button } from "../ui/button"
-import { useTheme } from "../providers/theme-provider"
-import { useNavigate } from "react-router"
-import { useTranslation } from "react-i18next"
-import { useLocale } from "../../hooks/use-locale"
-import { NAV_ITEMS } from "./sidebar"
+import React, { useState, useRef, useEffect } from "react";
+import {
+  Bell,
+  Moon,
+  Search,
+  Sparkles,
+  Sun,
+  ToggleLeft,
+  ToggleRight,
+} from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Button } from "../ui/button";
+import { useTheme } from "../providers/theme-provider";
+import { useNavigate } from "react-router";
+import { useTranslation } from "react-i18next";
+import { useLocale } from "../../hooks/use-locale";
+import { NAV_ITEMS } from "./sidebar";
 
 export function Topbar({
   activeId,
@@ -14,31 +22,32 @@ export function Topbar({
   onAssistantToggle,
   notificationsCount = 3,
   userInitials = "MH",
-  onLogout
+  onLogout,
 }) {
-  const { theme, toggleTheme, contrast, toggleContrast } = useTheme()
-  const [showMenu, setShowMenu] = useState(false)
-  const menuRef = useRef(null)
-  const navigate = useNavigate()
-  const { t } = useTranslation()
-  const { isRtl } = useLocale()
+  const { theme, toggleTheme, contrast, toggleContrast } = useTheme();
+  const [showMenu, setShowMenu] = useState(false);
+  const menuRef = useRef(null);
+  const navigate = useNavigate();
+  const { t } = useTranslation();
+  const { isRtl } = useLocale();
 
   const handleLogout = async () => {
-    await onLogout()
-    navigate("/login", { replace: true })
-  }
+    await onLogout();
+    navigate("/login", { replace: true });
+  };
 
   useEffect(() => {
     function handleClickOutside(event) {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setShowMenu(false)
+        setShowMenu(false);
       }
     }
-    document.addEventListener("mousedown", handleClickOutside)
-    return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [])
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
-  const activeItem = NAV_ITEMS.find((item) => item.id === activeId) || NAV_ITEMS[0]
+  const activeItem =
+    NAV_ITEMS.find((item) => item.id === activeId) || NAV_ITEMS[0];
 
   return (
     <header className="h-16 w-full bg-(--bg-card) border-b border-(--border-default) px-6 flex items-center justify-between shrink-0">
@@ -51,13 +60,10 @@ export function Topbar({
       <div className="flex-1 max-w-md mx-6 hidden md:block">
         <button
           onClick={onSearchClick}
-          className="w-full flex items-center justify-between px-3 h-10 rounded-sm border border-(--border-default) bg-(--bg-card-subtle) hover:bg-(--bg-card-raised) text-sm text-(--text-muted) transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-(--border-focus) cursor-pointer text-start"
-        >
+          className="w-full flex items-center justify-between px-3 h-10 rounded-sm border border-(--border-default) bg-(--bg-card-subtle) hover:bg-(--bg-card-raised) text-sm text-(--text-muted) transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-(--border-focus) cursor-pointer text-start">
           <span className="flex min-w-0 items-center gap-2">
             <Search className="h-4 w-4 shrink-0" />
-            <span className="truncate">
-              {t("topbar.searchPrompt")}
-            </span>
+            <span className="truncate">{t("topbar.searchPrompt")}</span>
           </span>
           <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border border-(--border-default) bg-(--bg-page-alt) px-1.5 font-mono text-[10px] font-medium opacity-100">
             Ctrl K
@@ -71,8 +77,7 @@ export function Topbar({
           size="xs"
           onClick={toggleContrast}
           className="h-8 px-2 flex items-center gap-1.5 text-xs cursor-pointer"
-          title={t("topbar.toggleContrast")}
-        >
+          title={t("topbar.toggleContrast")}>
           {contrast === "high" ? (
             <ToggleRight className="h-5 w-5 text-(--ai-primary)" />
           ) : (
@@ -86,9 +91,12 @@ export function Topbar({
           size="xs"
           onClick={toggleTheme}
           className="h-8 w-8 p-0 cursor-pointer"
-          title={t("topbar.toggleTheme")}
-        >
-          {theme === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+          title={t("topbar.toggleTheme")}>
+          {theme === "light" ? (
+            <Moon className="h-4 w-4" />
+          ) : (
+            <Sun className="h-4 w-4" />
+          )}
         </Button>
 
         {onAssistantToggle && (
@@ -97,8 +105,7 @@ export function Topbar({
             size="xs"
             onClick={onAssistantToggle}
             className="h-8 w-8 p-0 text-(--ai-primary) hover:text-(--accent-primary-active) hover:bg-(--ai-surface) cursor-pointer"
-            title={t("topbar.aiAssistant")}
-          >
+            title={t("topbar.aiAssistant")}>
             <Sparkles className="h-4 w-4" />
           </Button>
         )}
@@ -108,8 +115,7 @@ export function Topbar({
             variant="ghost"
             size="xs"
             className="h-8 w-8 p-0 cursor-pointer"
-            title={t("topbar.notifications")}
-          >
+            title={t("topbar.notifications")}>
             <Bell className="h-4 w-4" />
             {notificationsCount > 0 && (
               <span className="absolute top-1 right-1 flex h-2 w-2 rounded-full bg-(--status-error-fg)" />
@@ -122,14 +128,14 @@ export function Topbar({
         <div className="relative" ref={menuRef}>
           <Avatar
             className="h-8 w-8 cursor-pointer select-none ring-offset-2 ring-blue-500 hover:ring-2 transition-all"
-            onClick={() => setShowMenu(!showMenu)}
-          >
+            onClick={() => setShowMenu(!showMenu)}>
             <AvatarImage src="" />
             <AvatarFallback>{userInitials}</AvatarFallback>
           </Avatar>
 
           {showMenu && (
-            <div className={`absolute ${isRtl ? "left-0" : "right-0"} mt-2 w-48 rounded-sm border border-(--border-default) bg-(--bg-card) p-1 shadow-md z-50`}>
+            <div
+              className={`absolute ${isRtl ? "left-0" : "right-0"} mt-2 w-48 rounded-sm border border-(--border-default) bg-(--bg-card) p-1 shadow-md z-50`}>
               <div className="px-3 py-1.5 text-xs border-b border-(--border-default)">
                 <p className="font-semibold text-(--text-primary)">
                   {t("topbar.accountSettings")}
@@ -137,8 +143,7 @@ export function Topbar({
               </div>
               <button
                 onClick={handleLogout}
-                className="w-full text-start px-3 py-2 text-sm text-red-500 hover:bg-(--bg-card-subtle) rounded-sm transition-colors cursor-pointer"
-              >
+                className="w-full text-start px-3 py-2 text-sm text-(--status-error-fg) hover:bg-(--bg-card-subtle) rounded-sm transition-colors cursor-pointer">
                 {t("topbar.logout")}
               </button>
             </div>
@@ -146,5 +151,5 @@ export function Topbar({
         </div>
       </div>
     </header>
-  )
+  );
 }

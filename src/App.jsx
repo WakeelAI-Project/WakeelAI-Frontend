@@ -30,7 +30,6 @@ import { useTranslation } from "react-i18next"
 import { getCompanyProfile } from "./features/company/services/profile-service"
 import "./i18n" // Load i18n configuration
 
-// Inject Zustand store reference into the Axios layer once at module load
 configureAuthStore(useAuthStore.getState)
 
 function DashboardShell() {
@@ -44,7 +43,6 @@ function DashboardShell() {
   const { isRtl } = useLocale()
   const { t } = useTranslation()
 
-  // Merge dynamic authentication data into user state
   const currentUser = useMemo(() => {
     if (!authUser) return defaultUser
     return {
@@ -76,7 +74,7 @@ function DashboardShell() {
     <div className="flex h-screen w-screen overflow-hidden bg-(--bg-page) text-(--text-primary)">
       <Sidebar
         activeId={activeId}
-        companyName={isRtl ? activeCompany.name : activeCompany.nameEn}
+        companyName={(isRtl ? activeCompany?.name : activeCompany?.nameEn) || ""}
         rolePrefix={rolePrefix}
         onNavSelect={(navId) => navigate(`${rolePrefix}/${navId}`)}
       />
@@ -170,34 +168,38 @@ const router = createBrowserRouter([
 ])
 
 function AuthBootstrap() {
-  const { setActiveCompany } = useApp()
+  const { setActiveCompany, clearActiveCompany } = useApp()
   const { isAuthenticated } = useAuth()
 
   useEffect(() => {
-    // Restore cookie-persisted auth state on every page load.
-    // bootstrapAuth is async: it attempts a silent token refresh when the
-    // access token cookie is expired but a refresh token cookie is present.
-    // We call it via getState() to avoid binding to the React render cycle.
     useAuthStore.getState().bootstrapAuth()
   }, [])
 
   useEffect(() => {
-    if (isAuthenticated) {
-      getCompanyProfile()
-        .then((data) => {
-          if (data && data.name) {
-            setActiveCompany({
-              id: data.id,
-              name: data.name,
-              nameEn: data.nameEn || data.name,
-            })
-          }
-        })
-        .catch((err) => {
-          console.error("Failed to load company profile on bootstrap:", err)
-        })
+    if (!isAuthenticated) {
+      // Covers explicit logout (client-side navigation, no hard reload) as well
+      // as a failed silent refresh — never let one user's session data leak
+      // into the next login.
+      clearActiveCompany()
+      return
     }
-  }, [isAuthenticated, setActiveCompany])
+
+    getCompanyProfile()
+      .then((data) => {
+        if (data && data.name) {
+          setActiveCompany({
+            id: data.id,
+            name: data.name,
+            nameEn: data.nameEn || data.name,
+          })
+        }
+      })
+      .catch((err) => {
+        // 403 (HR) or any other failure: leave activeCompany cleared —
+        // no fallback/mock data is substituted here.
+        console.error("Failed to load company profile on bootstrap:", err)
+      })
+  }, [isAuthenticated, setActiveCompany, clearActiveCompany])
 
   return null
 }
