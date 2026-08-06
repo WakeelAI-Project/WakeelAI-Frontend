@@ -1,5 +1,5 @@
 import React from "react"
-import { Pencil } from "lucide-react"
+import { Pencil, Trash2 } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { Table } from "../../../components/data-display/table"
 import { Badge } from "../../../components/ui/badge"
@@ -11,7 +11,7 @@ function statusVariant(status) {
   return "employee"
 }
 
-export function EmployeeTable({ employees = [], onEdit = () => {} }) {
+export function EmployeeTable({ employees = [], onEdit = () => {}, onDeactivate = () => {}, editLoading = false, deactivating = false }) {
   const { t } = useTranslation()
 
   const columns = [
@@ -37,11 +37,25 @@ export function EmployeeTable({ employees = [], onEdit = () => {} }) {
             variant="ghost"
             size="sm"
             onClick={() => onEdit(row)}
+            disabled={editLoading}
             aria-label={t("employees.editAction", { name: row.full_name })}
           >
             <Pencil className="h-4 w-4" aria-hidden="true" />
             {t("employees.editActionShort")}
           </Button>
+          {row.employment_status === "Active" && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => onDeactivate(row)}
+              disabled={deactivating}
+              aria-label={t("employees.deactivateAction", { name: row.full_name })}
+            >
+              <Trash2 className="h-4 w-4" aria-hidden="true" />
+              {t("employees.deactivateActionShort")}
+            </Button>
+          )}
         </div>
       ),
     },

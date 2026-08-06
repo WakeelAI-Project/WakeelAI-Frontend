@@ -236,18 +236,19 @@ export async function getEmployees({ role, page = 1, limit = 20 } = {}) {
 /**
  * Fetch a single employee record by ID.
  *
- * @param {string|number} employeeId
- * @returns {Promise<object|null>} Employee object
+ * GET /api/employees/{recordId}
+ * [Authorize(Roles = "HR_Manager")]
  *
- * @status BACKEND ENDPOINT NOT IMPLEMENTED
+ * @param {string} recordId - UUID of the employee record
+ * @returns {Promise<object>} EmployeeDetailResponse
  */
-export async function getEmployee(_employeeId) {
-  // TODO: Uncomment when GET /employees/:id is available.
-  // const response = await api.get(`/employees/${employeeId}`);
-  // return response.data;
-
-  // ⚠️  Backend endpoint not implemented
-  return null;
+export async function getEmployee(recordId) {
+  try {
+    const { data } = await api.get(`/employees/${recordId}`);
+    return data;
+  } catch (error) {
+    throwEmployeeError(error);
+  }
 }
 
 /**
@@ -298,7 +299,7 @@ export async function updateUserStatus(userId, isActive) {
 /**
  * Create an employee record for the authenticated company.
  *
- * POST /employees
+ * POST /api/employees
  *
  * @param {{
  *   full_name: string,
@@ -332,8 +333,25 @@ export async function createEmployee(payload) {
 }
 
 /**
+ * Deactivate an employee record.
+ *
+ * DELETE /api/employees/{recordId}
+ * [Authorize(Roles = "HR_Manager")]
+ *
+ * @param {string} recordId - UUID of the employee record
+ * @returns {Promise<void>}
+ */
+export async function deactivateEmployee(recordId) {
+  try {
+    await api.delete(`/employees/${recordId}`);
+  } catch (error) {
+    throwEmployeeError(error);
+  }
+}
+
+/**
  * Update an employee record. Email is intentionally omitted because v2 does
- * not support changing it through PATCH /employees/{record_id}.
+ * not support changing it through PATCH /api/employees/{record_id}.
  *
  * @param {string} recordId
  * @param {{
@@ -344,7 +362,7 @@ export async function createEmployee(payload) {
  *   hire_date?: string,
  *   salary?: number,
  *   contract_type?: string,
- *   national_id?: string
+ *   national_id?: string,
  * }} payload
  * @returns {Promise<object>} Updated employee record
  */
@@ -359,14 +377,18 @@ export async function updateEmployee(recordId, payload) {
 }
 
 /**
- * @param {{ page?: number, limit?: number, status?: "Active" | "Inactive" }} params
+ * @param {{ page?: number, limit?: number, status?: "Active" | "Inactive", search?: string }} params
  * @returns {Promise<{ data: Array, page: number, total: number }>}
  */
-export async function listEmployees({ page = 1, limit = 20, status } = {}) {
+export async function listEmployees({ page = 1, limit = 20, status, search } = {}) {
   const params = { page, limit };
 
   if (status) {
     params.status = status;
+  }
+
+  if (search) {
+    params.search = search;
   }
 
   const { data } = await api.get("/employees", { params });

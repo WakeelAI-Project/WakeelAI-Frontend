@@ -210,7 +210,11 @@
     "salaryRequired": "Salary is required",
     "salaryInvalid": "Salary must be greater than 0",
     "contractTypeRequired": "Contract type is required",
-    "nationalIdInvalid": "National ID must be exactly 14 digits"
+    "nationalIdInvalid": "National ID must be exactly 14 digits",
+    "deactivateAction": "Deactivate {{name}}",
+    "deactivateActionShort": "Deactivate",
+    "activateActionShort": "Activate",
+    "deactivateSuccess": "Employee status updated"
   },
   "contracts": {
     "officialRecords": "Official Records",

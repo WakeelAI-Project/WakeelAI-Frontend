@@ -1,9 +1,9 @@
-import React, { useCallback, useEffect, useState } from "react"
+import React, { useCallback, useDeferredValue, useEffect, useState, useTransition } from "react"
 import { Plus } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { EmployeeTable } from "../features/company/components/employee-table"
 import { EmployeeFormModal } from "../features/company/components/employee-form-modal"
-import { listEmployees } from "../features/company/services/employee-service"
+import { listEmployees, getEmployee, deactivateEmployee } from "../features/company/services/employee-service"
 import { listDepartments } from "../features/company/services/department-service"
 import { EmptyState } from "../components/layout/empty-state"
 import { Pagination } from "../components/navigation/pagination"
@@ -35,6 +35,11 @@ export function EmployeesPage() {
   const [error, setError] = useState(null)
   const [createOpen, setCreateOpen] = useState(false)
   const [editTarget, setEditTarget] = useState(null)
+  const [editLoading, setEditLoading] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const [isPending, startTransition] = useTransition()
+
+  const deferredSearchQuery = useDeferredValue(searchQuery)
 
   const totalPages = total > 0 ? Math.ceil(total / PAGE_SIZE) : 0
 
@@ -47,6 +52,7 @@ export function EmployeesPage() {
         page,
         limit: PAGE_SIZE,
         status: statusFilter === "all" ? undefined : statusFilter,
+        search: deferredSearchQuery || undefined,
       })
 
       setEmployees(response.data ?? [])
@@ -58,7 +64,7 @@ export function EmployeesPage() {
     } finally {
       setLoading(false)
     }
-  }, [page, statusFilter, t])
+  }, [page, statusFilter, deferredSearchQuery, t])
 
   useEffect(() => {
     loadEmployees()
@@ -90,9 +96,55 @@ export function EmployeesPage() {
   }, [t, toast])
 
   const handleStatusChange = (value) => {
-    setStatusFilter(value)
-    setPage(1)
+    startTransition(() => {
+      setStatusFilter(value)
+      setPage(1)
+    })
   }
+
+  const handleSearchChange = useCallback((event) => {
+    const value = event.target.value
+    startTransition(() => {
+      setSearchQuery(value)
+      setPage(1)
+    })
+  }, [])
+
+  const handleDeactivate = useCallback(async (employee) => {
+    setDeleting(true)
+    try {
+      await deactivateEmployee(employee.record_id)
+      loadEmployees()
+      toast({
+        type: "success",
+        message: t("employees.deactivateSuccess"),
+      })
+    } catch (err) {
+      toast({
+        type: "error",
+        message: t("common.error"),
+        description: err?.message,
+      })
+    } finally {
+      setDeleting(false)
+    }
+  }, [loadEmployees, toast, t])
+
+  const handleEditClick = useCallback(async (row) => {
+    setEditLoading(true)
+    try {
+      const detail = await getEmployee(row.record_id)
+      setEditTarget(detail)
+    } catch (err) {
+      toast({
+        type: "error",
+        message: t("common.error"),
+        description: err?.message,
+      })
+    } finally {
+      setEditLoading(false)
+    }
+  }, [toast, t])
 
   const handleCreateSuccess = (result) => {
     if (result?.error) {
@@ -140,7 +192,7 @@ export function EmployeesPage() {
             <Input
               type="search"
               value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
+              onChange={handleSearchChange}
               placeholder={t("employees.searchPlaceholder")}
               aria-label={t("employees.searchPlaceholder")}
             />
@@ -170,7 +222,7 @@ export function EmployeesPage() {
           </div>
         </div>
 
-        {loading ? (
+        {loading || isPending ? (
           <div className="flex min-h-48 items-center justify-center" role="status" aria-live="polite">
             <Spinner size="lg" />
             <span className="sr-only">{t("common.loading")}</span>
@@ -189,7 +241,13 @@ export function EmployeesPage() {
           />
         ) : (
           <>
-            <EmployeeTable employees={employees} onEdit={(row) => setEditTarget(row)} />
+            <EmployeeTable 
+              employees={employees} 
+              onEdit={handleEditClick}
+              onDeactivate={handleDeactivate}
+              editLoading={editLoading}
+              deactivating={deleting}
+            />
 
             {totalPages > 1 && (
               <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-between">

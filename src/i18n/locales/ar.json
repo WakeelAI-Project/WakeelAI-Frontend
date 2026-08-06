@@ -210,7 +210,11 @@
     "salaryRequired": "الراتب مطلوب",
     "salaryInvalid": "يجب أن يكون الراتب أكبر من 0",
     "contractTypeRequired": "نوع العقد مطلوب",
-    "nationalIdInvalid": "يجب أن يتكون الرقم القومي من 14 رقمًا بالضبط"
+    "nationalIdInvalid": "يجب أن يتكون الرقم القومي من 14 رقمًا بالضبط",
+    "deactivateAction": "إلغاء تنشيط {{name}}",
+    "deactivateActionShort": "إلغاء التنشيط",
+    "activateActionShort": "تنشيط",
+    "deactivateSuccess": "تم تحديث حالة الموظف"
   },
   "contracts": {
     "officialRecords": "السجلات الرسمية",
