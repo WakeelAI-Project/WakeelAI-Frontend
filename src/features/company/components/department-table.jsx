@@ -29,7 +29,7 @@ export function DepartmentTable({ departments = [], onEdit, onDelete }) {
     },
     {
       title: t("departmentsPage.createdCol"),
-      key: "created_at",
+      key: "createdAt",
       render: (value) => formatCreatedDate(value),
     },
     {
@@ -63,10 +63,7 @@ export function DepartmentTable({ departments = [], onEdit, onDelete }) {
     },
   ]
 
-  const rows = departments.map((department) => ({
-    ...department,
-    id: department.department_id,
-  }))
+  const rows = departments
 
   return <Table columns={columns} data={rows} />
 }

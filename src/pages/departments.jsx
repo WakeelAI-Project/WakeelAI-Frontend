@@ -97,7 +97,8 @@ export function DepartmentsPage() {
     setDeleting(true)
 
     try {
-      await deleteDepartment(deleteTarget.department_id)
+      console.log(deleteTarget)
+      await deleteDepartment(deleteTarget.id)
       setDeleteTarget(null)
       loadDepartments()
       toast({

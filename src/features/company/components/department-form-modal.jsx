@@ -55,7 +55,7 @@ export function DepartmentFormModal({
 
     try {
       if (isEdit) {
-        await updateDepartment(department.department_id, { name, description })
+        await updateDepartment(department.id, { name, description })
       } else {
         await createDepartment({ name, description })
       }
