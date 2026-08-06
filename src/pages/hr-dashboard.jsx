@@ -1,7 +1,7 @@
 import React from "react"
 import { Badge } from "../components/ui/badge"
-import { StatCard } from "../components/data-display/stat-card"
 import { PageShell } from "./page-shell"
+import { DashboardSummaryCards } from "../features/company/components/DashboardSummaryCards"
 import { useTranslation } from "react-i18next"
 
 export function HrDashboardPage() {
@@ -13,11 +13,7 @@ export function HrDashboardPage() {
       title={t("dashboard.hrTitle")}
       description={t("dashboard.hrDesc")}
     >
-      <div className="grid gap-4 md:grid-cols-3">
-        <StatCard title={t("dashboard.activeEmployees")} value="128" domain="employee" trend={{ value: 6, isPositive: true }} />
-        <StatCard title={t("dashboard.leaveRequests")} value="12" domain="leave" description={t("dashboard.urgentRequests")} />
-        <StatCard title={t("dashboard.contractsToReview")} value="7" domain="legal" description={t("dashboard.dueToday")} />
-      </div>
+      <DashboardSummaryCards />
 
       <section className="rounded-md border border-(--border-default) bg-(--bg-card) p-5 text-start shadow-(--shadow-1)">
         <div className="mb-4 flex items-center justify-between gap-3">
