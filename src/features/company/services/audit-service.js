@@ -7,8 +7,6 @@
  *   GET /audit  — Backend endpoint not yet implemented
  */
 
-import api from "../../../lib/api";
-
 /**
  * Fetch the audit event log for the authenticated company.
  *

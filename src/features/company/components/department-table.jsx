@@ -17,7 +17,7 @@ function formatCreatedDate(iso) {
   }
 }
 
-export function DepartmentTable({ departments = [], onEdit, onDelete }) {
+export function DepartmentTable({ departments = [], canManage = false, onEdit, onDelete }) {
   const { t } = useTranslation()
 
   const columns = [
@@ -30,9 +30,12 @@ export function DepartmentTable({ departments = [], onEdit, onDelete }) {
     {
       title: t("departmentsPage.createdCol"),
       key: "createdAt",
-      render: (value) => formatCreatedDate(value),
+      render: (value, row) => formatCreatedDate(value ?? row.created_at),
     },
-    {
+  ]
+
+  if (canManage) {
+    columns.push({
       title: t("departmentsPage.actionsCol"),
       key: "actions",
       render: (_value, row) => (
@@ -60,8 +63,8 @@ export function DepartmentTable({ departments = [], onEdit, onDelete }) {
           </Button>
         </div>
       ),
-    },
-  ]
+    })
+  }
 
   const rows = departments
 

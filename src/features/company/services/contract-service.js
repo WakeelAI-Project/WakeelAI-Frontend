@@ -8,8 +8,6 @@
  *   POST /contracts  — Backend endpoint not yet implemented
  */
 
-import api from "../../../lib/api";
-
 /**
  * Fetch the list of contracts for the authenticated company.
  *
@@ -34,7 +32,7 @@ export async function getContracts() {
  *
  * @status BACKEND ENDPOINT NOT IMPLEMENTED
  */
-export async function getContract(contractId) {
+export async function getContract(_contractId) {
   // TODO: Uncomment when GET /contracts/:id is available.
   // const response = await api.get(`/contracts/${contractId}`);
   // return response.data;
