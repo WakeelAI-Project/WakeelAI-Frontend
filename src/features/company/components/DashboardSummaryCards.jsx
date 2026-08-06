@@ -62,14 +62,20 @@ function SummaryCard({ title, domain, icon: Icon, loading, error, value, descrip
  * DashboardSummaryCards
  *
  * Renders four summary stat cards for the HR Dashboard Overview (Story #172):
- *   1. Employees  — total count from GET /employees
- *   2. Leave Requests — pending count from GET /leave-requests?status=Pending
- *   3. AI Usage   — no endpoint in API v2; displayed as "—"
- *   4. Documents  — total count from GET /documents (stub while BE is not live)
+ *   1. Employees  — employee_count from GET /api/dashboard/summary
+ *   2. Leave Requests — pending_leave_requests from GET /api/dashboard/summary
+ *   3. AI Usage   — handbook_uploaded from GET /api/dashboard/summary
+ *   4. Documents  — generated_documents_count from GET /api/dashboard/summary
  */
 export function DashboardSummaryCards({ className }) {
   const { t } = useTranslation()
-  const { employees, leaveRequests, documents } = useDashboardSummary()
+  const { employees, leaveRequests, handbook, documents } = useDashboardSummary()
+
+  const handbookValue = handbook.uploaded === null
+    ? null
+    : handbook.uploaded
+    ? t("dashboard.summaryHandbookUploaded")
+    : t("dashboard.summaryHandbookNotUploaded")
 
   const cards = [
     {
@@ -79,7 +85,7 @@ export function DashboardSummaryCards({ className }) {
       icon: Users,
       loading: employees.loading,
       error: employees.error,
-      value: employees.total,
+      value: employees.count,
       description: t("dashboard.summaryEmployeesDesc"),
     },
     {
@@ -97,10 +103,9 @@ export function DashboardSummaryCards({ className }) {
       title: t("dashboard.summaryAiUsage"),
       domain: "AI",
       icon: Sparkles,
-      loading: false,
-      error: null,
-      // AI usage analytics endpoint does not exist in API v2 (§19)
-      value: null,
+      loading: handbook.loading,
+      error: handbook.error,
+      value: handbookValue,
       description: t("dashboard.summaryAiDesc"),
     },
     {
@@ -110,7 +115,7 @@ export function DashboardSummaryCards({ className }) {
       icon: FileText,
       loading: documents.loading,
       error: documents.error,
-      value: documents.total,
+      value: documents.count,
       description: t("dashboard.summaryDocumentsDesc"),
     },
   ]
