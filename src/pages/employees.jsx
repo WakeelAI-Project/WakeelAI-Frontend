@@ -1,109 +1,230 @@
-import React, { useEffect, useState } from "react"
-import { EmployeeCard } from "../components/legal/employee-card"
-import { StatCard } from "../components/data-display/stat-card"
-import { Table } from "../components/data-display/table"
-import { getEmployees } from "../features/company/services/employee-service"
-import { PageShell } from "./page-shell"
+import React, { useCallback, useEffect, useState } from "react"
+import { Plus } from "lucide-react"
 import { useTranslation } from "react-i18next"
-import { useLocale } from "../hooks/use-locale"
+import { EmployeeTable } from "../features/company/components/employee-table"
+import { EmployeeFormModal } from "../features/company/components/employee-form-modal"
+import { listEmployees } from "../features/company/services/employee-service"
+import { listDepartments } from "../features/company/services/department-service"
+import { EmptyState } from "../components/layout/empty-state"
+import { Pagination } from "../components/navigation/pagination"
+import { Button } from "../components/ui/button"
+import { Input } from "../components/ui/input"
+import { Spinner } from "../components/ui/spinner"
+import { useToast } from "../components/ui/toast"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../components/ui/select"
+import { PageShell } from "./page-shell"
+
+const PAGE_SIZE = 20
 
 export function EmployeesPage() {
   const { t } = useTranslation()
-  const { isRtl } = useLocale()
+  const { toast } = useToast()
+  const [page, setPage] = useState(1)
+  const [statusFilter, setStatusFilter] = useState("all")
+  const [searchQuery, setSearchQuery] = useState("")
   const [employees, setEmployees] = useState([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [fetchError, setFetchError] = useState(null)
+  const [departments, setDepartments] = useState([])
+  const [total, setTotal] = useState(0)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [createOpen, setCreateOpen] = useState(false)
+  const [editTarget, setEditTarget] = useState(null)
+
+  const totalPages = total > 0 ? Math.ceil(total / PAGE_SIZE) : 0
+
+  const loadEmployees = useCallback(async () => {
+    setLoading(true)
+    setError(null)
+
+    try {
+      const response = await listEmployees({
+        page,
+        limit: PAGE_SIZE,
+        status: statusFilter === "all" ? undefined : statusFilter,
+      })
+
+      setEmployees(response.data ?? [])
+      setTotal(response.total ?? 0)
+    } catch {
+      setEmployees([])
+      setTotal(0)
+      setError(t("employees.loadError"))
+    } finally {
+      setLoading(false)
+    }
+  }, [page, statusFilter, t])
 
   useEffect(() => {
-    setIsLoading(true)
-    setFetchError(null)
+    loadEmployees()
+  }, [loadEmployees])
 
-    // Fetch all users; filter by role on the server if needed
-    getEmployees({ page: 1, limit: 50 })
-      .then((data) => {
-        setEmployees(data)
-      })
-      .catch((err) => {
-        setFetchError(err?.message || t("common.error"))
-        setEmployees([])
-      })
-      .finally(() => {
-        setIsLoading(false)
-      })
-  }, [t])
+  useEffect(() => {
+    let ignore = false
 
-  const columns = [
-    { title: t("employees.nameCol"), key: isRtl ? "name" : "nameEn", sortable: true },
-    { title: t("employees.deptCol"), key: isRtl ? "department" : "departmentEn", sortable: true },
-    { title: t("employees.salaryCol"), key: "salary", sortable: true, isNumeric: true }
-  ]
+    async function loadDepartments() {
+      try {
+        const response = await listDepartments()
+        if (!ignore) setDepartments(response.data ?? [])
+      } catch (err) {
+        if (!ignore) {
+          toast({
+            type: "error",
+            message: t("departmentsPage.loadError"),
+            description: err?.message,
+          })
+        }
+      }
+    }
 
-  const activeCount = employees.filter((e) => e.isActive !== false).length
+    loadDepartments()
+
+    return () => {
+      ignore = true
+    }
+  }, [t, toast])
+
+  const handleStatusChange = (value) => {
+    setStatusFilter(value)
+    setPage(1)
+  }
+
+  const handleCreateSuccess = (result) => {
+    if (result?.error) {
+      toast({
+        type: "error",
+        message: t("common.error"),
+        description: result.error.message,
+      })
+      return
+    }
+    setCreateOpen(false)
+    loadEmployees()
+    toast({
+      type: "success",
+      message: t("employees.createSuccess"),
+    })
+  }
+
+  const handleEditSuccess = (result) => {
+    if (result?.error) {
+      toast({
+        type: "error",
+        message: t("common.error"),
+        description: result.error.message,
+      })
+      return
+    }
+    setEditTarget(null)
+    loadEmployees()
+    toast({
+      type: "success",
+      message: t("employees.updateSuccess"),
+    })
+  }
 
   return (
     <PageShell
       eyebrow={t("employees.peopleOps")}
       title={t("employees.title")}
-      description={t("employees.description")}
+      description={t("employees.listDescription")}
     >
-      <section className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <StatCard
-          title={t("employees.active")}
-          value={isLoading ? "—" : activeCount.toString()}
-          domain="employee"
-        />
-        <StatCard title={t("employees.toRefresh")} value="0" domain="legal" />
-        <StatCard title={t("employees.openLeave")} value="0" domain="leave" />
+      <section className="rounded-md border border-(--border-default) bg-(--bg-card) p-5 text-start shadow-(--shadow-1)">
+        <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div className="w-full sm:max-w-sm">
+            <Input
+              type="search"
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder={t("employees.searchPlaceholder")}
+              aria-label={t("employees.searchPlaceholder")}
+            />
+          </div>
+
+          <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-end">
+            <div className="w-full sm:w-48">
+              <label className="mb-1.5 block text-sm font-medium text-(--text-primary)">
+                {t("employees.statusFilter")}
+              </label>
+              <Select value={statusFilter} onValueChange={handleStatusChange}>
+                <SelectTrigger aria-label={t("employees.statusFilter")}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t("employees.statusAll")}</SelectItem>
+                  <SelectItem value="Active">{t("employees.statusActive")}</SelectItem>
+                  <SelectItem value="Inactive">{t("employees.statusInactive")}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <Button type="button" onClick={() => setCreateOpen(true)}>
+              <Plus className="h-4 w-4" aria-hidden="true" />
+              {t("employees.createButton")}
+            </Button>
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="flex min-h-48 items-center justify-center" role="status" aria-live="polite">
+            <Spinner size="lg" />
+            <span className="sr-only">{t("common.loading")}</span>
+          </div>
+        ) : error ? (
+          <EmptyState
+            illustrationType="offline"
+            title={t("employees.loadError")}
+            description={t("employees.loadErrorDescription")}
+          />
+        ) : employees.length === 0 ? (
+          <EmptyState
+            illustrationType="folder"
+            title={t("employees.emptyTitle")}
+            description={t("employees.emptyDescription")}
+          />
+        ) : (
+          <>
+            <EmployeeTable employees={employees} onEdit={(row) => setEditTarget(row)} />
+
+            {totalPages > 1 && (
+              <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-between">
+                <p className="text-xs text-(--text-secondary)">
+                  {t("employees.pageSummary", { page, totalPages, total })}
+                </p>
+                <Pagination
+                  currentPage={page}
+                  totalPages={totalPages}
+                  onPageChange={setPage}
+                />
+              </div>
+            )}
+          </>
+        )}
       </section>
 
-      {/* Loading skeleton */}
-      {isLoading && (
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-3" aria-busy="true" aria-label={t("common.loading")}>
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="h-40 rounded-md animate-skeleton" />
-          ))}
-        </div>
-      )}
+      <EmployeeFormModal
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+        mode="create"
+        departments={departments}
+        onSuccess={handleCreateSuccess}
+      />
 
-      {/* Error banner */}
-      {!isLoading && fetchError && (
-        <div
-          role="alert"
-          className="rounded-md border border-(--status-error-fg) bg-(--status-error-bg) px-4 py-3 text-sm text-(--status-error-fg)"
-        >
-          {fetchError}
-        </div>
-      )}
-
-      {/* Employee list */}
-      {!isLoading && !fetchError && employees.length > 0 && (
-        <>
-          <section className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-            {employees.map((employee) => (
-              <EmployeeCard
-                key={employee.id}
-                name={isRtl ? employee.name : employee.nameEn}
-                role={employee.role}
-                department={isRtl ? employee.department : employee.departmentEn}
-                status={employee.status}
-                statusText={isRtl ? employee.statusText : employee.status}
-                email={employee.email}
-                phone={employee.phone}
-                hireDate={employee.hireDate}
-              />
-            ))}
-          </section>
-
-          <Table columns={columns} data={employees} enableSelection />
-        </>
-      )}
-
-      {/* Empty state */}
-      {!isLoading && !fetchError && employees.length === 0 && (
-        <p className="text-sm text-(--text-muted) text-center py-12">
-          {t("employees.noEmployees", { defaultValue: "No employees found." })}
-        </p>
-      )}
+      <EmployeeFormModal
+        open={!!editTarget}
+        onOpenChange={(open) => {
+          if (!open) setEditTarget(null)
+        }}
+        mode="edit"
+        employee={editTarget}
+        departments={departments}
+        onSuccess={handleEditSuccess}
+      />
     </PageShell>
   )
 }

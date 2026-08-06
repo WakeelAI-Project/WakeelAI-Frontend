@@ -9,6 +9,7 @@ import {
   FolderOpen,
   History,
   Landmark,
+  Layers,
   MessageSquareCode,
   ShieldCheck,
   UserRound,
@@ -22,6 +23,7 @@ import { useLocale } from "../../hooks/use-locale"
 export const NAV_ITEMS = [
   { id: "dashboard", labelKey: "sidebar.dashboard", icon: Building2 },
   { id: "company-profile", labelKey: "sidebar.companyProfile", icon: Landmark },
+  { id: "departments", labelKey: "sidebar.departments", icon: Layers },
   { id: "profile", labelKey: "sidebar.myProfile", icon: UserRound },
   { id: "employees", labelKey: "sidebar.employees", icon: Users },
   { id: "contracts", labelKey: "sidebar.contracts", icon: FileText },
@@ -30,6 +32,19 @@ export const NAV_ITEMS = [
   { id: "documents", labelKey: "sidebar.documents", icon: FolderOpen },
   { id: "assistant", labelKey: "sidebar.assistant", icon: MessageSquareCode },
   { id: "audit", labelKey: "sidebar.audit", icon: History }
+]
+
+const HR_VISIBLE_IDS = [
+  "dashboard",
+  "employees",
+  "contracts",
+  "leave",
+  "compliance",
+  "documents",
+  "assistant",
+  "audit",
+  "company-profile",
+  "profile"
 ]
 
 export function Sidebar({
@@ -43,9 +58,9 @@ export function Sidebar({
   const { isRtl } = useLocale()
   const visibleItems = rolePrefix === "/owner"
     ? NAV_ITEMS.filter((item) =>
-        ["dashboard", "company-profile", "profile"].includes(item.id)
+        ["dashboard", "company-profile", "departments", "profile"].includes(item.id)
       )
-    : NAV_ITEMS
+    : NAV_ITEMS.filter((item) => HR_VISIBLE_IDS.includes(item.id))
 
   return (
     <aside className="w-60 xl:w-66 h-screen bg-(--bg-sidebar) text-(--text-on-brand) flex flex-col justify-between select-none border-e border-(--brand-primary-hover) shrink-0">
