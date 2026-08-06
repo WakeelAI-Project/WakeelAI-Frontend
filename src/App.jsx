@@ -134,7 +134,7 @@ const router = createBrowserRouter([
           { path: "dashboard", element: <OwnerDashboardPage /> },
           { path: "company-profile", element: <CompanyProfilePage /> },
           { path: "profile", element: <UserProfilePage /> },
-          { path: "departments", element: <DepartmentsPage /> }
+          { path: "departments", element: <DepartmentsPage canManage /> }
         ]
       }
     ]
@@ -153,6 +153,7 @@ const router = createBrowserRouter([
           { path: "leave", element: <LeavePage /> },
           { path: "compliance", element: <CompliancePage /> },
           { path: "documents", element: <DocumentsPage /> },
+          { path: "departments", element: <DepartmentsPage canManage={false} /> },
           { path: "assistant", element: <AssistantPage /> },
           { path: "audit", element: <AuditPage /> },
           { path: "company-profile", element: <CompanyProfilePage /> },

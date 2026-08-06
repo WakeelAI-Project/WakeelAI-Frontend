@@ -20,6 +20,10 @@ import {
 
 const EMPTY = { name: "", description: "" }
 
+function getDepartmentId(department) {
+  return department?.department_id ?? department?.id ?? ""
+}
+
 export function DepartmentFormModal({
   open,
   onOpenChange,
@@ -55,7 +59,7 @@ export function DepartmentFormModal({
 
     try {
       if (isEdit) {
-        await updateDepartment(department.id, { name, description })
+        await updateDepartment(getDepartmentId(department), { name, description })
       } else {
         await createDepartment({ name, description })
       }

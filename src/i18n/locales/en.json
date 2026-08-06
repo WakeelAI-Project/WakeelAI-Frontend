@@ -64,7 +64,9 @@
     "eyebrow": "Organization",
     "title": "Departments",
     "description": "Define departments for your company. HR uses these when assigning employees.",
+    "readOnlyDescription": "View the departments created for your company. These departments are used when assigning employees.",
     "listHint": "Manage department names and descriptions for your organization.",
+    "readOnlyListHint": "Department management is available to the company owner.",
     "nameCol": "Department Name",
     "descriptionCol": "Description",
     "createdCol": "Created Date",
@@ -92,6 +94,7 @@
     "deleteConfirmAction": "Delete department",
     "emptyTitle": "No departments yet",
     "emptyDescription": "Create your first department to organize employees.",
+    "readOnlyEmptyDescription": "No departments are available yet. Ask the company owner to create one.",
     "loadError": "Unable to load departments",
     "loadErrorDescription": "Something went wrong while fetching departments. Try again later.",
     "pageSummary": "Page {{page}} of {{totalPages}} · {{total}} departments"

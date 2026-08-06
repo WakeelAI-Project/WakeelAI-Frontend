@@ -7,8 +7,6 @@
  *   GET /compliance  — Backend endpoint not yet implemented
  */
 
-import api from "../../../lib/api";
-
 /**
  * Fetch compliance items / audit results for the authenticated company.
  *

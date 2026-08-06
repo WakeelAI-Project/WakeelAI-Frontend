@@ -1,5 +1,5 @@
 /**
- * Department Service — GET/POST/PATCH/DELETE /departments (Owner)
+ * Department Service — GET /departments (Owner, HR), mutations (Owner)
  */
 
 import api from "../../../lib/api";
@@ -9,25 +9,46 @@ const DESCRIPTION_MAX_LENGTH = 500;
 
 export { NAME_MAX_LENGTH, DESCRIPTION_MAX_LENGTH };
 
+function getDepartmentErrorCode(data) {
+  return data?.code || data?.error_code || data?.error || data?.type;
+}
+
+function getResponseMessage(data) {
+  if (typeof data?.message === "string") return data.message;
+  if (typeof data?.title === "string") return data.title;
+  return undefined;
+}
+
 function mapDepartmentError(error) {
   const data = error?.response?.data;
   const status = error?.response?.status;
+  const code = getDepartmentErrorCode(data);
+  const message = getResponseMessage(data);
 
-  if (data?.message) return data.message;
   if (status === 401) return "Your session has expired. Please log in again.";
   if (status === 403) return "You are not authorized to perform this action.";
-  if (status === 404) return "Department not found.";
+  if (status === 404 && code === "department_not_found") return "Department not found.";
+  if (status === 404) return message || "Department not found.";
+  if (status === 409 && code === "department_in_use") {
+    return "Reassign employees before deleting this department.";
+  }
+  if (status === 409) return message || "This department cannot be changed right now.";
   if (status === 400 || status === 422) {
-    return data?.message || "Invalid request. Please check your input.";
+    if (code === "validation_error") {
+      return message || "Invalid department details. Please check your input.";
+    }
+    return message || "Invalid request. Please check your input.";
   }
   if (status >= 500) return "A server error occurred. Please try again later.";
 
-  return data?.error || error?.message || "An unexpected error occurred.";
+  return message || data?.error || error?.message || "An unexpected error occurred.";
 }
 
 function throwDepartmentError(error) {
+  const data = error?.response?.data;
   const err = new Error(mapDepartmentError(error));
   err.status = error?.response?.status;
+  err.code = getDepartmentErrorCode(data);
   err.cause = error;
   throw err;
 }

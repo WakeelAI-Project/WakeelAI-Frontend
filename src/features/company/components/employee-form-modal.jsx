@@ -2,6 +2,7 @@ import React, { useEffect } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
 import { Button } from "../../../components/ui/button"
+import { Dropdown } from "../../../components/ui/dropdown"
 import { Input } from "../../../components/ui/input"
 import {
   Dialog,
@@ -264,44 +265,20 @@ export function EmployeeFormModal({
               control={control}
               rules={{ required: t("employees.departmentRequired") }}
               render={({ field }) => (
-                <div className="w-full flex flex-col gap-1.5 text-start">
-                  <label className="text-sm font-medium text-(--text-primary) select-none">
-                    {t("employees.departmentLabel")}
-                    <span className="text-(--text-muted) ms-1">*</span>
-                  </label>
-                  <Select
-                    value={field.value || ""}
-                    onValueChange={field.onChange}
-                    disabled={isSubmitting}
-                  >
-                    <SelectTrigger
-                      aria-label={t("employees.departmentLabel")}
-                      className={
-                        errors.department_id
-                          ? "border-(--status-error-fg) focus:border-(--status-error-fg) focus:ring-(--status-error-fg)"
-                          : undefined
-                      }
-                    >
-                      <SelectValue placeholder={t("employees.departmentLabel")} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {departments.map((department) => {
-                        const id = getDepartmentId(department)
-                        if (!id) return null
-                        return (
-                          <SelectItem key={id} value={id}>
-                            {getDepartmentName(department) || id}
-                          </SelectItem>
-                        )
-                      })}
-                    </SelectContent>
-                  </Select>
-                  {errors.department_id?.message && (
-                    <p className="text-xs text-(--status-error-fg)" role="alert">
-                      {errors.department_id.message}
-                    </p>
-                  )}
-                </div>
+                <Dropdown
+                  label={t("employees.departmentLabel")}
+                  required
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  disabled={isSubmitting}
+                  placeholder={t("employees.departmentLabel")}
+                  options={departments}
+                  getOptionValue={getDepartmentId}
+                  getOptionLabel={(department) =>
+                    getDepartmentName(department) || getDepartmentId(department)
+                  }
+                  errorText={errors.department_id?.message}
+                />
               )}
             />
 

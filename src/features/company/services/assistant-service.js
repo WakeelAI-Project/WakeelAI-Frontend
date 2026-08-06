@@ -8,8 +8,6 @@
  *   GET  /assistant/thread — Backend endpoint not yet implemented
  */
 
-import api from "../../../lib/api";
-
 /**
  * Send a message to the AI assistant and receive a response.
  *
@@ -18,7 +16,7 @@ import api from "../../../lib/api";
  *
  * @status BACKEND ENDPOINT NOT IMPLEMENTED
  */
-export async function sendAssistantMessage(payload) {
+export async function sendAssistantMessage(_payload) {
   // TODO: Uncomment when POST /assistant/chat is available.
   // const response = await api.post("/assistant/chat", payload);
   // return response.data;

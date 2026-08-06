@@ -9,8 +9,6 @@
  *   DELETE /documents/:id      — Backend endpoint not yet implemented
  */
 
-import api from "../../../lib/api";
-
 /**
  * Fetch all documents for the authenticated company.
  *
@@ -35,7 +33,7 @@ export async function getDocuments() {
  *
  * @status BACKEND ENDPOINT NOT IMPLEMENTED
  */
-export async function uploadDocument(formData) {
+export async function uploadDocument(_formData) {
   // TODO: Uncomment when POST /documents/upload is available.
   // const response = await api.post("/documents/upload", formData, {
   //   headers: { "Content-Type": "multipart/form-data" },
@@ -54,7 +52,7 @@ export async function uploadDocument(formData) {
  *
  * @status BACKEND ENDPOINT NOT IMPLEMENTED
  */
-export async function deleteDocument(documentId) {
+export async function deleteDocument(_documentId) {
   // TODO: Uncomment when DELETE /documents/:id is available.
   // await api.delete(`/documents/${documentId}`);
 

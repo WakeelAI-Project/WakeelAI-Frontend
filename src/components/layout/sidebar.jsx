@@ -41,6 +41,7 @@ const HR_VISIBLE_IDS = [
   "leave",
   "compliance",
   "documents",
+  "departments",
   "assistant",
   "audit",
   "company-profile",
