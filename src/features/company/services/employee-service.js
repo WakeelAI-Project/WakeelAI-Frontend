@@ -4,12 +4,15 @@
  * Wraps all user and employee-related API calls.
  * All calls go through the shared Axios instance (with Bearer token injected automatically).
  *
- * Backend status:
+ * Backend supports:
  *   POST /users/invite            — ✅ Implemented
  *   GET  /users                   — ✅ Implemented (query: role, page, limit)
  *   PATCH /users/{userId}/status  — ✅ Implemented
- *   GET  /employees               — @status BACKEND ENDPOINT NOT IMPLEMENTED (stub preserved)
- *   GET  /employees/:id           — @status BACKEND ENDPOINT NOT IMPLEMENTED (stub preserved)
+ *   GET  /employees               — ✅ Implemented (query: page, limit, status)
+ *   GET  /employees/:id           — ✅ Implemented
+ *
+ * Note: GET /employees does NOT support a search query parameter.
+ * Search is handled entirely on the frontend in employees.jsx.
  */
 
 import api from "../../../lib/api";
@@ -344,6 +347,7 @@ export async function createEmployee(payload) {
 export async function deactivateEmployee(recordId) {
   try {
     await api.delete(`/employees/${recordId}`);
+    // await api.patch(`/users/${recordId}/status`, { is_active: false });
   } catch (error) {
     throwEmployeeError(error);
   }
@@ -377,18 +381,22 @@ export async function updateEmployee(recordId, payload) {
 }
 
 /**
- * @param {{ page?: number, limit?: number, status?: "Active" | "Inactive", search?: string }} params
+ * Fetch a paginated list of employees.
+ *
+ * GET /api/employees
+ * Supported query params: page, limit, status
+ *
+ * Search is NOT forwarded to the backend — it is handled entirely
+ * on the frontend in employees.jsx using a useMemo filter.
+ *
+ * @param {{ page?: number, limit?: number, status?: "Active" | "Inactive" }} params
  * @returns {Promise<{ data: Array, page: number, total: number }>}
  */
-export async function listEmployees({ page = 1, limit = 20, status, search } = {}) {
+export async function listEmployees({ page = 1, limit = 20, status } = {}) {
   const params = { page, limit };
 
   if (status) {
     params.status = status;
-  }
-
-  if (search) {
-    params.search = search;
   }
 
   const { data } = await api.get("/employees", { params });

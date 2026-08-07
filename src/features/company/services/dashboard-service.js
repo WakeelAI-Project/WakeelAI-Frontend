@@ -8,6 +8,6 @@ import api from "../../../lib/api";
  * @returns {Promise<object>} Dashboard summary data
  */
 export async function getDashboardSummary() {
-  const response = await api.get("/api/dashboard/summary");
+  const response = await api.get("dashboard/summary");
   return response.data;
 }

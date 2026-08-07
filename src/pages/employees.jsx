@@ -1,4 +1,11 @@
-import React, { useCallback, useDeferredValue, useEffect, useState, useTransition } from "react"
+import React, {
+  useCallback,
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useState,
+  useTransition,
+} from "react"
 import { Plus } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { EmployeeTable } from "../features/company/components/employee-table"
@@ -25,12 +32,24 @@ const PAGE_SIZE = 20
 export function EmployeesPage() {
   const { t } = useTranslation()
   const { toast } = useToast()
-  const [page, setPage] = useState(1)
+
+  // ── Backend-driven state ─────────────────────────────────────────────────
+  // allEmployees holds the raw list returned by the backend for the current
+  // status filter and page. Search never triggers a new API call.
+  const [allEmployees, setAllEmployees] = useState([])
+  const [backendTotal, setBackendTotal] = useState(0)
   const [statusFilter, setStatusFilter] = useState("all")
+  const [backendPage, setBackendPage] = useState(1)
+
+  // ── Client-side search state ─────────────────────────────────────────────
+  // searchQuery drives the local filter; useDeferredValue keeps the UI
+  // responsive while the (synchronous) filter runs.
   const [searchQuery, setSearchQuery] = useState("")
-  const [employees, setEmployees] = useState([])
+  const [searchPage, setSearchPage] = useState(1)
+  const deferredSearchQuery = useDeferredValue(searchQuery)
+
+  // ── UI state ─────────────────────────────────────────────────────────────
   const [departments, setDepartments] = useState([])
-  const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [createOpen, setCreateOpen] = useState(false)
@@ -39,37 +58,71 @@ export function EmployeesPage() {
   const [deleting, setDeleting] = useState(false)
   const [isPending, startTransition] = useTransition()
 
-  const deferredSearchQuery = useDeferredValue(searchQuery)
+  // ── Derived: client-side search ──────────────────────────────────────────
+  // filteredEmployees is computed from allEmployees without any API call.
+  // Runs only when allEmployees or deferredSearchQuery changes.
+  const filteredEmployees = useMemo(() => {
+    const q = deferredSearchQuery.trim().toLowerCase()
+    if (!q) return allEmployees
 
-  const totalPages = total > 0 ? Math.ceil(total / PAGE_SIZE) : 0
+    return allEmployees.filter((emp) => {
+      const name   = (emp.full_name         ?? "").toLowerCase()
+      const job    = (emp.job_title         ?? "").toLowerCase()
+      const dept   = (emp.department        ?? "").toLowerCase()
+      const status = (emp.employment_status ?? "").toLowerCase()
+      return (
+        name.includes(q)   ||
+        job.includes(q)    ||
+        dept.includes(q)   ||
+        status.includes(q)
+      )
+    })
+  }, [allEmployees, deferredSearchQuery])
 
+  // ── Derived: pagination ──────────────────────────────────────────────────
+  // When searching: paginate the filtered list on the frontend.
+  // When not searching: use the backend's total for the page count.
+  const isSearchActive = deferredSearchQuery.trim().length > 0
+
+  const displayedPage  = isSearchActive ? searchPage  : backendPage
+  const displayedTotal = isSearchActive ? filteredEmployees.length : backendTotal
+  const totalPages     = displayedTotal > 0 ? Math.ceil(displayedTotal / PAGE_SIZE) : 0
+
+  const pagedEmployees = useMemo(() => {
+    if (!isSearchActive) return filteredEmployees        // already paged by backend
+    const start = (searchPage - 1) * PAGE_SIZE
+    return filteredEmployees.slice(start, start + PAGE_SIZE)
+  }, [filteredEmployees, isSearchActive, searchPage])
+
+  // ── Data fetching ────────────────────────────────────────────────────────
+  // Only fires when statusFilter or backendPage changes — never on search.
   const loadEmployees = useCallback(async () => {
     setLoading(true)
     setError(null)
 
     try {
       const response = await listEmployees({
-        page,
-        limit: PAGE_SIZE,
+        page:   backendPage,
+        limit:  PAGE_SIZE,
         status: statusFilter === "all" ? undefined : statusFilter,
-        search: deferredSearchQuery || undefined,
       })
 
-      setEmployees(response.data ?? [])
-      setTotal(response.total ?? 0)
+      setAllEmployees(response.data  ?? [])
+      setBackendTotal(response.total ?? 0)
     } catch {
-      setEmployees([])
-      setTotal(0)
+      setAllEmployees([])
+      setBackendTotal(0)
       setError(t("employees.loadError"))
     } finally {
       setLoading(false)
     }
-  }, [page, statusFilter, deferredSearchQuery, t])
+  }, [backendPage, statusFilter, t])
 
   useEffect(() => {
     loadEmployees()
   }, [loadEmployees])
 
+  // ── Departments (for modals) ─────────────────────────────────────────────
   useEffect(() => {
     let ignore = false
 
@@ -89,16 +142,16 @@ export function EmployeesPage() {
     }
 
     loadDepartments()
-
-    return () => {
-      ignore = true
-    }
+    return () => { ignore = true }
   }, [t, toast])
 
+  // ── Handlers ─────────────────────────────────────────────────────────────
   const handleStatusChange = (value) => {
     startTransition(() => {
       setStatusFilter(value)
-      setPage(1)
+      setBackendPage(1)
+      // Reset search pagination too so results start from page 1
+      setSearchPage(1)
     })
   }
 
@@ -106,25 +159,26 @@ export function EmployeesPage() {
     const value = event.target.value
     startTransition(() => {
       setSearchQuery(value)
-      setPage(1)
+      setSearchPage(1)   // always restart filtered pagination from page 1
     })
   }, [])
+
+  const handlePageChange = useCallback((newPage) => {
+    if (isSearchActive) {
+      setSearchPage(newPage)
+    } else {
+      setBackendPage(newPage)
+    }
+  }, [isSearchActive])
 
   const handleDeactivate = useCallback(async (employee) => {
     setDeleting(true)
     try {
       await deactivateEmployee(employee.record_id)
       loadEmployees()
-      toast({
-        type: "success",
-        message: t("employees.deactivateSuccess"),
-      })
+      toast({ type: "success", message: t("employees.deactivateSuccess") })
     } catch (err) {
-      toast({
-        type: "error",
-        message: t("common.error"),
-        description: err?.message,
-      })
+      toast({ type: "error", message: t("common.error"), description: err?.message })
     } finally {
       setDeleting(false)
     }
@@ -136,11 +190,7 @@ export function EmployeesPage() {
       const detail = await getEmployee(row.record_id)
       setEditTarget(detail)
     } catch (err) {
-      toast({
-        type: "error",
-        message: t("common.error"),
-        description: err?.message,
-      })
+      toast({ type: "error", message: t("common.error"), description: err?.message })
     } finally {
       setEditLoading(false)
     }
@@ -148,38 +198,25 @@ export function EmployeesPage() {
 
   const handleCreateSuccess = (result) => {
     if (result?.error) {
-      toast({
-        type: "error",
-        message: t("common.error"),
-        description: result.error.message,
-      })
+      toast({ type: "error", message: t("common.error"), description: result.error.message })
       return
     }
     setCreateOpen(false)
     loadEmployees()
-    toast({
-      type: "success",
-      message: t("employees.createSuccess"),
-    })
+    toast({ type: "success", message: t("employees.createSuccess") })
   }
 
   const handleEditSuccess = (result) => {
     if (result?.error) {
-      toast({
-        type: "error",
-        message: t("common.error"),
-        description: result.error.message,
-      })
+      toast({ type: "error", message: t("common.error"), description: result.error.message })
       return
     }
     setEditTarget(null)
     loadEmployees()
-    toast({
-      type: "success",
-      message: t("employees.updateSuccess"),
-    })
+    toast({ type: "success", message: t("employees.updateSuccess") })
   }
 
+  // ── Render ────────────────────────────────────────────────────────────────
   return (
     <PageShell
       eyebrow={t("employees.peopleOps")}
@@ -233,7 +270,7 @@ export function EmployeesPage() {
             title={t("employees.loadError")}
             description={t("employees.loadErrorDescription")}
           />
-        ) : employees.length === 0 ? (
+        ) : pagedEmployees.length === 0 ? (
           <EmptyState
             illustrationType="folder"
             title={t("employees.emptyTitle")}
@@ -241,8 +278,8 @@ export function EmployeesPage() {
           />
         ) : (
           <>
-            <EmployeeTable 
-              employees={employees} 
+            <EmployeeTable
+              employees={pagedEmployees}
               onEdit={handleEditClick}
               onDeactivate={handleDeactivate}
               editLoading={editLoading}
@@ -252,12 +289,12 @@ export function EmployeesPage() {
             {totalPages > 1 && (
               <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-between">
                 <p className="text-xs text-(--text-secondary)">
-                  {t("employees.pageSummary", { page, totalPages, total })}
+                  {t("employees.pageSummary", { page: displayedPage, totalPages, total: displayedTotal })}
                 </p>
                 <Pagination
-                  currentPage={page}
+                  currentPage={displayedPage}
                   totalPages={totalPages}
-                  onPageChange={setPage}
+                  onPageChange={handlePageChange}
                 />
               </div>
             )}
