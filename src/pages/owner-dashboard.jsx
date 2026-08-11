@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { Building2, Send, ShieldCheck, Users } from "lucide-react"
 import { Button } from "../components/ui/button"
@@ -8,6 +8,7 @@ import { useToast } from "../components/ui/toast"
 import { PageShell } from "./page-shell"
 import { useTranslation } from "react-i18next"
 import { inviteEmployee } from "../features/company/services/employee-service"
+import { listHRUsers } from "../features/company/services/user-service"
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -15,6 +16,26 @@ export function OwnerDashboardPage() {
   const { toast } = useToast()
   const { t } = useTranslation()
   const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm()
+  const [hrCount, setHrCount] = useState(null)
+  const [hrCountLoading, setHrCountLoading] = useState(true)
+
+  // Fetch HR count on mount
+  useEffect(() => {
+    const fetchHRCount = async () => {
+      try {
+        setHrCountLoading(true)
+        const response = await listHRUsers()
+        setHrCount(response.total || 0)
+      } catch (error) {
+        console.error("Failed to fetch HR count:", error)
+        setHrCount(null)
+      } finally {
+        setHrCountLoading(false)
+      }
+    }
+
+    fetchHRCount()
+  }, [])
 
   const onInvite = async ({ name, email }) => {
     try {
@@ -27,6 +48,14 @@ export function OwnerDashboardPage() {
         description: t("dashboard.inviteSentDesc", { defaultValue: "An invitation email has been sent to {{email}}.", email }),
       })
       reset({ name: "", email: "" })
+      
+      // Refresh HR count after successful invite
+      try {
+        const response = await listHRUsers()
+        setHrCount(response.total || 0)
+      } catch (error) {
+        console.error("Failed to refresh HR count:", error)
+      }
     } catch (err) {
       toast({
         type: "error",
@@ -35,6 +64,8 @@ export function OwnerDashboardPage() {
       })
     }
   }
+
+  const hrCountDisplay = hrCountLoading ? "..." : hrCount !== null ? hrCount.toString() : "—"
 
   return (
     <PageShell
@@ -45,7 +76,7 @@ export function OwnerDashboardPage() {
       <div className="grid gap-4 md:grid-cols-3">
         {[
           [Building2, t("dashboard.company"), t("dashboard.activeWorkspace")],
-          [Users, t("dashboard.hrTeam"), "—"],
+          [Users, t("dashboard.hrTeam"), hrCountDisplay],
           [ShieldCheck, t("dashboard.access"), t("dashboard.owner")],
         ].map(([Icon, label, value]) => (
           <div key={label} className="rounded-md border border-(--border-default) bg-(--bg-card) p-5 text-start shadow-(--shadow-1)">

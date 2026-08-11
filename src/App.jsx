@@ -15,11 +15,14 @@ import { EmployeesPage } from "./pages/employees"
 import { LeavePage } from "./pages/leave"
 import { LoginPage } from "./pages/auth/login"
 import { RegisterPage } from "./pages/auth/register"
+import { ChangePasswordPage } from "./pages/auth/change-password"
 import { HrDashboardPage } from "./pages/hr-dashboard"
 import { OwnerDashboardPage } from "./pages/owner-dashboard"
+import { HrTeamPage } from "./pages/hr-team"
 import { DepartmentsPage } from "./pages/departments"
 import { CompanyProfilePage } from "./pages/company-profile"
 import { UserProfilePage } from "./pages/user-profile"
+import { AccountSettingsPage } from "./pages/account-settings"
 import { ProtectedRoute } from "./features/auth/components/ProtectedRoute"
 import { GuestRoute } from "./features/auth/components/GuestRoute"
 import { useAuth } from "./features/auth/hooks/use-auth"
@@ -87,6 +90,7 @@ function DashboardShell() {
           notificationsCount={notifications.length}
           userInitials={currentUser.initials}
           onLogout={logout}
+          rolePrefix={rolePrefix}
         />
 
         <div className="flex items-center justify-end gap-2 border-b border-(--border-default) bg-(--bg-card-subtle) px-6 py-2">
@@ -124,6 +128,10 @@ const router = createBrowserRouter([
     ]
   },
   {
+    path: "/change-password",
+    element: <ChangePasswordPage />
+  },
+  {
     path: "/owner",
     element: <ProtectedRoute allowedRoles={["Owner", "Company_Owner"]} />,
     children: [
@@ -134,7 +142,9 @@ const router = createBrowserRouter([
           { path: "dashboard", element: <OwnerDashboardPage /> },
           { path: "company-profile", element: <CompanyProfilePage /> },
           { path: "profile", element: <UserProfilePage /> },
-          { path: "departments", element: <DepartmentsPage canManage /> }
+          { path: "account-settings", element: <AccountSettingsPage /> },
+          { path: "departments", element: <DepartmentsPage canManage /> },
+          { path: "hr-team", element: <HrTeamPage /> }
         ]
       }
     ]
@@ -157,7 +167,8 @@ const router = createBrowserRouter([
           { path: "assistant", element: <AssistantPage /> },
           { path: "audit", element: <AuditPage /> },
           { path: "company-profile", element: <CompanyProfilePage /> },
-          { path: "profile", element: <UserProfilePage /> }
+          { path: "profile", element: <UserProfilePage /> },
+          { path: "account-settings", element: <AccountSettingsPage /> }
         ]
       }
     ]

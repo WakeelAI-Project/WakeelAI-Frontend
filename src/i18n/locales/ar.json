@@ -10,7 +10,9 @@
     "save": "حفظ",
     "cancel": "إلغاء",
     "noContent": "لا يوجد محتوى متاح",
-    "back": "رجوع"
+    "back": "رجوع",
+    "retry": "إعادة المحاولة",
+    "unknown": "غير معروف"
   },
   "auth": {
     "welcomeBack": "مرحباً بعودتك",
@@ -58,7 +60,8 @@
     "documents": "المستندات",
     "assistant": "المساعد الذكي",
     "audit": "سجل التدقيق",
-    "departments": "الأقسام"
+    "departments": "الأقسام",
+    "hrTeam": "فريق الموارد البشرية"
   },
   "departmentsPage": {
     "eyebrow": "الهيكل التنظيمي",
@@ -453,5 +456,19 @@
     "eventCol": "الحدث",
     "actorCol": "المنفذ",
     "timeCol": "الوقت"
+  },
+  "hrTeam": {
+    "eyebrow": "إدارة الفريق",
+    "title": "فريق الموارد البشرية",
+    "description": "عرض وإدارة مديري الموارد البشرية في شركتك.",
+    "loading": "جاري تحميل فريق الموارد البشرية...",
+    "errorTitle": "فشل تحميل فريق الموارد البشرية",
+    "emptyTitle": "لا يوجد مديرو موارد بشرية بعد",
+    "emptyDescription": "قم بدعوة أول مدير موارد بشرية من لوحة التحكم.",
+    "nameColumn": "الاسم",
+    "roleColumn": "الدور",
+    "statusColumn": "الحالة",
+    "active": "نشط",
+    "inactive": "غير نشط"
   }
 }

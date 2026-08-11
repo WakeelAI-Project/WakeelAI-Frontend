@@ -3,10 +3,12 @@ import {
   Bell,
   Moon,
   Search,
+  Settings,
   Sparkles,
   Sun,
   ToggleLeft,
   ToggleRight,
+  User,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
@@ -14,6 +16,7 @@ import { useTheme } from "../providers/theme-provider";
 import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import { useLocale } from "../../hooks/use-locale";
+import { useAuth } from "../../features/auth/hooks/use-auth";
 import { NAV_ITEMS } from "./sidebar";
 
 export function Topbar({
@@ -23,6 +26,7 @@ export function Topbar({
   notificationsCount = 3,
   userInitials = "MH",
   onLogout,
+  rolePrefix = "/hr",
 }) {
   const { theme, toggleTheme, contrast, toggleContrast } = useTheme();
   const [showMenu, setShowMenu] = useState(false);
@@ -30,6 +34,10 @@ export function Topbar({
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { isRtl } = useLocale();
+  const { currentUser } = useAuth();
+
+  // Check if current user is Owner (hide My Profile for owners)
+  const isOwner = currentUser?.role?.toLowerCase().includes("owner");
 
   const handleLogout = async () => {
     await onLogout();
@@ -136,11 +144,27 @@ export function Topbar({
           {showMenu && (
             <div
               className={`absolute ${isRtl ? "left-0" : "right-0"} mt-2 w-48 rounded-sm border border-(--border-default) bg-(--bg-card) p-1 shadow-md z-50`}>
-              <div className="px-3 py-1.5 text-xs border-b border-(--border-default)">
-                <p className="font-semibold text-(--text-primary)">
-                  {t("topbar.accountSettings")}
-                </p>
-              </div>
+              {!isOwner && (
+                <button
+                  onClick={() => {
+                    setShowMenu(false)
+                    navigate(`${rolePrefix}/profile`)
+                  }}
+                  className="w-full text-start px-3 py-2 text-sm text-(--text-primary) hover:bg-(--bg-card-subtle) rounded-sm transition-colors cursor-pointer flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  {t("topbar.myProfile", { defaultValue: "My Profile" })}
+                </button>
+              )}
+              <button
+                onClick={() => {
+                  setShowMenu(false)
+                  navigate(`${rolePrefix}/account-settings`)
+                }}
+                className="w-full text-start px-3 py-2 text-sm text-(--text-primary) hover:bg-(--bg-card-subtle) rounded-sm transition-colors cursor-pointer flex items-center gap-2">
+                <Settings className="h-4 w-4" />
+                {t("topbar.accountSettingsMenu", { defaultValue: "Account Settings" })}
+              </button>
+              <div className="my-1 border-t border-(--border-default)" />
               <button
                 onClick={handleLogout}
                 className="w-full text-start px-3 py-2 text-sm text-(--status-error-fg) hover:bg-(--bg-card-subtle) rounded-sm transition-colors cursor-pointer">
