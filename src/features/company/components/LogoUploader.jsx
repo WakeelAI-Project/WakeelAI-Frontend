@@ -12,16 +12,22 @@ import { validateLogo } from "../utils/imageValidation"
 /**
  * LogoUploader
  *
- * Always interactive — no disabled/blur mode.
- * Fixed square frame; image covers the entire frame (object-cover).
- * Click anywhere on the logo (or the camera overlay) to replace it.
- * Drag-and-drop also supported.
+ * Respects the disabled prop — when disabled, the logo is non-interactive:
+ * - No hover effects
+ * - No click to upload
+ * - Upload button is hidden
+ * - Drag-and-drop is disabled
+ *
+ * When enabled (not disabled):
+ * - Fixed square frame; image covers the entire frame (object-cover).
+ * - Click anywhere on the logo (or the camera overlay) to replace it.
+ * - Drag-and-drop also supported.
  *
  * @param {Object}        props
  * @param {File|null}     props.value        - Staged File (controlled).
  * @param {Function}      props.onChange     - Called with File on valid pick, null on remove.
  * @param {string|null}   props.currentLogo  - URL of the already-saved logo.
- * @param {boolean}       props.disabled     - Reserved prop for future use; kept for API compat.
+ * @param {boolean}       props.disabled     - When true, logo is completely non-interactive.
  */
 export function LogoUploader({ value, onChange, currentLogo = null, disabled = false }) {
   const { toast } = useToast()
@@ -68,10 +74,20 @@ export function LogoUploader({ value, onChange, currentLogo = null, disabled = f
 
   // ── Drag and drop ────────────────────────────────────────────────────────
 
-  const handleDragEnter = (e) => { e.preventDefault(); e.stopPropagation(); setIsDragActive(true) }
-  const handleDragOver  = (e) => { e.preventDefault(); e.stopPropagation(); setIsDragActive(true) }
-  const handleDragLeave = (e) => { e.preventDefault(); e.stopPropagation(); setIsDragActive(false) }
+  const handleDragEnter = (e) => { 
+    if (disabled) return
+    e.preventDefault(); e.stopPropagation(); setIsDragActive(true) 
+  }
+  const handleDragOver  = (e) => { 
+    if (disabled) return
+    e.preventDefault(); e.stopPropagation(); setIsDragActive(true) 
+  }
+  const handleDragLeave = (e) => { 
+    if (disabled) return
+    e.preventDefault(); e.stopPropagation(); setIsDragActive(false) 
+  }
   const handleDrop = (e) => {
+    if (disabled) return
     e.preventDefault(); e.stopPropagation(); setIsDragActive(false)
     const file = e.dataTransfer.files?.[0]
     if (file) handleFile(file)
@@ -91,27 +107,28 @@ export function LogoUploader({ value, onChange, currentLogo = null, disabled = f
     <div className="flex flex-col items-start gap-3">
       {/* ── Fixed-size frame ───────────────────────────────────────────── */}
       <div
-        role="button"
+        role={disabled ? "img" : "button"}
         tabIndex={disabled ? -1 : 0}
-        aria-label="Upload company logo"
-        onClick={openFilePicker}
-        onKeyDown={(e) => {
+        aria-label={disabled ? "Company logo" : "Upload company logo"}
+        onClick={disabled ? undefined : openFilePicker}
+        onKeyDown={disabled ? undefined : (e) => {
           if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openFilePicker() }
         }}
-        onDragEnter={handleDragEnter}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
+        onDragEnter={disabled ? undefined : handleDragEnter}
+        onDragOver={disabled ? undefined : handleDragOver}
+        onDragLeave={disabled ? undefined : handleDragLeave}
+        onDrop={disabled ? undefined : handleDrop}
         className={cn(
           // Fixed square — always the same size regardless of content
-          "group relative h-28 w-28 shrink-0 overflow-hidden rounded-xl",
+          "relative h-28 w-28 shrink-0 overflow-hidden rounded-xl",
           "border-2 border-(--border-default) bg-(--bg-card-subtle)",
-          "cursor-pointer select-none outline-none",
-          "transition-colors duration-150",
-          // Drag highlight
-          isDragActive && "border-(--brand-primary) bg-(--accent-surface)",
-          // Focus ring
-          "focus-visible:ring-2 focus-visible:ring-(--border-focus) focus-visible:ring-offset-2"
+          disabled ? "select-none" : "group cursor-pointer select-none outline-none",
+          // Only apply interactive styles when not disabled
+          !disabled && "transition-colors duration-150",
+          // Drag highlight (only when enabled)
+          !disabled && isDragActive && "border-(--brand-primary) bg-(--accent-surface)",
+          // Focus ring (only when enabled)
+          !disabled && "focus-visible:ring-2 focus-visible:ring-(--border-focus) focus-visible:ring-offset-2"
         )}
       >
         {/* Logo image — covers the whole frame */}
@@ -123,28 +140,32 @@ export function LogoUploader({ value, onChange, currentLogo = null, disabled = f
             className="h-full w-full object-cover"
           />
         ) : (
-          // Empty state — centred camera icon
-          <div className="flex h-full w-full flex-col items-center justify-center gap-1.5 text-(--text-muted)">
-            <Camera className="h-6 w-6" />
-            <span className="text-[10px] font-medium leading-tight text-center px-1">
-              Upload logo
-            </span>
-          </div>
+          // Empty state — centred camera icon (only shown when enabled)
+          !disabled && (
+            <div className="flex h-full w-full flex-col items-center justify-center gap-1.5 text-(--text-muted)">
+              <Camera className="h-6 w-6" />
+              <span className="text-[10px] font-medium leading-tight text-center px-1">
+                Upload logo
+              </span>
+            </div>
+          )
         )}
 
-        {/* Hover overlay — always shows camera icon on hover to signal interactivity */}
-        <div
-          className={cn(
-            "absolute inset-0 flex items-center justify-center",
-            "bg-black/40 opacity-0 transition-opacity duration-150",
-            "group-hover:opacity-100",
-            // Also show when actively dragging
-            isDragActive && "opacity-100",
-          )}
-          aria-hidden="true"
-        >
-          <Camera className="h-6 w-6 text-white drop-shadow" />
-        </div>
+        {/* Hover overlay — only shows when enabled and user hovers */}
+        {!disabled && (
+          <div
+            className={cn(
+              "absolute inset-0 flex items-center justify-center",
+              "bg-black/40 opacity-0 transition-opacity duration-150",
+              "group-hover:opacity-100",
+              // Also show when actively dragging
+              isDragActive && "opacity-100",
+            )}
+            aria-hidden="true"
+          >
+            <Camera className="h-6 w-6 text-white drop-shadow" />
+          </div>
+        )}
       </div>
 
       {/* Hidden file input */}
@@ -160,38 +181,42 @@ export function LogoUploader({ value, onChange, currentLogo = null, disabled = f
       />
 
       {/* ── Action row ─────────────────────────────────────────────────── */}
-      <div className="flex flex-wrap items-center gap-2">
-        <Button
-          type="button"
-          variant="secondary"
-          size="sm"
-          disabled={disabled}
-          onClick={openFilePicker}
-          className="flex items-center gap-1.5"
-        >
-          <Camera className="h-3.5 w-3.5" />
-          {hasPreview ? "Replace" : "Upload logo"}
-        </Button>
-
-        {hasPreview && (
+      {!disabled && (
+        <div className="flex flex-wrap items-center gap-2">
           <Button
             type="button"
-            variant="ghost"
+            variant="secondary"
             size="sm"
             disabled={disabled}
-            onClick={handleRemove}
-            className="flex items-center gap-1.5 text-(--status-error-fg) hover:bg-(--status-error-bg)"
+            onClick={openFilePicker}
+            className="flex items-center gap-1.5"
           >
-            <Trash2 className="h-3.5 w-3.5" />
-            Remove
+            <Camera className="h-3.5 w-3.5" />
+            {hasPreview ? "Replace" : "Upload logo"}
           </Button>
-        )}
-      </div>
 
-      {/* Hint text */}
-      <p className="text-[10px] text-(--text-muted) leading-relaxed -mt-1">
-        {ALLOWED_LOGO_TYPES_LABEL} · Max {MAX_LOGO_SIZE_LABEL}
-      </p>
+          {hasPreview && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              disabled={disabled}
+              onClick={handleRemove}
+              className="flex items-center gap-1.5 text-(--status-error-fg) hover:bg-(--status-error-bg)"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+              Remove
+            </Button>
+          )}
+        </div>
+      )}
+
+      {/* Hint text — only shown when enabled */}
+      {!disabled && (
+        <p className="text-[10px] text-(--text-muted) leading-relaxed -mt-1">
+          {ALLOWED_LOGO_TYPES_LABEL} · Max {MAX_LOGO_SIZE_LABEL}
+        </p>
+      )}
     </div>
   )
 }

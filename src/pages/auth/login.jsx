@@ -1,12 +1,11 @@
 import React, { useState } from "react"
 import { useForm } from "react-hook-form"
-import { Link, useLocation } from "react-router"
+import { Link, useLocation, useNavigate } from "react-router"
 import { AuthLayout } from "../../components/auth/auth-layout"
 import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
 import { SegmentedControl } from "../../components/ui/segmented-control"
 import { useAuth } from "../../features/auth/hooks/use-auth"
-import { login as loginRequest, normalizeAuthResponse } from "../../features/auth/services/auth-service"
 import { decodeToken } from "../../features/auth/utils/jwt"
 import { useLocale } from "../../hooks/use-locale"
 import { useTranslation } from "react-i18next"
@@ -14,10 +13,12 @@ import { useTranslation } from "react-i18next"
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export function LoginPage() {
-  const { setToken } = useAuth()
+  const { login } = useAuth()
   const location = useLocation()
+  const navigate = useNavigate()
   const [selectedRole, setSelectedRole] = useState("Owner")
   const [submitError, setSubmitError] = useState("")
+  const [successMessage, setSuccessMessage] = useState(location.state?.message || "")
   const { isRtl } = useLocale()
   const { t } = useTranslation()
   const {
@@ -29,11 +30,11 @@ export function LoginPage() {
 
   const onSubmit = async ({ email, password }) => {
     setSubmitError("")
+    setSuccessMessage("")
 
     try {
-      const raw = await loginRequest(email, password)
-      // normalizeAuthResponse handles both { token } and { access_token } backend shapes
-      const normalized = normalizeAuthResponse(raw)
+      // Use the auth store's login method which handles temporary password storage
+      const normalized = await login(email, password)
 
       if (!normalized.token) {
         setSubmitError(t("auth.loginFailed"))
@@ -51,7 +52,22 @@ export function LoginPage() {
         return
       }
 
-      setToken(normalized.token, normalized.refreshToken)
+      // Check must_change_password and redirect if needed
+      if (normalized.mustChangePassword) {
+        // Redirect to change password page
+        navigate("/change-password", { replace: true })
+        return
+      }
+
+      // Normal login flow - navigate directly to role-specific dashboard
+      if (role.includes("hr")) {
+        navigate("/hr/dashboard", { replace: true })
+      } else if (role.includes("owner")) {
+        navigate("/owner/dashboard", { replace: true })
+      } else {
+        // Fallback to HR dashboard for unknown roles
+        navigate("/hr/dashboard", { replace: true })
+      }
     } catch (error) {
       setSubmitError(error?.message || t("auth.loginFailed"))
     }
@@ -78,6 +94,12 @@ export function LoginPage() {
             ]}
           />
         </div>
+
+        {successMessage && (
+          <div role="status" className="rounded-md border border-(--status-success-fg) bg-(--status-success-bg) px-4 py-3 text-sm text-(--status-success-fg)">
+            {successMessage}
+          </div>
+        )}
 
         {submitError && (
           <div role="alert" className="rounded-md border border-(--status-error-fg) bg-(--status-error-bg) px-4 py-3 text-sm text-(--status-error-fg)">

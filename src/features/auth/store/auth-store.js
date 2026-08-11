@@ -31,6 +31,8 @@ const initialStoreState = {
   refreshToken: null,
   currentUser: null,
   isAuthenticated: false,
+  mustChangePassword: false,
+  temporaryPassword: null, // Used only during first-login password change flow
 };
 
 export const useAuthStore = create((set, get) => ({
@@ -43,8 +45,9 @@ export const useAuthStore = create((set, get) => ({
    * @param {string} token - JWT access token
    * @param {string|null} [refreshToken] - Refresh token (optional)
    * @param {number|null} [expiresIn] - Access token TTL in seconds (from auth response)
+   * @param {boolean} [mustChangePassword] - Whether password change is required (optional)
    */
-  setToken: (token, refreshToken, expiresIn) => {
+  setToken: (token, refreshToken, expiresIn, mustChangePassword) => {
     if (!token) {
       get().clearAuth();
       return;
@@ -70,6 +73,7 @@ export const useAuthStore = create((set, get) => ({
       refreshToken: newRefreshToken,
       currentUser: decoded,
       isAuthenticated: true,
+      mustChangePassword: mustChangePassword ?? false,
     });
   },
 
@@ -105,8 +109,20 @@ export const useAuthStore = create((set, get) => ({
         throw new Error("Invalid response format: missing access_token");
       }
 
-      // Pass expiresIn so cookies are stamped with the right TTL
-      get().setToken(normalized.token, normalized.refreshToken, normalized.expiresIn);
+      // Pass expiresIn and mustChangePassword so they are stored in the auth state
+      get().setToken(
+        normalized.token, 
+        normalized.refreshToken, 
+        normalized.expiresIn,
+        normalized.mustChangePassword
+      );
+      
+      // Store password temporarily ONLY if mustChangePassword is true
+      // This allows the change-password page to use it as current_password
+      if (normalized.mustChangePassword) {
+        set({ temporaryPassword: password });
+      }
+      
       return normalized;
     } catch (error) {
       get().clearAuth();
@@ -126,6 +142,14 @@ export const useAuthStore = create((set, get) => ({
     } finally {
       get().clearAuth();
     }
+  },
+
+  /**
+   * Clears the temporary password from the store.
+   * Should be called after successful password change.
+   */
+  clearTemporaryPassword: () => {
+    set({ temporaryPassword: null });
   },
 
   /**
@@ -161,6 +185,7 @@ export const useAuthStore = create((set, get) => ({
         refreshToken: cookieRefreshToken ?? null,
         currentUser: decoded,
         isAuthenticated: true,
+        mustChangePassword: false, // Bootstrap assumes normal login; first-login only happens via explicit login
       });
       return;
     }

@@ -24,6 +24,7 @@ export const NAV_ITEMS = [
   { id: "dashboard", labelKey: "sidebar.dashboard", icon: Building2 },
   { id: "company-profile", labelKey: "sidebar.companyProfile", icon: Landmark },
   { id: "departments", labelKey: "sidebar.departments", icon: Layers },
+  { id: "hr-team", labelKey: "sidebar.hrTeam", icon: Users },
   { id: "profile", labelKey: "sidebar.myProfile", icon: UserRound },
   { id: "employees", labelKey: "sidebar.employees", icon: Users },
   { id: "contracts", labelKey: "sidebar.contracts", icon: FileText },
@@ -57,9 +58,11 @@ export function Sidebar({
 }) {
   const { t } = useTranslation()
   const { isRtl } = useLocale()
+  
+  // Filter visible items based on role
   const visibleItems = rolePrefix === "/owner"
     ? NAV_ITEMS.filter((item) =>
-        ["dashboard", "company-profile", "departments", "profile"].includes(item.id)
+        ["dashboard", "company-profile", "departments", "hr-team"].includes(item.id)
       )
     : NAV_ITEMS.filter((item) => HR_VISIBLE_IDS.includes(item.id))
 

@@ -7,15 +7,23 @@ import { useAuth } from "../hooks/use-auth";
  * Checks if the user is authenticated. If not, redirects to the redirect path (defaults to /login).
  * Supports checking roles (e.g. ['hr', 'owner']) for scalable role-based routes in the future.
  * 
+ * IMPORTANT: Blocks access to protected routes when mustChangePassword is true.
+ * Users with mustChangePassword=true must complete password change before accessing the app.
+ * 
  * @param {object} props
  * @param {string[]} [props.allowedRoles] - Optional list of roles allowed to access this route
  * @param {string} [props.redirectTo] - Route to redirect to if unauthenticated
  */
 export function ProtectedRoute({ allowedRoles, redirectTo = "/login" }) {
-  const { isAuthenticated, currentUser } = useAuth();
+  const { isAuthenticated, currentUser, mustChangePassword } = useAuth();
 
   if (!isAuthenticated) {
     return <Navigate to={redirectTo} replace />;
+  }
+
+  // Block access to protected routes if password change is required
+  if (mustChangePassword) {
+    return <Navigate to="/change-password" replace />;
   }
 
   if (allowedRoles && allowedRoles.length > 0) {

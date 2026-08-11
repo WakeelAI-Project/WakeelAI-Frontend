@@ -12,7 +12,7 @@ import api from "../../../lib/api";
  * of which endpoint produced the response.
  *
  * @param {object} raw - Raw response data from the backend
- * @returns {{ token: string|null, refreshToken: string|null, expiresIn: number|null, companyId: string|null, userId: string|null, role: string|null }}
+ * @returns {{ token: string|null, refreshToken: string|null, expiresIn: number|null, companyId: string|null, userId: string|null, role: string|null, mustChangePassword: boolean }}
  */
 export function normalizeAuthResponse(raw) {
   if (!raw) {
@@ -23,6 +23,7 @@ export function normalizeAuthResponse(raw) {
       companyId: null,
       userId: null,
       role: null,
+      mustChangePassword: false,
     };
   }
 
@@ -33,6 +34,7 @@ export function normalizeAuthResponse(raw) {
     companyId: raw.company_id ?? null,
     userId: raw.user_id ?? null,
     role: raw.role ?? null,
+    mustChangePassword: raw.must_change_password ?? false,
   };
 }
 

@@ -10,7 +10,9 @@
     "save": "Save",
     "cancel": "Cancel",
     "noContent": "No content available",
-    "back": "Back"
+    "back": "Back",
+    "retry": "Retry",
+    "unknown": "Unknown"
   },
   "auth": {
     "welcomeBack": "Welcome back",
@@ -58,7 +60,8 @@
     "documents": "Documents",
     "assistant": "AI Assistant",
     "audit": "Audit Log",
-    "departments": "Departments"
+    "departments": "Departments",
+    "hrTeam": "HR Team"
   },
   "departmentsPage": {
     "eyebrow": "Organization",
@@ -453,5 +456,19 @@
     "eventCol": "Event",
     "actorCol": "Actor",
     "timeCol": "Time"
+  },
+  "hrTeam": {
+    "eyebrow": "Team Management",
+    "title": "HR Team",
+    "description": "View and manage your company's HR managers.",
+    "loading": "Loading HR team...",
+    "errorTitle": "Failed to load HR team",
+    "emptyTitle": "No HR managers yet",
+    "emptyDescription": "Invite your first HR manager from the dashboard.",
+    "nameColumn": "Name",
+    "roleColumn": "Role",
+    "statusColumn": "Status",
+    "active": "Active",
+    "inactive": "Inactive"
   }
 }
