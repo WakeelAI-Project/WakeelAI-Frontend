@@ -31,6 +31,7 @@ export const NAV_ITEMS = [
   { id: "leave", labelKey: "sidebar.leave", icon: Calendar },
   { id: "compliance", labelKey: "sidebar.compliance", icon: ShieldCheck },
   { id: "documents", labelKey: "sidebar.documents", icon: FolderOpen },
+  { id: "templates", labelKey: "sidebar.templates", icon: FileText },
   { id: "assistant", labelKey: "sidebar.assistant", icon: MessageSquareCode },
   { id: "audit", labelKey: "sidebar.audit", icon: History }
 ]
@@ -42,6 +43,7 @@ const HR_VISIBLE_IDS = [
   "leave",
   "compliance",
   "documents",
+  "templates",
   "departments",
   "assistant",
   "audit",
@@ -54,17 +56,22 @@ export function Sidebar({
   onNavSelect,
   companyName = "الشركة المصرية للمقاولات",
   onCompanySwitch,
+  userRole,
   rolePrefix = ""
 }) {
   const { t } = useTranslation()
   const { isRtl } = useLocale()
+  const isHrManager = userRole?.toLowerCase() === "hr_manager"
   
   // Filter visible items based on role
   const visibleItems = rolePrefix === "/owner"
     ? NAV_ITEMS.filter((item) =>
         ["dashboard", "company-profile", "departments", "hr-team"].includes(item.id)
       )
-    : NAV_ITEMS.filter((item) => HR_VISIBLE_IDS.includes(item.id))
+    : NAV_ITEMS.filter((item) => (
+        HR_VISIBLE_IDS.includes(item.id) &&
+        (item.id !== "templates" || isHrManager)
+      ))
 
   return (
     <aside className="w-60 xl:w-66 h-screen bg-(--bg-sidebar) text-(--text-on-brand) flex flex-col justify-between select-none border-e border-(--brand-primary-hover) shrink-0">

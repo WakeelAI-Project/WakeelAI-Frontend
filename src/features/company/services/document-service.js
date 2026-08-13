@@ -1,61 +1,89 @@
 /**
  * Document Service
  *
- * Wraps all document-related API calls.
+ * Backend contract inspected 2026-08-14:
+ * - Internal M2M only:
+ *   GET  /api/ai/templates/active
+ *   POST /api/documents/save
+ * - Public HR document list/detail/review endpoints are not exposed yet.
  *
- * Backend status:
- *   GET    /documents          — Backend endpoint not yet implemented
- *   POST   /documents/upload   — Backend endpoint not yet implemented
- *   DELETE /documents/:id      — Backend endpoint not yet implemented
+ * The browser must not call the internal M2M endpoints because they are
+ * secured for the Node AI service. Keep this boundary explicit until the
+ * backend publishes HR-facing document APIs.
  */
 
-/**
- * Fetch all documents for the authenticated company.
- *
- * @returns {Promise<Array>} Array of document objects
- *
- * @status BACKEND ENDPOINT NOT IMPLEMENTED
- */
-export async function getDocuments() {
-  // TODO: Uncomment when GET /documents is available.
-  // const response = await api.get("/documents");
-  // return response.data;
+export const DOCUMENT_BACKEND_STATUS = Object.freeze({
+  READY: "ready",
+  PENDING_BACKEND_CONTRACT: "pending_backend_contract",
+});
 
-  // ⚠️  Backend endpoint not implemented — returning empty array
-  return [];
+export const DOCUMENT_BACKEND_CAPABILITIES = Object.freeze({
+  canList: false,
+  canRead: false,
+  canUpload: false,
+  canDelete: false,
+  canFinalize: false,
+  canReject: false,
+  canSearch: false,
+  canFilterByStatus: false,
+  canFilterByType: false,
+});
+
+const DOCUMENT_API_PENDING_CODE = "documents_api_pending_backend_contract";
+
+function createDocumentApiUnavailableError(operation) {
+  const error = new Error(
+    "Public HR document endpoints are not available in the current backend contract.",
+  );
+  error.code = DOCUMENT_API_PENDING_CODE;
+  error.operation = operation;
+  error.retryable = false;
+  return error;
+}
+
+export function isDocumentApiUnavailableError(error) {
+  return error?.code === DOCUMENT_API_PENDING_CODE;
+}
+
+export function getDocumentId(document) {
+  return document?.id ?? document?.documentId ?? document?.document_id ?? null;
 }
 
 /**
- * Upload a new document.
+ * Fetch documents for the authenticated company.
  *
- * @param {FormData} formData - Must include the file and any metadata
- * @returns {Promise<object>} Uploaded document metadata
- *
- * @status BACKEND ENDPOINT NOT IMPLEMENTED
+ * @returns {Promise<{data: Array, page: number, total: number, status: string, capabilities: object}>}
  */
-export async function uploadDocument(_formData) {
-  // TODO: Uncomment when POST /documents/upload is available.
-  // const response = await api.post("/documents/upload", formData, {
-  //   headers: { "Content-Type": "multipart/form-data" },
-  // });
-  // return response.data;
-
-  // ⚠️  Backend endpoint not implemented
-  return null;
+export async function getDocuments({ page = 1 } = {}) {
+  return {
+    data: [],
+    page,
+    total: 0,
+    status: DOCUMENT_BACKEND_STATUS.PENDING_BACKEND_CONTRACT,
+    capabilities: DOCUMENT_BACKEND_CAPABILITIES,
+  };
 }
 
 /**
- * Delete a document by ID.
+ * Fetch one generated document for HR review.
  *
  * @param {string} documentId
- * @returns {Promise<void>}
- *
- * @status BACKEND ENDPOINT NOT IMPLEMENTED
  */
-export async function deleteDocument(_documentId) {
-  // TODO: Uncomment when DELETE /documents/:id is available.
-  // await api.delete(`/documents/${documentId}`);
+export async function getDocument(documentId) {
+  if (!documentId) {
+    const error = new Error("documentId is required.");
+    error.code = "validation_error";
+    error.retryable = false;
+    throw error;
+  }
 
-  // ⚠️  Backend endpoint not implemented
-  return null;
+  throw createDocumentApiUnavailableError("getDocument");
+}
+
+export async function uploadDocument() {
+  throw createDocumentApiUnavailableError("uploadDocument");
+}
+
+export async function deleteDocument() {
+  throw createDocumentApiUnavailableError("deleteDocument");
 }

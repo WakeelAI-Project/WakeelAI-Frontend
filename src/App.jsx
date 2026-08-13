@@ -9,6 +9,7 @@ import { AppProvider, useApp } from "./context/app-context"
 import { AssistantPage } from "./pages/assistant"
 import { AuditPage } from "./pages/audit"
 import { CompliancePage } from "./pages/compliance"
+import { DocumentReviewPage } from "./pages/document-review"
 import { ContractsPage } from "./pages/contracts"
 import { DocumentsPage } from "./pages/documents"
 import { EmployeesPage } from "./pages/employees"
@@ -19,6 +20,8 @@ import { ChangePasswordPage } from "./pages/auth/change-password"
 import { HrDashboardPage } from "./pages/hr-dashboard"
 import { OwnerDashboardPage } from "./pages/owner-dashboard"
 import { HrTeamPage } from "./pages/hr-team"
+import { TemplateEditorPage } from "./pages/template-editor"
+import { TemplatesPage } from "./pages/templates"
 import { DepartmentsPage } from "./pages/departments"
 import { CompanyProfilePage } from "./pages/company-profile"
 import { UserProfilePage } from "./pages/user-profile"
@@ -78,6 +81,7 @@ function DashboardShell() {
       <Sidebar
         activeId={activeId}
         companyName={(isRtl ? activeCompany?.name : activeCompany?.nameEn) || ""}
+        userRole={currentUser?.role}
         rolePrefix={rolePrefix}
         onNavSelect={(navId) => navigate(`${rolePrefix}/${navId}`)}
       />
@@ -163,6 +167,15 @@ const router = createBrowserRouter([
           { path: "leave", element: <LeavePage /> },
           { path: "compliance", element: <CompliancePage /> },
           { path: "documents", element: <DocumentsPage /> },
+          { path: "documents/:documentId", element: <DocumentReviewPage /> },
+          {
+            element: <ProtectedRoute allowedRoles={["HR_Manager"]} />,
+            children: [
+              { path: "templates", element: <TemplatesPage /> },
+              { path: "templates/new", element: <TemplateEditorPage mode="create" /> },
+              { path: "templates/:templateId/edit", element: <TemplateEditorPage mode="edit" /> }
+            ]
+          },
           { path: "departments", element: <DepartmentsPage canManage={false} /> },
           { path: "assistant", element: <AssistantPage /> },
           { path: "audit", element: <AuditPage /> },
