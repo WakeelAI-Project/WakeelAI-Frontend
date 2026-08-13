@@ -16,9 +16,9 @@ const stringifyValue = (value) => {
   }
 };
 
-export function resolveDocumentDraftRoute(_card) {
-  // TODO: Connect this to the future document review route once it exists.
-  return null;
+export function resolveDocumentDraftRoute(card) {
+  if (!card?.docId) return null;
+  return `/hr/documents/${encodeURIComponent(String(card.docId))}`;
 }
 
 function ResultShell({ icon: Icon, title, badge, children }) {
@@ -198,4 +198,3 @@ export function AssistantResultCard({ card, onReviewDocument }) {
     </div>
   );
 }
-
