@@ -1,73 +1,12 @@
-import React, { useEffect, useState } from "react"
-import { Send } from "lucide-react"
-import { AiMessageBubble, AiSuggestions, UserMessageBubble, VoiceButton } from "../components/ai/ai-chat"
-import { Button } from "../components/ui/button"
-import { Input } from "../components/ui/input"
-import { getAssistantThread } from "../features/company/services/assistant-service"
-import { PageShell } from "./page-shell"
-import { useTranslation } from "react-i18next"
-import { useLocale } from "../hooks/use-locale"
+import React from "react";
+import { AssistantChat } from "../features/company/components/assistant/assistant-chat";
 
 export function AssistantPage() {
-  const [isVoiceRecording, setIsVoiceRecording] = useState(false)
-  const [thread, setThread] = useState([])
-  const { t } = useTranslation()
-  const { isRtl } = useLocale()
-
-  useEffect(() => {
-    getAssistantThread().then(setThread).catch(() => setThread([]))
-  }, [])
-
   return (
-    <PageShell
-      eyebrow={t("assistant.evidence")}
-      title={t("assistant.title")}
-      description={t("assistant.description")}
-    >
-      <section className="mx-auto flex h-[620px] w-full max-w-3xl flex-col rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--bg-card)] shadow-[var(--shadow-2)]">
-        <div className="flex-1 overflow-y-auto p-4 space-y-4 flex flex-col">
-          {thread.map((message) =>
-            message.role === "ai" ? (
-              <AiMessageBubble
-                key={message.id}
-                message={isRtl ? message.message : message.messageEn}
-                citation={isRtl ? message.citationAr : message.citation}
-                confidence={message.confidence}
-              />
-            ) : (
-              <UserMessageBubble
-                key={message.id}
-                message={isRtl ? message.message : message.messageEn}
-              />
-            )
-          )}
-        </div>
-
-        <div className="p-4 border-t border-[var(--border-default)] flex flex-col gap-3 shrink-0">
-          <AiSuggestions
-            suggestions={
-              isRtl
-                ? ["كم رصيد إجازاتي السنوية؟", "صياغة عقد عمل مؤقت", "مراجعة بند عدم المنافسة"]
-                : ["What is my leave balance?", "Draft temporary contract", "Review non-compete clause"]
-            }
-            onSelect={() => {}}
-          />
-          <div className="flex items-center gap-2">
-            <Input
-              className="flex-1 rounded-[var(--radius-2xl)]"
-              placeholder={t("assistant.inputPlaceholder")}
-            />
-            <VoiceButton
-              isActive={isVoiceRecording}
-              onStart={() => setIsVoiceRecording(true)}
-              onEnd={() => setIsVoiceRecording(false)}
-            />
-            <Button variant="ai" className="h-10 w-10 p-0 rounded-full shrink-0 cursor-pointer">
-              <Send className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      </section>
-    </PageShell>
-  )
+    <main className="flex min-h-full bg-(--bg-page) p-3 sm:p-4 lg:p-6">
+      <div className="flex min-h-[calc(100vh-8.5rem)] w-full">
+        <AssistantChat className="w-full flex-1" />
+      </div>
+    </main>
+  );
 }
