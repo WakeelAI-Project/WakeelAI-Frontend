@@ -309,12 +309,86 @@
   "assistant": {
     "evidence": "AI With Evidence",
     "title": "AI Assistant",
-    "description": "Wakeel answers with cited labor-law sources, confidence, and an auditable trail.",
+    "description": "Ask Wakeel to answer HR questions, draft documents, calculate entitlements, and cite the sources behind its answers.",
+    "identity": "Wakeel AI",
     "searching": "Searching Egyptian Labor Law...",
     "thinking": "Drafting overtime clause...",
     "inputPlaceholder": "Ask Wakeel about any regulation...",
+    "composerLabel": "Message Wakeel AI",
+    "send": "Send message",
     "you": "You",
-    "humanReview": "This section requires human review"
+    "humanReview": "This section requires human review",
+    "chat": {
+      "newTitle": "New conversation",
+      "activeTitle": "Conversation",
+      "newDescription": "Send a message to start a new HR assistant conversation."
+    },
+    "conversations": {
+      "title": "Conversations",
+      "subtitle": "Current assistant threads",
+      "new": "New chat",
+      "emptyTitle": "No conversations yet",
+      "emptyDescription": "Start a chat and it will appear here for this session.",
+      "pendingBackend": "Conversation discovery is waiting on the backend conversation-list endpoint. New chats from this session will still appear here.",
+      "groups": {
+        "today": "Today",
+        "yesterday": "Yesterday",
+        "earlier": "Earlier"
+      }
+    },
+    "empty": {
+      "title": "How can Wakeel help HR today?",
+      "description": "Ask about leave balances, Egyptian labor-law rules, draft documents, or calculations. Answers can include citations and structured next steps.",
+      "prompts": [
+        "What are the annual leave rules under Egyptian Labor Law?",
+        "What are the main requirements of an employment contract?",
+        "What information is needed to generate an employment contract?",
+        "How is end-of-service gratuity calculated?"
+      ]
+    },
+    "sources": {
+      "title": "Sources",
+      "article": "Article {{value}}",
+      "section": "Section {{value}}",
+      "relevance": "{{value}} relevance"
+    },
+    "missingFields": {
+      "title": "Additional details needed",
+      "continue": "Continue",
+      "providedDetails": "Provided the requested details",
+      "selectPlaceholder": "Select an option",
+      "fileUrlLabel": "File URL",
+      "fileUrlRequired": "Paste a file URL to continue.",
+      "fileUploadPending": "File upload storage is pending backend integration. Paste an uploaded file URL when available."
+    },
+    "resultCards": {
+      "calculation": "Calculation",
+      "calculationBadge": "Calculated result",
+      "result": "Result",
+      "inputs": "Inputs",
+      "breakdown": "Breakdown",
+      "documentDraftCreated": "Document Draft Created",
+      "documentType": "Document type",
+      "employee": "Employee",
+      "reviewDraft": "Review Draft",
+      "reviewRoutePending": "Document review route pending",
+      "leaveDraftCreated": "Leave Draft Created",
+      "attachmentUploaded": "Uploaded",
+      "noAttachment": "Not uploaded"
+    },
+    "errors": {
+      "title": "Wakeel could not complete that request",
+      "generic": "Something went wrong. Please try again.",
+      "validation": "Check the message details and try again.",
+      "unauthorized": "Your session needs to be refreshed. Sign in again if this continues.",
+      "forbidden": "This assistant is only available to authorized HR users.",
+      "notFound": "That conversation could not be found.",
+      "conflict": "The request conflicts with the current conversation state.",
+      "rateLimited": "You're sending messages too quickly. Please try again in a moment.",
+      "serviceUnavailable": "Wakeel AI is temporarily unavailable.",
+      "network": "The network request failed. Check your connection and try again.",
+      "retryAfter": "Try again in {{seconds}} seconds."
+    }
   },
   "profile": {
     "notProvided": "Not provided",
