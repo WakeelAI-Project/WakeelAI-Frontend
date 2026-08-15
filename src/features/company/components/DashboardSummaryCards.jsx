@@ -1,6 +1,5 @@
 import React from "react"
 import { useTranslation } from "react-i18next"
-import { Users, CalendarClock, Sparkles, FileText } from "lucide-react"
 import { StatCard } from "../../../components/data-display/stat-card"
 import { cn } from "../../../lib/utils"
 import { useDashboardSummary } from "../hooks/use-dashboard-summary"
@@ -26,7 +25,7 @@ function StatCardSkeleton({ className }) {
 // ---------------------------------------------------------------------------
 // Individual card with loading / error / value states
 // ---------------------------------------------------------------------------
-function SummaryCard({ title, domain, icon: Icon, loading, error, value, description }) {
+function SummaryCard({ title, domain, loading, error, value, description }) {
   const { t } = useTranslation()
 
   if (loading) {
@@ -82,7 +81,6 @@ export function DashboardSummaryCards({ className }) {
       key: "employees",
       title: t("dashboard.summaryEmployees"),
       domain: "employee",
-      icon: Users,
       loading: employees.loading,
       error: employees.error,
       value: employees.count,
@@ -92,7 +90,6 @@ export function DashboardSummaryCards({ className }) {
       key: "leave",
       title: t("dashboard.summaryLeaveRequests"),
       domain: "leave",
-      icon: CalendarClock,
       loading: leaveRequests.loading,
       error: leaveRequests.error,
       value: leaveRequests.pending,
@@ -102,7 +99,6 @@ export function DashboardSummaryCards({ className }) {
       key: "ai",
       title: t("dashboard.summaryAiUsage"),
       domain: "AI",
-      icon: Sparkles,
       loading: handbook.loading,
       error: handbook.error,
       value: handbookValue,
@@ -112,7 +108,6 @@ export function DashboardSummaryCards({ className }) {
       key: "documents",
       title: t("dashboard.summaryDocuments"),
       domain: "document",
-      icon: FileText,
       loading: documents.loading,
       error: documents.error,
       value: documents.count,

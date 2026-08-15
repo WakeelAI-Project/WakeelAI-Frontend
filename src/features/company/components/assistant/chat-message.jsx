@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { AlertTriangle, User } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { SealMark } from "../../../../components/brand/seal-mark";
@@ -8,6 +8,7 @@ import { useLocale } from "../../../../hooks/use-locale";
 import { AssistantSources } from "./assistant-sources";
 import { AssistantResultCard } from "./assistant-result-card";
 import { MissingFieldsForm } from "./missing-fields-form";
+import { MarkdownRenderer } from "./markdown-renderer";
 
 const ARABIC_TEXT_PATTERN = /[\u0600-\u06FF]/;
 
@@ -67,53 +68,6 @@ function useTypewriterText({ text, enabled, onComplete }) {
   return visibleText;
 }
 
-function MarkdownLite({ text }) {
-  const blocks = useMemo(() => (
-    text
-      .split(/\n{2,}/)
-      .map((block) => block.trim())
-      .filter(Boolean)
-  ), [text]);
-
-  if (!blocks.length) return null;
-
-  return (
-    <div className="space-y-3 text-sm leading-relaxed">
-      {blocks.map((block, blockIndex) => {
-        const lines = block.split("\n").map((line) => line.trim()).filter(Boolean);
-        const isBulletList = lines.every((line) => /^[-*•]\s+/.test(line));
-        const isNumberedList = lines.every((line) => /^\d+[.)]\s+/.test(line));
-
-        if (isBulletList) {
-          return (
-            <ul key={`${block}-${blockIndex}`} className="list-disc space-y-1 ps-5">
-              {lines.map((line, index) => (
-                <li key={`${line}-${index}`}>{line.replace(/^[-*•]\s+/, "")}</li>
-              ))}
-            </ul>
-          );
-        }
-
-        if (isNumberedList) {
-          return (
-            <ol key={`${block}-${blockIndex}`} className="list-decimal space-y-1 ps-5">
-              {lines.map((line, index) => (
-                <li key={`${line}-${index}`}>{line.replace(/^\d+[.)]\s+/, "")}</li>
-              ))}
-            </ol>
-          );
-        }
-
-        return (
-          <p key={`${block}-${blockIndex}`} className="whitespace-pre-wrap">
-            {block}
-          </p>
-        );
-      })}
-    </div>
-  );
-}
-
 export function ChatMessage({
   message,
   isProgressive,
@@ -153,7 +107,7 @@ export function ChatMessage({
               isRtl ? "rounded-tl-xs" : "rounded-tr-xs",
             )}
           >
-            <MarkdownLite text={message.content} />
+            <MarkdownRenderer text={message.content} />
           </div>
         </div>
       </article>
@@ -178,7 +132,7 @@ export function ChatMessage({
           )}
         >
           {visibleText ? (
-            <MarkdownLite text={visibleText} />
+            <MarkdownRenderer text={visibleText} />
           ) : (
             <span className="text-sm text-(--text-secondary)">{t("assistant.thinking")}</span>
           )}
