@@ -1,5 +1,5 @@
 import React from "react";
-import { MessageSquarePlus, MessagesSquare } from "lucide-react";
+import { MessageSquarePlus, MessagesSquare, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "../../../../components/ui/button";
 import { Skeleton } from "../../../../components/ui/skeleton";
@@ -33,6 +33,7 @@ export function ConversationSidebar({
   status,
   onSelectConversation,
   onNewConversation,
+  onDeleteConversation,
   className,
 }) {
   const { t } = useTranslation();
@@ -102,26 +103,44 @@ export function ConversationSidebar({
                     {items.map((conversation) => {
                       const isActive = conversation.id === activeConversationId;
                       return (
-                        <button
+                        <div
                           key={conversation.id}
-                          type="button"
-                          onClick={() => onSelectConversation(conversation.id)}
                           className={cn(
-                            "w-full rounded-sm border px-3 py-2 text-start transition-colors",
+                            "group relative flex w-full items-center justify-between rounded-sm border px-3 py-2 text-start transition-colors",
                             isActive
                               ? "border-(--ai-primary) bg-(--ai-surface) text-(--brand-primary)"
                               : "border-transparent text-(--text-primary) hover:border-(--border-default) hover:bg-(--bg-card)",
                           )}
                         >
-                          <span className="block truncate text-sm font-semibold">
-                            {conversation.title}
-                          </span>
-                          {conversation.lastMessage && (
-                            <span className="mt-0.5 block truncate text-xs text-(--text-secondary)">
-                              {conversation.lastMessage}
+                          <button
+                            type="button"
+                            onClick={() => onSelectConversation(conversation.id)}
+                            className="flex-1 min-w-0 text-start"
+                          >
+                            <span className="block truncate text-sm font-semibold">
+                              {conversation.title}
                             </span>
-                          )}
-                        </button>
+                            {conversation.lastMessage && (
+                              <span className="mt-0.5 block truncate text-xs text-(--text-secondary)">
+                                {conversation.lastMessage}
+                              </span>
+                            )}
+                          </button>
+                          
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (window.confirm(t("assistant.conversations.confirmDelete") || "Are you sure you want to delete this conversation?")) {
+                                onDeleteConversation?.(conversation.id);
+                              }
+                            }}
+                            className="ms-2 hidden shrink-0 rounded-sm p-1 text-(--text-secondary) opacity-0 transition-opacity hover:bg-black/10 hover:text-(--status-error-fg) group-hover:block group-hover:opacity-100"
+                            aria-label={t("common.delete")}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
                       );
                     })}
                   </div>

@@ -126,4 +126,45 @@ describe("assistant-store", () => {
     expect(useAssistantStore.getState().messages).toHaveLength(1);
     expect(useAssistantStore.getState().messages[0].conversationId).toBe("conv-a");
   });
+
+  it("loads conversations from backend successfully", async () => {
+    serviceMocks.getConversations.mockResolvedValueOnce({
+      conversations: [
+        {
+          id: "conv-1",
+          title: "Conversation",
+          lastMessage: "",
+          createdAt: "2030-01-01T00:00:00Z",
+          updatedAt: "2030-01-01T00:00:00Z",
+        },
+      ],
+      status: "ready",
+      pagination: { page: 1, limit: 50, total: 1, hasNextPage: false },
+    });
+
+    // Start loading
+    const loadPromise = useAssistantStore.getState().loadConversations();
+    
+    // Should be loading immediately
+    expect(useAssistantStore.getState().isLoadingConversations).toBe(true);
+    
+    await loadPromise;
+
+    // Loading done, data populated
+    expect(useAssistantStore.getState().isLoadingConversations).toBe(false);
+    expect(useAssistantStore.getState().conversations).toHaveLength(1);
+    expect(useAssistantStore.getState().conversations[0].id).toBe("conv-1");
+    expect(useAssistantStore.getState().conversationListStatus).toBe("ready");
+  });
+
+  it("handles getConversations failure gracefully", async () => {
+    serviceMocks.getConversations.mockRejectedValueOnce(new Error("Network Error"));
+
+    await useAssistantStore.getState().loadConversations();
+
+    expect(useAssistantStore.getState().isLoadingConversations).toBe(false);
+    expect(useAssistantStore.getState().error).toBeDefined();
+    // Conversations remain unchanged (empty from reset)
+    expect(useAssistantStore.getState().conversations).toHaveLength(0);
+  });
 });

@@ -268,9 +268,54 @@ export async function getChatHistory(conversationId, { page = 1, limit = 50 } = 
   }
 }
 
-export async function getConversations() {
+/**
+ * Normalizes a single conversation record from the backend list response.
+ * The backend returns { conversationId, role, createdAt, updatedAt }.
+ * The frontend store expects { id, title, lastMessage, createdAt, updatedAt }.
+ */
+export function normalizeConversationDto(rawConversation) {
+  const id = pick(rawConversation, ["conversationId", "conversation_id", "id"]) || null;
+  const createdAt = pick(rawConversation, ["createdAt", "created_at"]) || new Date().toISOString();
+  const updatedAt = pick(rawConversation, ["updatedAt", "updated_at"]) || createdAt;
+  const title = pick(rawConversation, ["title"]) || "New conversation";
+
   return {
-    conversations: [],
-    status: CONVERSATION_LIST_STATUS.PENDING_BACKEND_CONTRACT,
+    id,
+    title,
+    lastMessage: "",
+    createdAt,
+    updatedAt,
   };
+}
+
+export async function getConversations({ page = 1, limit = 50 } = {}) {
+  try {
+    const response = await api.get("/ai/chat/conversations", {
+      params: { page, limit },
+    });
+
+    const raw = response.data;
+    const conversations = toArray(raw?.conversations ?? raw?.items ?? raw?.data)
+      .map(normalizeConversationDto)
+      .filter((c) => Boolean(c.id));
+
+    return {
+      conversations,
+      status: CONVERSATION_LIST_STATUS.READY,
+      pagination: raw?.pagination || null,
+    };
+  } catch (error) {
+    throw normalizeAssistantError(error);
+  }
+}
+
+export async function deleteConversation(conversationId) {
+  if (!conversationId) return false;
+  
+  try {
+    await api.delete(`/ai/chat/conversations/${conversationId}`);
+    return true;
+  } catch (error) {
+    throw normalizeAssistantError(error);
+  }
 }

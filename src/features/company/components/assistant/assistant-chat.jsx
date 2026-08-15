@@ -122,6 +122,7 @@ export function AssistantChat({ className }) {
     submitMissingFields,
     retryLastMessage,
     markProgressiveComplete,
+    deleteConversation,
   } = useAssistantStore();
 
   useEffect(() => {
@@ -176,6 +177,7 @@ export function AssistantChat({ className }) {
       status={conversationListStatus}
       onSelectConversation={handleSelectConversation}
       onNewConversation={handleNewConversation}
+      onDeleteConversation={deleteConversation}
     />
   );
 

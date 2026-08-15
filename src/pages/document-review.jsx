@@ -11,6 +11,8 @@ import {
   getDocument,
   getDocumentId,
   isDocumentApiUnavailableError,
+  finalizeDocument,
+  sendDocumentEmail,
 } from "../features/company/services/document-service"
 import { useLocale } from "../hooks/use-locale"
 import { PageShell } from "./page-shell"
@@ -72,8 +74,26 @@ function getEmployee(document) {
   return pick(document, ["employeeName", "employee_name", "employeeId", "employee_id"])
 }
 
-function getContent(document) {
-  return pick(document, ["content", "plainText", "plain_text", "body", "text"])
+function getContent(document, t) {
+  if (document?.pdfUrl) {
+    return (
+      <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
+        <div className="rounded-full bg-(--bg-muted) p-4">
+          <FileText className="h-8 w-8 text-(--legal-primary)" />
+        </div>
+        <div>
+          <p className="font-medium text-(--text-primary)">{t("documents.finalizedPdfTitle", "Document Finalized")}</p>
+          <p className="text-sm text-(--text-secondary)">{t("documents.finalizedPdfDesc", "This document is finalized and available as a PDF.")}</p>
+        </div>
+        <Button asChild variant="outline" size="sm">
+          <a href={document.pdfUrl} target="_blank" rel="noopener noreferrer">
+            {t("documents.downloadPdf", "Download PDF")}
+          </a>
+        </Button>
+      </div>
+    )
+  }
+  return pick(document, ["contentHtml", "content_html", "content", "plainText", "plain_text", "body", "text"])
 }
 
 function isAiGeneratedDocument(document) {
@@ -227,6 +247,7 @@ export function DocumentReviewPage() {
   const [document, setDocument] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [actionLoading, setActionLoading] = useState(false)
 
   const locale = isRtl ? "ar-EG" : "en-US"
 
@@ -248,6 +269,38 @@ export function DocumentReviewPage() {
   useEffect(() => {
     loadDocument()
   }, [loadDocument])
+
+  const handleFinalize = async () => {
+    if (!window.confirm(t("documents.confirmFinalize", "Are you sure you want to finalize this document? This cannot be undone."))) {
+      return
+    }
+    setActionLoading(true)
+    try {
+      await finalizeDocument(documentId)
+      await loadDocument()
+    } catch (err) {
+      alert(t("documents.finalizeError", "Failed to finalize document. " + (err.message || "")))
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
+  const handleSendEmail = async () => {
+    const email = window.prompt(t("documents.promptEmail", "Enter email address to send to (leave empty to use employee's email if available):"))
+    // prompt returns null if cancelled
+    if (email === null) return
+    
+    setActionLoading(true)
+    try {
+      await sendDocumentEmail(documentId, email.trim() || null)
+      alert(t("documents.emailSentSuccess", "Email sent successfully!"))
+      await loadDocument()
+    } catch (err) {
+      alert(t("documents.emailSendError", "Failed to send email. " + (err.message || "")))
+    } finally {
+      setActionLoading(false)
+    }
+  }
 
   const status = pick(document, ["status"])
   const lifecycleCopyKey = getLifecycleCopyKey(status)
@@ -298,7 +351,7 @@ export function DocumentReviewPage() {
 
             <DocumentPreview
               title={getTitle(document, t)}
-              content={getContent(document)}
+              content={getContent(document, t)}
               isAiGenerated={isAiGeneratedDocument(document)}
               showCitationFooter={false}
             />
@@ -312,9 +365,35 @@ export function DocumentReviewPage() {
                 <FileText className="h-4 w-4 text-(--legal-primary)" aria-hidden="true" />
                 <h3 className="text-sm font-semibold">{t("documents.reviewActions")}</h3>
               </div>
-              <p className="text-sm leading-relaxed text-(--text-secondary)">
-                {t("documents.noReviewActions")}
-              </p>
+              <div className="flex flex-col gap-3 mt-4">
+                {String(status).toLowerCase() === "draft" && (
+                  <Button 
+                    type="button" 
+                    variant="primary" 
+                    className="w-full justify-center"
+                    onClick={handleFinalize}
+                    disabled={actionLoading}
+                  >
+                    {actionLoading ? t("common.loading", "Loading...") : t("documents.actionFinalize", "Finalize Document")}
+                  </Button>
+                )}
+                {String(status).toLowerCase() === "finalized" && (
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    className="w-full justify-center"
+                    onClick={handleSendEmail}
+                    disabled={actionLoading}
+                  >
+                    {actionLoading ? t("common.loading", "Loading...") : t("documents.actionSendEmail", "Send Email")}
+                  </Button>
+                )}
+                {String(status).toLowerCase() !== "draft" && String(status).toLowerCase() !== "finalized" && (
+                   <p className="text-sm leading-relaxed text-(--text-secondary)">
+                     {t("documents.noReviewActions")}
+                   </p>
+                )}
+              </div>
             </section>
 
             {getEmployee(document) && (

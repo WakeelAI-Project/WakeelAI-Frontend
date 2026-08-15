@@ -97,7 +97,7 @@ export function TemplatesPage() {
     setError(null)
 
     try {
-      const response = await getTemplates({ page, limit: PAGE_SIZE })
+      const response = await getTemplates({ page, limit: PAGE_SIZE, documentType: documentTypeFilter })
       setTemplates(response?.data ?? [])
       setTotal(response?.total ?? 0)
       setBackendStatus(response?.status ?? TEMPLATE_BACKEND_STATUS.READY)
@@ -110,7 +110,7 @@ export function TemplatesPage() {
     } finally {
       setLoading(false)
     }
-  }, [page, t])
+  }, [page, documentTypeFilter, t])
 
   useEffect(() => {
     loadTemplates()
@@ -266,7 +266,10 @@ export function TemplatesPage() {
           <SegmentedControl
             name="templates-document-type-filter"
             value={documentTypeFilter}
-            onChange={setDocumentTypeFilter}
+            onChange={(val) => {
+              setDocumentTypeFilter(val)
+              setPage(1)
+            }}
             options={[
               { value: "all", label: t("templates.filters.all") },
               ...DOCUMENT_TEMPLATE_TYPES.map((documentType) => ({

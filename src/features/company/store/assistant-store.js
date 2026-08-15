@@ -5,6 +5,7 @@ import {
   getConversations,
   normalizeAssistantError,
   sendMessage as sendAssistantMessage,
+  deleteConversation as deleteConversationService,
 } from "../services/assistant-service";
 
 const createLocalId = (prefix) => `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -127,6 +128,32 @@ export const useAssistantStore = create((set, get) => ({
         error: normalizeAssistantError(error),
         isLoadingHistory: false,
       });
+    }
+  },
+
+  deleteConversation: async (conversationId) => {
+    if (!conversationId) return false;
+
+    // Optimistically update UI
+    const currentConversations = get().conversations;
+    const activeId = get().activeConversationId;
+    
+    set((state) => ({
+      conversations: state.conversations.filter((c) => c.id !== conversationId),
+      ...(activeId === conversationId ? { activeConversationId: null, messages: [] } : {})
+    }));
+
+    try {
+      await deleteConversationService(conversationId);
+      return true;
+    } catch (error) {
+      // Revert if failed
+      set({
+        conversations: currentConversations,
+        ...(activeId === conversationId ? { activeConversationId: activeId } : {}),
+        error: normalizeAssistantError(error),
+      });
+      return false;
     }
   },
 
