@@ -222,11 +222,23 @@ export async function sendMessage(payload) {
     ? payload.fieldValues
     : null;
 
+  // The .NET gateway serializes null properties explicitly when building the
+  // internal Node.js payload (JsonContent.Create uses default options that
+  // include null values).  The Node.js AI service validates with Zod schemas
+  // where .optional() accepts `T | undefined` but NOT `T | null`.
+  //
+  // Fix: always send `field_values` as an object so .NET forwards a non-null
+  // value ({} when empty, actual values otherwise).  An empty record is
+  // semantically equivalent to "no supplementary field values".
+  //
+  // `language` is always "AR" | "EN" from getRequestLanguage(), but we guard
+  // with a fallback to prevent the rare undefined case from also serialising
+  // to null on the Node.js side.
   const body = {
     message: payload.message?.trim() || ASSISTANT_CONTINUE_MESSAGE,
-    language: payload.language,
+    language: payload.language ?? "EN",
     ...(payload.conversationId ? { conversation_id: payload.conversationId } : {}),
-    ...(fieldValues ? { field_values: fieldValues } : {}),
+    field_values: fieldValues ?? {},
   };
 
   try {
