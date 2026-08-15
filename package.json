@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
+    "test": "vitest run --pool=threads",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -39,7 +40,10 @@
     "react-dom": "^19.2.7",
     "react-hook-form": "^7.83.0",
     "react-i18next": "^17.0.11",
+    "react-markdown": "^10.1.0",
     "react-router": "^7.18.1",
+    "rehype-sanitize": "^6.0.0",
+    "remark-gfm": "^4.0.1",
     "tailwind-merge": "^3.6.0",
     "zustand": "^5.0.14"
   },
@@ -48,6 +52,8 @@
     "@eslint/js": "^10.0.1",
     "@rolldown/plugin-babel": "^0.2.3",
     "@tailwindcss/vite": "^4.3.3",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.2",
     "@vitejs/plugin-react": "^6.0.3",
     "autoprefixer": "^10.4.17",
     "babel-plugin-react-compiler": "^1.0.0",
@@ -55,8 +61,10 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.3",
     "globals": "^17.7.0",
+    "jsdom": "^29.1.1",
     "postcss": "^8.4.32",
     "tailwindcss": "^4.3.3",
-    "vite": "^8.1.1"
+    "vite": "^8.1.1",
+    "vitest": "^4.1.10"
   }
 }
