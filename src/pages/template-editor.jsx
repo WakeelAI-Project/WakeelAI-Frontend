@@ -34,6 +34,7 @@ import { PlaceholderPalette } from "../features/company/components/templates/pla
 import { TemplatePreview } from "../features/company/components/templates/template-preview";
 import {
   createTemplate,
+  generateLegalClauses,
   getTemplate,
   isTemplateApiUnavailableError,
   updateTemplate,
@@ -55,6 +56,13 @@ const EMPTY_TEMPLATE_FORM = {
   document_type: "Contract",
   content_template: "",
   is_active: false,
+};
+
+const EMPTY_CLAUSE_GENERATION_FORM = {
+  language: "en",
+  include_labor_law: true,
+  include_company_policy: true,
+  instruction: "",
 };
 
 const FORM_FIELDS = new Set([
@@ -136,6 +144,44 @@ function getApiErrorMessage(t, error) {
   return message || error?.message || t("templates.errors.generic");
 }
 
+function formatClauseCategory(category) {
+  const normalized = String(category ?? "").toLowerCase();
+
+  if (normalized === "labor_law" || normalized === "labor-law") {
+    return "Labor Law";
+  }
+
+  if (normalized === "company_policy" || normalized === "company-policy") {
+    return "Company Policy";
+  }
+
+  if (normalized === "mixed") {
+    return "Mixed Sources";
+  }
+
+  return category || "Legal Clause";
+}
+
+function formatSourceMetadata(metadata) {
+  if (!metadata || typeof metadata !== "object") return [];
+
+  return Object.entries(metadata)
+    .filter(
+      ([, value]) => value !== null && value !== undefined && value !== "",
+    )
+    .map(([key, value]) => {
+      const normalizedKey = key
+        .replace(/_/g, " ")
+        .replace(/([a-z])([A-Z])/g, "$1 $2")
+        .trim();
+
+      return {
+        label: normalizedKey.charAt(0).toUpperCase() + normalizedKey.slice(1),
+        value: typeof value === "string" ? value : JSON.stringify(value),
+      };
+    });
+}
+
 function formatTemplateContentIssue(t, issue) {
   if (!issue) return true;
 
@@ -215,6 +261,18 @@ export function TemplateEditorPage({ mode = "create" }) {
 
   const [loading, setLoading] = useState(isEdit);
   const [loadError, setLoadError] = useState(null);
+  const [isGenerateClauseDialogOpen, setIsGenerateClauseDialogOpen] =
+    useState(false);
+  const [generationForm, setGenerationForm] = useState(
+    EMPTY_CLAUSE_GENERATION_FORM,
+  );
+  const [isGeneratingClauses, setIsGeneratingClauses] = useState(false);
+  const [generationPhase, setGenerationPhase] = useState("idle");
+  const [generationError, setGenerationError] = useState("");
+  const [generatedClauses, setGeneratedClauses] = useState([]);
+  const [selectedClauseIds, setSelectedClauseIds] = useState([]);
+  const [editingClauseId, setEditingClauseId] = useState(null);
+  const [editingDraft, setEditingDraft] = useState("");
 
   const {
     control,
@@ -310,6 +368,143 @@ export function TemplateEditorPage({ mode = "create" }) {
     });
   };
 
+  const insertTextAtCursor = (snippet) => {
+    const textarea = contentRef.current;
+    const currentValue = contentValue ?? "";
+    const selectionStart = textarea?.selectionStart ?? currentValue.length;
+    const selectionEnd = textarea?.selectionEnd ?? currentValue.length;
+    const nextValue = `${currentValue.slice(0, selectionStart)}${snippet}${currentValue.slice(selectionEnd)}`;
+    const nextCursor = selectionStart + snippet.length;
+
+    setValue("content_template", nextValue, {
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true,
+    });
+
+    window.requestAnimationFrame(() => {
+      textarea?.focus();
+      textarea?.setSelectionRange(nextCursor, nextCursor);
+    });
+  };
+
+  const handleGenerateClauses = async () => {
+    if (!templateId) return;
+
+    setGenerationError("");
+    setIsGeneratingClauses(true);
+    setGenerationPhase("context");
+
+    try {
+      setGenerationPhase("clauses");
+      const response = await generateLegalClauses(templateId, {
+        language: generationForm.language,
+        include_labor_law: generationForm.include_labor_law,
+        include_company_policy: generationForm.include_company_policy,
+        instruction: generationForm.instruction,
+      });
+
+      const clauses = Array.isArray(response?.clauses) ? response.clauses : [];
+      if (!response?.success && clauses.length === 0) {
+        setGenerationError(t("templates.errors.noRelevantSources"));
+        setGeneratedClauses([]);
+        setSelectedClauseIds([]);
+        return;
+      }
+
+      if (clauses.length === 0) {
+        setGenerationError(t("templates.errors.noRelevantSources"));
+        setGeneratedClauses([]);
+        setSelectedClauseIds([]);
+        return;
+      }
+
+      setGeneratedClauses(clauses);
+      setSelectedClauseIds([clauses[0].id].filter(Boolean));
+      setEditingClauseId(null);
+      setEditingDraft("");
+    } catch (err) {
+      const message = getApiErrorMessage(t, err);
+      setGenerationError(message);
+      setGeneratedClauses([]);
+      setSelectedClauseIds([]);
+    } finally {
+      setIsGeneratingClauses(false);
+      setGenerationPhase("idle");
+    }
+  };
+
+  const handleClauseSelectionToggle = (clauseId) => {
+    setSelectedClauseIds((current) =>
+      current.includes(clauseId)
+        ? current.filter((id) => id !== clauseId)
+        : [...current, clauseId],
+    );
+  };
+
+  const handleEditClauseStart = (clause) => {
+    setEditingClauseId(clause.id);
+    setEditingDraft(clause.content || "");
+  };
+
+  const handleSaveClauseEdit = (clauseId) => {
+    const nextDraft = editingDraft.trim();
+
+    setGeneratedClauses((current) =>
+      current.map((clause) =>
+        clause.id === clauseId
+          ? { ...clause, content: nextDraft || clause.content || "" }
+          : clause,
+      ),
+    );
+
+    setEditingClauseId(null);
+    setEditingDraft("");
+  };
+
+  const handleCancelClauseEdit = () => {
+    setEditingClauseId(null);
+    setEditingDraft("");
+  };
+
+  const handleRejectClause = (clauseId) => {
+    setGeneratedClauses((current) =>
+      current.filter((clause) => clause.id !== clauseId),
+    );
+    setSelectedClauseIds((current) => current.filter((id) => id !== clauseId));
+  };
+
+  const handleInsertSelectedClauses = () => {
+    const selectedClauses = generatedClauses.filter((clause) =>
+      selectedClauseIds.includes(clause.id),
+    );
+
+    if (selectedClauses.length === 0) {
+      toast({
+        type: "error",
+        message: t("templates.generateLegalClausesInsertEmpty"),
+      });
+      return;
+    }
+
+    const snippet = selectedClauses
+      .map(
+        (clause) =>
+          `\n\n### ${clause.title || "Clause"}\n\n${clause.content || ""}\n\n`,
+      )
+      .join("");
+
+    insertTextAtCursor(snippet.trim() + "\n\n");
+    setIsGenerateClauseDialogOpen(false);
+    setGeneratedClauses([]);
+    setSelectedClauseIds([]);
+    setGenerationError("");
+    toast({
+      type: "success",
+      message: t("templates.generateLegalClausesInserted"),
+    });
+  };
+
   const applyServerErrors = (err) => {
     let hasFieldError = false;
     const fieldErrors = getFieldErrors(err);
@@ -384,6 +579,23 @@ export function TemplateEditorPage({ mode = "create" }) {
         </div>
 
         <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            variant="ai"
+            size="sm"
+            onClick={() => {
+              setGenerationError("");
+              setGenerationForm(EMPTY_CLAUSE_GENERATION_FORM);
+              setGeneratedClauses([]);
+              setSelectedClauseIds([]);
+              setEditingClauseId(null);
+              setEditingDraft("");
+              setIsGenerateClauseDialogOpen(true);
+            }}
+            disabled={loading || isSubmitting}>
+            <Sparkles className="h-4 w-4" aria-hidden="true" />
+            {t("templates.generateLegalClauses")}
+          </Button>
           <Button
             type="button"
             variant="secondary"
@@ -692,6 +904,347 @@ export function TemplateEditorPage({ mode = "create" }) {
           </div>
         </form>
       )}
+
+      <ClauseGenerationDialog
+        open={isGenerateClauseDialogOpen}
+        onOpenChange={(nextOpen) => {
+          setIsGenerateClauseDialogOpen(nextOpen);
+          if (!nextOpen) {
+            setGenerationError("");
+            setGeneratedClauses([]);
+            setSelectedClauseIds([]);
+            setEditingClauseId(null);
+            setEditingDraft("");
+          }
+        }}
+        loading={isGeneratingClauses}
+        phase={generationPhase}
+        generationError={generationError}
+        form={generationForm}
+        setForm={setGenerationForm}
+        onGenerate={handleGenerateClauses}
+        clauses={generatedClauses}
+        selectedClauseIds={selectedClauseIds}
+        onToggleSelect={handleClauseSelectionToggle}
+        onReject={handleRejectClause}
+        editingClauseId={editingClauseId}
+        editingDraft={editingDraft}
+        setEditingDraft={setEditingDraft}
+        onEditStart={handleEditClauseStart}
+        onSaveEdit={handleSaveClauseEdit}
+        onCancelEdit={handleCancelClauseEdit}
+        onInsertSelected={handleInsertSelectedClauses}
+        t={t}
+      />
     </PageShell>
+  );
+}
+
+function ClauseGenerationDialog({
+  open,
+  onOpenChange,
+  loading,
+  phase,
+  generationError,
+  form,
+  setForm,
+  onGenerate,
+  clauses,
+  selectedClauseIds,
+  onToggleSelect,
+  onReject,
+  editingClauseId,
+  editingDraft,
+  setEditingDraft,
+  onEditStart,
+  onSaveEdit,
+  onCancelEdit,
+  onInsertSelected,
+  t,
+}) {
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 bg-(--overlay-scrim) flex items-center justify-center p-4">
+      <div className="w-full max-w-3xl rounded-lg border border-(--border-default) bg-paper p-0 shadow-(--shadow-3) dark:bg-(--bg-card-raised) dark:border-(--border-emphasis)">
+        <div className="border-b border-(--border-default) px-6 py-4">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-(--text-secondary)">
+                {t("templates.generateLegalClausesTitle")}
+              </p>
+              <h3 className="mt-1 text-lg font-semibold text-(--text-primary)">
+                {t("templates.generateLegalClauses")}
+              </h3>
+            </div>
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={() => onOpenChange(false)}>
+              {t("common.close")}
+            </Button>
+          </div>
+        </div>
+
+        <div className="max-h-[80vh] overflow-y-auto p-6">
+          {!clauses.length && (
+            <div className="space-y-4">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="flex flex-col gap-1.5 text-start">
+                  <label className="text-sm font-medium text-(--text-primary)">
+                    {t("templates.generateLegalClausesLanguage")}
+                  </label>
+                  <select
+                    className="h-10 rounded-sm border border-(--border-default) bg-paper px-3 text-sm text-(--text-primary) focus:outline-none focus:border-(--border-focus)"
+                    value={form.language}
+                    onChange={(event) =>
+                      setForm((current) => ({
+                        ...current,
+                        language: event.target.value,
+                      }))
+                    }
+                    aria-label={t("templates.generateLegalClausesLanguage")}>
+                    <option value="en">English</option>
+                    <option value="ar">العربية</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="space-y-3 rounded-sm border border-(--border-default) bg-(--bg-card-subtle) p-4">
+                <div className="flex items-center justify-between gap-4">
+                  <label className="text-sm font-medium text-(--text-primary)">
+                    {t("templates.generateLegalClausesUseLaborLaw")}
+                  </label>
+                  <Switch
+                    checked={Boolean(form.include_labor_law)}
+                    onCheckedChange={(checked) =>
+                      setForm((current) => ({
+                        ...current,
+                        include_labor_law: checked,
+                      }))
+                    }
+                  />
+                </div>
+                <div className="flex items-center justify-between gap-4">
+                  <label className="text-sm font-medium text-(--text-primary)">
+                    {t("templates.generateLegalClausesUseCompanyPolicy")}
+                  </label>
+                  <Switch
+                    checked={Boolean(form.include_company_policy)}
+                    onCheckedChange={(checked) =>
+                      setForm((current) => ({
+                        ...current,
+                        include_company_policy: checked,
+                      }))
+                    }
+                  />
+                </div>
+              </div>
+
+              <Textarea
+                label={t("templates.generateLegalClausesInstruction")}
+                value={form.instruction}
+                onChange={(event) =>
+                  setForm((current) => ({
+                    ...current,
+                    instruction: event.target.value,
+                  }))
+                }
+                className="min-h-24"
+              />
+
+              {generationError && (
+                <Alert
+                  variant="error"
+                  title={t("templates.generateLegalClausesErrorTitle")}>
+                  {generationError}
+                </Alert>
+              )}
+
+              <div className="flex justify-end gap-2 pb-2">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => onOpenChange(false)}>
+                  {t("templates.generateLegalClausesCancel")}
+                </Button>
+                <Button
+                  type="button"
+                  variant="ai"
+                  isLoading={loading}
+                  loadingText={
+                    phase === "context"
+                      ? t("templates.generateLegalClausesLoadingContext")
+                      : t("templates.generateLegalClausesLoadingGenerate")
+                  }
+                  onClick={onGenerate}
+                  disabled={
+                    loading ||
+                    (!form.include_labor_law && !form.include_company_policy)
+                  }>
+                  <Sparkles className="h-4 w-4" aria-hidden="true" />
+                  {t("templates.generateLegalClausesGenerate")}
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {clauses.length > 0 && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-(--text-secondary)">
+                    {t("templates.generateLegalClausesReview")}
+                  </p>
+                  <h4 className="mt-1 text-base font-semibold text-(--text-primary)">
+                    {t("templates.generateLegalClausesReviewTitle")}
+                  </h4>
+                </div>
+                <Button
+                  type="button"
+                  variant="ai"
+                  size="sm"
+                  onClick={onGenerate}
+                  disabled={loading}>
+                  <Sparkles className="h-4 w-4" aria-hidden="true" />
+                  {t("templates.generateLegalClausesRegenerate")}
+                </Button>
+              </div>
+
+              {clauses.map((clause) => {
+                const isSelected = selectedClauseIds.includes(clause.id);
+                const isEditing = editingClauseId === clause.id;
+
+                return (
+                  <div
+                    key={clause.id}
+                    className="rounded-md border border-(--border-default) bg-(--bg-card-subtle) p-4">
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div>
+                        <h5 className="text-base font-semibold text-(--text-primary)">
+                          {clause.title || "Generated clause"}
+                        </h5>
+                        <p className="mt-1 text-xs text-(--text-secondary)">
+                          {t("templates.generateLegalClausesCategory")}:{" "}
+                          {formatClauseCategory(clause.category)}
+                        </p>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => onEditStart(clause)}>
+                          {t("templates.generateLegalClausesEdit")}
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => onReject(clause.id)}>
+                          {t("templates.generateLegalClausesReject")}
+                        </Button>
+                        <Button
+                          type="button"
+                          variant={isSelected ? "primary" : "secondary"}
+                          size="sm"
+                          onClick={() => onToggleSelect(clause.id)}>
+                          {isSelected
+                            ? t("templates.generateLegalClausesSelected")
+                            : t("templates.generateLegalClausesSelect")}
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="mt-4">
+                      {isEditing ? (
+                        <div className="space-y-3">
+                          <Textarea
+                            label={t(
+                              "templates.generateLegalClausesClauseText",
+                            )}
+                            value={editingDraft}
+                            onChange={(event) =>
+                              setEditingDraft(event.target.value)
+                            }
+                            className="min-h-28"
+                          />
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              type="button"
+                              variant="secondary"
+                              size="sm"
+                              onClick={onCancelEdit}>
+                              {t("templates.generateLegalClausesCancelEdit")}
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="primary"
+                              size="sm"
+                              onClick={() => onSaveEdit(clause.id)}>
+                              {t("templates.generateLegalClausesSaveEdit")}
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="whitespace-pre-wrap text-sm leading-7 text-(--text-primary)">
+                          {clause.content}
+                        </p>
+                      )}
+                    </div>
+
+                    {clause.sources?.length > 0 && (
+                      <div className="mt-4 border-t border-(--border-default) pt-3">
+                        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-(--text-secondary)">
+                          {t("templates.generateLegalClausesSources")}
+                        </p>
+                        <ul className="mt-2 space-y-2 text-sm text-(--text-secondary)">
+                          {clause.sources.map((source) => (
+                            <li
+                              key={source.id || source.title}
+                              className="rounded-sm border border-(--border-default) bg-paper p-2">
+                              <div className="font-medium text-(--text-primary)">
+                                {source.title || source.type || "Source"}
+                              </div>
+                              <div className="mt-1 text-xs text-(--text-secondary)">
+                                {source.type === "labor-law"
+                                  ? "Egyptian Labor Law"
+                                  : source.type === "company-policy"
+                                    ? "Company Handbook"
+                                    : source.type || "Source"}
+                              </div>
+                              {formatSourceMetadata(source.metadata).map(
+                                (entry) => (
+                                  <div
+                                    key={`${source.id}-${entry.label}`}
+                                    className="mt-1 text-xs text-(--text-secondary)">
+                                    {entry.label}: {entry.value}
+                                  </div>
+                                ),
+                              )}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+
+              <div className="flex justify-end pt-2">
+                <Button
+                  type="button"
+                  variant="primary"
+                  onClick={onInsertSelected}
+                  disabled={selectedClauseIds.length === 0}>
+                  {t("templates.generateLegalClausesInsert")}
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
