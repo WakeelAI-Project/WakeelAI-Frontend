@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Briefcase, Landmark, Mail, Pencil, Save, X } from "lucide-react";
+import { Briefcase, FileText, Landmark, Mail, Pencil, Save, X } from "lucide-react";
 import { LogoUploader } from "../features/company/components/LogoUploader";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -12,6 +12,8 @@ import {
   getCompanyProfile,
   updateCompanyProfile,
 } from "../features/company/services/profile-service";
+import { uploadCompanyPolicy } from "../features/company/services/company-policy-service";
+import { FileUpload } from "../components/forms/file-upload";
 import { useAuth } from "../features/auth/hooks/use-auth";
 import {
   DetailGrid,
@@ -54,6 +56,12 @@ export function CompanyProfilePage() {
   const [isForbidden, setIsForbidden] = useState(false);
 
   const [company, setCompany] = useState(EMPTY_COMPANY);
+  const [policyTitle, setPolicyTitle] = useState("");
+  const [policyFile, setPolicyFile] = useState(null);
+  const [policyUploadError, setPolicyUploadError] = useState("");
+  const [isUploadingPolicy, setIsUploadingPolicy] = useState(false);
+  const [policyUploadSuccess, setPolicyUploadSuccess] = useState("");
+  const [policyUploadKey, setPolicyUploadKey] = useState(0);
 
   const {
     register,
@@ -156,6 +164,55 @@ export function CompanyProfilePage() {
   ) : (
     fallback
   );
+
+  const handlePolicyUpload = async () => {
+    if (!canEdit) return;
+    if (!policyFile) {
+      setPolicyUploadError(t("profile.policy.uploadRequired", {
+        defaultValue: "Select a PDF file to upload.",
+      }));
+      setPolicyUploadSuccess("");
+      return;
+    }
+
+    const trimmedTitle = policyTitle.trim();
+    if (!trimmedTitle) {
+      setPolicyUploadError(t("profile.policy.titleRequired", {
+        defaultValue: "Policy title is required.",
+      }));
+      setPolicyUploadSuccess("");
+      return;
+    }
+
+    try {
+      setIsUploadingPolicy(true);
+      setPolicyUploadError("");
+      setPolicyUploadSuccess("");
+
+      await uploadCompanyPolicy({
+        title: trimmedTitle,
+        pdf: policyFile,
+      });
+
+      setPolicyTitle("");
+      setPolicyFile(null);
+      setPolicyUploadKey((value) => value + 1);
+      setPolicyUploadSuccess(
+        t("profile.policy.uploadSuccess", {
+          defaultValue: "Company policy uploaded successfully.",
+        }),
+      );
+    } catch (err) {
+      setPolicyUploadError(
+        err?.message ||
+          t("profile.policy.uploadError", {
+            defaultValue: "Unable to upload the policy PDF.",
+          }),
+      );
+    } finally {
+      setIsUploadingPolicy(false);
+    }
+  };
 
   return (
     <PageShell
@@ -371,6 +428,68 @@ export function CompanyProfilePage() {
                   </DetailGrid>
                 )}
               </ProfileSection>
+
+              {canEdit && (
+                <ProfileSection
+                  icon={FileText}
+                  title={t("profile.sections.policy")}
+                  description={t("profile.policy.description", {
+                    defaultValue: "Upload the latest company policy handbook for AI-powered legal context.",
+                  })}>
+                  <div className="grid gap-4">
+                    <Input
+                      label={t("profile.policy.titleLabel", {
+                        defaultValue: "Policy title",
+                      })}
+                      value={policyTitle}
+                      onChange={(event) => setPolicyTitle(event.target.value)}
+                      placeholder={t("profile.policy.titlePlaceholder", {
+                        defaultValue: "Employee Handbook",
+                      })}
+                    />
+
+                    <FileUpload
+                      key={policyUploadKey}
+                      label={t("profile.policy.fileLabel", {
+                        defaultValue: "Company policy PDF",
+                      })}
+                      maxSizeMB={20}
+                      acceptedTypes=".pdf,application/pdf"
+                      onFileDrop={(files) => setPolicyFile(files[0] ?? null)}
+                    />
+
+                    {policyUploadError && (
+                      <div
+                        role="alert"
+                        className="rounded-md border border-(--status-error-fg) bg-(--status-error-bg) px-4 py-3 text-sm text-(--status-error-fg)">
+                        {policyUploadError}
+                      </div>
+                    )}
+
+                    {policyUploadSuccess && (
+                      <div
+                        role="status"
+                        className="rounded-md border border-(--status-success-fg) bg-(--status-success-bg) px-4 py-3 text-sm text-(--status-success-fg)">
+                        {policyUploadSuccess}
+                      </div>
+                    )}
+
+                    <Button
+                      type="button"
+                      variant="primary"
+                      className="self-start"
+                      onClick={handlePolicyUpload}
+                      isLoading={isUploadingPolicy}
+                      loadingText={t("profile.policy.uploading", {
+                        defaultValue: "Uploading...",
+                      })}>
+                      {t("profile.policy.uploadButton", {
+                        defaultValue: "Upload policy",
+                      })}
+                    </Button>
+                  </div>
+                </ProfileSection>
+              )}
             </div>
           </div>
         </form>

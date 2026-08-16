@@ -121,6 +121,27 @@ export async function registerCompany(data) {
   }
 }
 
+export async function forgotPassword({ email }) {
+  try {
+    const response = await api.post("/auth/forgot-password", { email });
+    return response.data;
+  } catch (error) {
+    throw new Error(mapAuthError(error), { cause: error });
+  }
+}
+
+export async function resetPassword({ email, otp, new_password }) {
+  try {
+    await api.post("/auth/reset-password", {
+      email,
+      otp,
+      new_password,
+    });
+  } catch (error) {
+    throw new Error(mapAuthError(error), { cause: error });
+  }
+}
+
 /**
  * Exchanges a refresh token for a new access token via POST /auth/refresh.
  *

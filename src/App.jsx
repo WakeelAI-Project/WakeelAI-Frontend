@@ -21,6 +21,8 @@ import { EmployeesPage } from "./pages/employees";
 import { LeavePage } from "./pages/leave";
 import { LoginPage } from "./pages/auth/login";
 import { RegisterPage } from "./pages/auth/register";
+import { ForgotPasswordPage } from "./pages/auth/forgot-password";
+import { ResetPasswordPage } from "./pages/auth/reset-password";
 import { ChangePasswordPage } from "./pages/auth/change-password";
 import { HrDashboardPage } from "./pages/hr-dashboard";
 import { OwnerDashboardPage } from "./pages/owner-dashboard";
@@ -139,6 +141,8 @@ const router = createBrowserRouter([
     children: [
       { path: "/login", element: <LoginPage /> },
       { path: "/register", element: <RegisterPage /> },
+      { path: "/forgot-password", element: <ForgotPasswordPage /> },
+      { path: "/reset-password", element: <ResetPasswordPage /> },
       { path: "/", element: <Navigate to="/login" replace /> },
     ],
   },

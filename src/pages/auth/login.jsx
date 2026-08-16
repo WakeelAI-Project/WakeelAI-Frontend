@@ -131,12 +131,20 @@ export function LoginPage() {
         </Button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-(--text-secondary)">
-        {t("auth.newOwner")}{" "}
-        <Link className="font-semibold text-(--brand-primary) underline-offset-4 hover:underline" to="/register">
-          {t("auth.createAccount")}
+      <div className="mt-6 flex flex-col items-center gap-2 text-sm text-(--text-secondary)">
+        <Link
+          className="font-medium text-(--brand-primary) underline-offset-4 hover:underline"
+          to="/forgot-password"
+        >
+          {t("auth.forgotPassword")}
         </Link>
-      </p>
+        <p>
+          {t("auth.newOwner")} {" "}
+          <Link className="font-semibold text-(--brand-primary) underline-offset-4 hover:underline" to="/register">
+            {t("auth.createAccount")}
+          </Link>
+        </p>
+      </div>
     </AuthLayout>
   )
 }
