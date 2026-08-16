@@ -1,8 +1,8 @@
-import React from "react"
-import { useTranslation } from "react-i18next"
-import { StatCard } from "../../../components/data-display/stat-card"
-import { cn } from "../../../lib/utils"
-import { useDashboardSummary } from "../hooks/use-dashboard-summary"
+import React from "react";
+import { useTranslation } from "react-i18next";
+import { StatCard } from "../../../components/data-display/stat-card";
+import { cn } from "../../../lib/utils";
+import { useDashboardSummary } from "../hooks/use-dashboard-summary";
 
 // ---------------------------------------------------------------------------
 // Skeleton placeholder — matches the StatCard proportions
@@ -12,36 +12,35 @@ function StatCardSkeleton({ className }) {
     <div
       className={cn(
         "rounded-md border border-(--border-default) bg-paper dark:bg-(--bg-card) dark:border-(--bg-card-raised) p-5 flex flex-col gap-3 shadow-sm animate-pulse",
-        className
-      )}
-    >
+        className,
+      )}>
       <div className="h-3 w-24 rounded bg-(--bg-disabled)" />
       <div className="h-9 w-16 rounded bg-(--bg-disabled)" />
       <div className="h-3 w-32 rounded bg-(--bg-disabled)" />
     </div>
-  )
+  );
 }
 
 // ---------------------------------------------------------------------------
 // Individual card with loading / error / value states
 // ---------------------------------------------------------------------------
 function SummaryCard({ title, domain, loading, error, value, description }) {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
 
   if (loading) {
-    return <StatCardSkeleton />
+    return <StatCardSkeleton />;
   }
 
   // Render the card even on error — show a dash so the layout is stable
   const displayValue = error
     ? "—"
     : value === null || value === undefined
-    ? "—"
-    : String(value)
+      ? "—"
+      : String(value);
 
   const displayDescription = error
     ? t("dashboard.summaryLoadError")
-    : description
+    : description;
 
   return (
     <StatCard
@@ -50,7 +49,7 @@ function SummaryCard({ title, domain, loading, error, value, description }) {
       domain={domain}
       description={displayDescription}
     />
-  )
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -60,21 +59,15 @@ function SummaryCard({ title, domain, loading, error, value, description }) {
 /**
  * DashboardSummaryCards
  *
- * Renders four summary stat cards for the HR Dashboard Overview (Story #172):
- *   1. Employees  — employee_count from GET /api/dashboard/summary
- *   2. Leave Requests — pending_leave_requests from GET /api/dashboard/summary
- *   3. AI Usage   — handbook_uploaded from GET /api/dashboard/summary
- *   4. Documents  — generated_documents_count from GET /api/dashboard/summary
+ * Renders the four summary stat cards for the HR dashboard using the backend's
+ * dashboard summary contract: employee_count, pending_leave_requests,
+ * employees_on_leave_today, and generated_documents_count. Where appropriate,
+ * active_employees is surfaced in the employees card description without changing
+ * the overall layout.
  */
 export function DashboardSummaryCards({ className }) {
-  const { t } = useTranslation()
-  const { employees, leaveRequests, handbook, documents } = useDashboardSummary()
-
-  const handbookValue = handbook.uploaded === null
-    ? null
-    : handbook.uploaded
-    ? t("dashboard.summaryHandbookUploaded")
-    : t("dashboard.summaryHandbookNotUploaded")
+  const { t } = useTranslation();
+  const { employees, leaveRequests, documents } = useDashboardSummary();
 
   const cards = [
     {
@@ -84,7 +77,10 @@ export function DashboardSummaryCards({ className }) {
       loading: employees.loading,
       error: employees.error,
       value: employees.count,
-      description: t("dashboard.summaryEmployeesDesc"),
+      description:
+        employees.active === null || employees.active === undefined
+          ? t("dashboard.summaryEmployeesDesc")
+          : `${t("dashboard.activeEmployees")}: ${employees.active}`,
     },
     {
       key: "leave",
@@ -96,13 +92,13 @@ export function DashboardSummaryCards({ className }) {
       description: t("dashboard.summaryLeaveDesc"),
     },
     {
-      key: "ai",
-      title: t("dashboard.summaryAiUsage"),
-      domain: "AI",
-      loading: handbook.loading,
-      error: handbook.error,
-      value: handbookValue,
-      description: t("dashboard.summaryAiDesc"),
+      key: "leave-today",
+      title: t("dashboard.summaryEmployeesOnLeaveToday"),
+      domain: "leave",
+      loading: employees.loading,
+      error: employees.error,
+      value: employees.onLeaveToday,
+      description: t("dashboard.summaryEmployeesOnLeaveDesc"),
     },
     {
       key: "documents",
@@ -113,7 +109,7 @@ export function DashboardSummaryCards({ className }) {
       value: documents.count,
       description: t("dashboard.summaryDocumentsDesc"),
     },
-  ]
+  ];
 
   return (
     <div className={cn("grid gap-4 sm:grid-cols-2 lg:grid-cols-4", className)}>
@@ -121,5 +117,5 @@ export function DashboardSummaryCards({ className }) {
         <SummaryCard key={card.key} {...card} />
       ))}
     </div>
-  )
+  );
 }
