@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Briefcase, FileText, Landmark, Mail, Pencil, Save, X } from "lucide-react";
+import {
+  Briefcase,
+  FileText,
+  Landmark,
+  Mail,
+  Pencil,
+  Save,
+  X,
+} from "lucide-react";
 import { LogoUploader } from "../features/company/components/LogoUploader";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -168,18 +176,22 @@ export function CompanyProfilePage() {
   const handlePolicyUpload = async () => {
     if (!canEdit) return;
     if (!policyFile) {
-      setPolicyUploadError(t("profile.policy.uploadRequired", {
-        defaultValue: "Select a PDF file to upload.",
-      }));
+      setPolicyUploadError(
+        t("profile.policy.uploadRequired", {
+          defaultValue: "Select a PDF file to upload.",
+        }),
+      );
       setPolicyUploadSuccess("");
       return;
     }
 
     const trimmedTitle = policyTitle.trim();
     if (!trimmedTitle) {
-      setPolicyUploadError(t("profile.policy.titleRequired", {
-        defaultValue: "Policy title is required.",
-      }));
+      setPolicyUploadError(
+        t("profile.policy.titleRequired", {
+          defaultValue: "Policy title is required.",
+        }),
+      );
       setPolicyUploadSuccess("");
       return;
     }
@@ -246,7 +258,8 @@ export function CompanyProfilePage() {
               defaultValue: "You don't have access to this page",
             })}
             description={t("profile.company.forbiddenDesc", {
-              defaultValue: "Company profile details are only visible to the company owner.",
+              defaultValue:
+                "Company profile details are only visible to the company owner.",
             })}
           />
         </section>
@@ -434,7 +447,8 @@ export function CompanyProfilePage() {
                   icon={FileText}
                   title={t("profile.sections.policy")}
                   description={t("profile.policy.description", {
-                    defaultValue: "Upload the latest company policy handbook for AI-powered legal context.",
+                    defaultValue:
+                      "Upload the latest company policy handbook for AI-powered legal context.",
                   })}>
                   <div className="grid gap-4">
                     <Input

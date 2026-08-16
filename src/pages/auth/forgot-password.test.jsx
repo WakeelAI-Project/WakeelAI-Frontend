@@ -10,14 +10,17 @@ vi.mock("react-i18next", () => ({
     const t = (key, options) => {
       const map = {
         "auth.forgotPasswordTitle": "Forgot password",
-        "auth.forgotPasswordDescription": "Enter your email to receive a verification code.",
+        "auth.forgotPasswordDescription":
+          "Enter your email to receive a verification code.",
         "auth.email": "Email",
         "auth.sendCode": "Send code",
         "auth.sendingCode": "Sending...",
         "auth.backToLogin": "Back to login",
         "auth.invalidEmail": "Enter a valid email address",
-        "auth.forgotPasswordSuccess": "If an account exists for this email, a verification code has been sent.",
-        "auth.welcomeDesc": "Sign in as the company owner or an invited HR user.",
+        "auth.forgotPasswordSuccess":
+          "If an account exists for this email, a verification code has been sent.",
+        "auth.welcomeDesc":
+          "Sign in as the company owner or an invited HR user.",
       };
       if (options?.defaultValue) return options.defaultValue;
       return map[key] || key;
@@ -35,14 +38,17 @@ vi.mock("../../hooks/use-locale", () => {
       const t = (key, options) => {
         const map = {
           "auth.forgotPasswordTitle": "Forgot password",
-          "auth.forgotPasswordDescription": "Enter your email to receive a verification code.",
+          "auth.forgotPasswordDescription":
+            "Enter your email to receive a verification code.",
           "auth.email": "Email",
           "auth.sendCode": "Send code",
           "auth.sendingCode": "Sending...",
           "auth.backToLogin": "Back to login",
           "auth.invalidEmail": "Enter a valid email address",
-          "auth.forgotPasswordSuccess": "If an account exists for this email, a verification code has been sent.",
-          "auth.welcomeDesc": "Sign in as the company owner or an invited HR user.",
+          "auth.forgotPasswordSuccess":
+            "If an account exists for this email, a verification code has been sent.",
+          "auth.welcomeDesc":
+            "Sign in as the company owner or an invited HR user.",
         };
         if (options?.defaultValue) return options.defaultValue;
         return map[key] || key;
@@ -86,8 +92,12 @@ describe("ForgotPasswordPage", () => {
     );
 
     expect(screen.getByText("Forgot password")).toBeInTheDocument();
-    expect(screen.getByText(/enter your email to receive a verification code/i)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /send code/i })).toBeInTheDocument();
+    expect(
+      screen.getByText(/enter your email to receive a verification code/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /send code/i }),
+    ).toBeInTheDocument();
   });
 
   it("includes the back to login link", async () => {
@@ -100,7 +110,9 @@ describe("ForgotPasswordPage", () => {
     );
 
     const backLinks = screen.getAllByText("Back to login");
-    const backLink = backLinks.find((link) => link.closest("a")?.href.includes("/login"));
+    const backLink = backLinks.find((link) =>
+      link.closest("a")?.href.includes("/login"),
+    );
     expect(backLink).toBeTruthy();
   });
 });
