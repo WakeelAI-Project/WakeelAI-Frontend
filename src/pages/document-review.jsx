@@ -1,36 +1,51 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react"
-import { useNavigate, useParams } from "react-router"
-import { ArrowLeft, CalendarClock, FileText, LockKeyhole, UserRound } from "lucide-react"
-import { useTranslation } from "react-i18next"
-import { DocumentPreview } from "../components/legal/document-preview"
-import { EmptyState } from "../components/layout/empty-state"
-import { Badge } from "../components/ui/badge"
-import { Button } from "../components/ui/button"
-import { Skeleton } from "../components/ui/skeleton"
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useNavigate, useParams } from "react-router";
+import {
+  ArrowLeft,
+  CalendarClock,
+  FileText,
+  LockKeyhole,
+  UserRound,
+} from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { DocumentPreview } from "../components/legal/document-preview";
+import { EmptyState } from "../components/layout/empty-state";
+import { ConfirmDialog } from "../components/overlay/confirm-dialog";
+import { Badge } from "../components/ui/badge";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Skeleton } from "../components/ui/skeleton";
+import { useToast } from "../components/ui/toast";
 import {
   getDocument,
   getDocumentId,
   isDocumentApiUnavailableError,
   finalizeDocument,
   sendDocumentEmail,
-} from "../features/company/services/document-service"
-import { useLocale } from "../hooks/use-locale"
-import { PageShell } from "./page-shell"
+} from "../features/company/services/document-service";
+import { getEmployee as getEmployeeById } from "../features/company/services/employee-service";
+import { useLocale } from "../hooks/use-locale";
+import { getImageUrl } from "../utils/get-image-url";
+import { PageShell } from "./page-shell";
 
 function pick(document, keys) {
   for (const key of keys) {
-    if (document?.[key] !== undefined && document?.[key] !== null && document?.[key] !== "") {
-      return document[key]
+    if (
+      document?.[key] !== undefined &&
+      document?.[key] !== null &&
+      document?.[key] !== ""
+    ) {
+      return document[key];
     }
   }
-  return null
+  return null;
 }
 
 function formatDate(value, locale) {
-  if (!value) return null
+  if (!value) return null;
 
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return value
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
 
   return date.toLocaleString(locale, {
     year: "numeric",
@@ -38,101 +53,133 @@ function formatDate(value, locale) {
     day: "numeric",
     hour: "2-digit",
     minute: "2-digit",
-  })
+  });
 }
 
 function getStatusVariant(status) {
-  const normalized = String(status || "").toLowerCase()
-  if (normalized === "draft") return "warning"
-  if (normalized === "finalized" || normalized === "approved") return "success"
-  if (normalized === "rejected") return "error"
-  return "info"
+  const normalized = String(status || "").toLowerCase();
+  if (normalized === "draft") return "warning";
+  if (normalized === "finalized" || normalized === "approved") return "success";
+  if (normalized === "rejected") return "error";
+  return "info";
 }
 
 function getStatusLabel(t, status) {
-  if (!status) return t("common.unknown")
-  const key = String(status).toLowerCase()
-  return t(`documents.status.${key}`, { defaultValue: status })
+  if (!status) return t("common.unknown");
+  const key = String(status).toLowerCase();
+  return t(`documents.status.${key}`, { defaultValue: status });
 }
 
 function getLifecycleCopyKey(status) {
-  const normalized = String(status || "").toLowerCase()
-  if (normalized === "draft") return "documents.draftNotice"
-  if (normalized === "finalized" || normalized === "approved") return "documents.finalizedNotice"
-  return null
+  const normalized = String(status || "").toLowerCase();
+  if (normalized === "draft") return "documents.draftNotice";
+  if (normalized === "finalized" || normalized === "approved")
+    return "documents.finalizedNotice";
+  return null;
 }
 
 function getTitle(document, t) {
-  return pick(document, ["title", "name", "filename"]) || t("documents.untitled")
+  return (
+    pick(document, ["title", "name", "filename"]) || t("documents.untitled")
+  );
 }
 
 function getType(document) {
-  return pick(document, ["documentType", "document_type", "docType", "doc_type"])
+  return pick(document, [
+    "documentType",
+    "document_type",
+    "docType",
+    "doc_type",
+  ]);
 }
 
 function getEmployee(document) {
-  return pick(document, ["employeeName", "employee_name", "employeeId", "employee_id"])
+  return pick(document, [
+    "employeeName",
+    "employee_name",
+    "employeeId",
+    "employee_id",
+  ]);
 }
 
+function isValidEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value ?? "").trim());
+}
+
+function getEmployeeEmailValue(employee) {
+  if (!employee || typeof employee !== "object") return "";
+
+  return (
+    pick(employee, ["email", "userEmail", "emailAddress"]) ||
+    employee?.user?.email ||
+    employee?.employee?.email ||
+    employee?.data?.email ||
+    ""
+  );
+}
+
+// eslint-disable-next-line no-unused-vars
 function getContent(document, t) {
-  if (document?.pdfUrl) {
-    return (
-      <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
-        <div className="rounded-full bg-(--bg-muted) p-4">
-          <FileText className="h-8 w-8 text-(--legal-primary)" />
-        </div>
-        <div>
-          <p className="font-medium text-(--text-primary)">{t("documents.finalizedPdfTitle", "Document Finalized")}</p>
-          <p className="text-sm text-(--text-secondary)">{t("documents.finalizedPdfDesc", "This document is finalized and available as a PDF.")}</p>
-        </div>
-        <Button asChild variant="outline" size="sm">
-          <a href={document.pdfUrl} target="_blank" rel="noopener noreferrer">
-            {t("documents.downloadPdf", "Download PDF")}
-          </a>
-        </Button>
-      </div>
-    )
-  }
-  return pick(document, ["contentHtml", "content_html", "content", "plainText", "plain_text", "body", "text"])
+  return pick(document, [
+    "contentHtml",
+    "content_html",
+    "content",
+    "plainText",
+    "plain_text",
+    "body",
+    "text",
+  ]);
 }
 
 function isAiGeneratedDocument(document) {
-  return pick(document, ["isAiGenerated", "is_ai_generated"]) ?? true
+  return pick(document, ["isAiGenerated", "is_ai_generated"]) ?? true;
 }
 
 function DetailRow({ label, value }) {
-  if (value === null || value === undefined || value === "") return null
+  if (value === null || value === undefined || value === "") return null;
 
   return (
     <div className="flex items-start justify-between gap-4 border-b border-(--border-default) py-3 text-sm last:border-b-0">
       <dt className="text-(--text-secondary)">{label}</dt>
-      <dd className="max-w-[60%] break-words text-end font-medium text-(--text-primary)">
+      <dd className="max-w-[60%] wrap-break-word text-end font-medium text-(--text-primary)">
         {String(value)}
       </dd>
     </div>
-  )
+  );
 }
 
 function MetadataPanel({ document, locale, t }) {
-  const status = pick(document, ["status"])
+  const status = pick(document, ["status"]);
   const rows = [
     [t("documents.fields.documentId"), getDocumentId(document)],
     [t("documents.fields.type"), getType(document)],
     [t("documents.fields.employee"), getEmployee(document)],
-    [t("documents.fields.createdAt"), formatDate(pick(document, ["createdAt", "created_at", "date"]), locale)],
-    [t("documents.fields.updatedAt"), formatDate(pick(document, ["updatedAt", "updated_at"]), locale)],
-  ].filter(([, value]) => value !== null && value !== undefined && value !== "")
+    [
+      t("documents.fields.createdAt"),
+      formatDate(pick(document, ["createdAt", "created_at", "date"]), locale),
+    ],
+    [
+      t("documents.fields.updatedAt"),
+      formatDate(pick(document, ["updatedAt", "updated_at"]), locale),
+    ],
+  ].filter(
+    ([, value]) => value !== null && value !== undefined && value !== "",
+  );
 
-  const metadata = document?.metadata && typeof document.metadata === "object"
-    ? Object.entries(document.metadata).filter(([, value]) => (
-      value !== null &&
-      value !== undefined &&
-      value !== "" &&
-      (typeof value === "string" || typeof value === "number" || typeof value === "boolean")
-    ))
-    : []
+  const metadata =
+    document?.metadata && typeof document.metadata === "object"
+      ? Object.entries(document.metadata).filter(
+          ([, value]) =>
+            value !== null &&
+            value !== undefined &&
+            value !== "" &&
+            (typeof value === "string" ||
+              typeof value === "number" ||
+              typeof value === "boolean"),
+        )
+      : [];
 
-  if (!status && rows.length === 0 && metadata.length === 0) return null
+  if (!status && rows.length === 0 && metadata.length === 0) return null;
 
   return (
     <aside className="rounded-md border border-(--border-default) bg-(--bg-card) p-5 shadow-(--shadow-1)">
@@ -168,7 +215,7 @@ function MetadataPanel({ document, locale, t }) {
         </div>
       )}
     </aside>
-  )
+  );
 }
 
 function ReviewLoading() {
@@ -182,7 +229,7 @@ function ReviewLoading() {
         <Skeleton className="h-12 w-full" />
       </div>
     </div>
-  )
+  );
 }
 
 function getErrorCopy(t, error) {
@@ -192,7 +239,7 @@ function getErrorCopy(t, error) {
       description: t("documents.reviewPendingDescription"),
       actionText: t("documents.backToDocuments"),
       canRetry: false,
-    }
+    };
   }
 
   if (error?.code === "validation_error") {
@@ -201,7 +248,7 @@ function getErrorCopy(t, error) {
       description: t("documents.invalidDocumentDescription"),
       actionText: t("documents.backToDocuments"),
       canRetry: false,
-    }
+    };
   }
 
   if (error?.status === 401) {
@@ -210,7 +257,7 @@ function getErrorCopy(t, error) {
       description: t("documents.unauthorizedDescription"),
       actionText: t("common.retry"),
       canRetry: true,
-    }
+    };
   }
 
   if (error?.status === 403) {
@@ -219,7 +266,7 @@ function getErrorCopy(t, error) {
       description: t("documents.forbiddenDescription"),
       actionText: t("documents.backToDocuments"),
       canRetry: false,
-    }
+    };
   }
 
   if (error?.status === 404) {
@@ -228,7 +275,7 @@ function getErrorCopy(t, error) {
       description: t("documents.notFoundDescription"),
       actionText: t("documents.backToDocuments"),
       canRetry: false,
-    }
+    };
   }
 
   return {
@@ -236,84 +283,217 @@ function getErrorCopy(t, error) {
     description: t("documents.loadErrorDescription"),
     actionText: t("common.retry"),
     canRetry: true,
-  }
+  };
 }
 
 export function DocumentReviewPage() {
-  const { documentId } = useParams()
-  const navigate = useNavigate()
-  const { t } = useTranslation()
-  const { isRtl } = useLocale()
-  const [document, setDocument] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [actionLoading, setActionLoading] = useState(false)
+  const { documentId } = useParams();
+  const navigate = useNavigate();
+  const { t } = useTranslation();
+  const { isRtl } = useLocale();
+  const { toast } = useToast();
+  const [document, setDocument] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
+  const [confirmType, setConfirmType] = useState(null);
+  const [emailTo, setEmailTo] = useState("");
+  const [emailValidationError, setEmailValidationError] = useState("");
+  const [isConfirming, setIsConfirming] = useState(false);
+  const [isLoadingRecipientEmail, setIsLoadingRecipientEmail] = useState(false);
 
-  const locale = isRtl ? "ar-EG" : "en-US"
+  const locale = isRtl ? "ar-EG" : "en-US";
 
   const loadDocument = useCallback(async () => {
-    setLoading(true)
-    setError(null)
+    setLoading(true);
+    setError(null);
 
     try {
-      const data = await getDocument(documentId)
-      setDocument(data)
+      const data = await getDocument(documentId);
+      setDocument(data);
     } catch (err) {
-      setDocument(null)
-      setError(err)
+      setDocument(null);
+      setError(err);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [documentId])
+  }, [documentId]);
 
   useEffect(() => {
-    loadDocument()
-  }, [loadDocument])
+    loadDocument();
+  }, [loadDocument]);
 
-  const handleFinalize = async () => {
-    if (!window.confirm(t("documents.confirmFinalize", "Are you sure you want to finalize this document? This cannot be undone."))) {
-      return
-    }
-    setActionLoading(true)
+  const closeConfirm = () => {
+    if (isConfirming) return;
+    setConfirmType(null);
+  };
+
+  const openFinalizeConfirm = () => setConfirmType("finalize");
+
+  const openSendEmailConfirm = async () => {
+    const employeeId = document?.employeeId ?? document?.employee_id;
+
+    setEmailTo("");
+    setEmailValidationError("");
+    setConfirmType("sendEmail");
+    setIsLoadingRecipientEmail(true);
+
     try {
-      await finalizeDocument(documentId)
-      await loadDocument()
-    } catch (err) {
-      alert(t("documents.finalizeError", "Failed to finalize document. " + (err.message || "")))
-    } finally {
-      setActionLoading(false)
-    }
-  }
+      if (!employeeId) {
+        setEmailValidationError(
+          t(
+            "documents.emailUnavailable",
+            "No employee email is available for this document.",
+          ),
+        );
+        return;
+      }
 
-  const handleSendEmail = async () => {
-    const email = window.prompt(t("documents.promptEmail", "Enter email address to send to (leave empty to use employee's email if available):"))
-    // prompt returns null if cancelled
-    if (email === null) return
-    
-    setActionLoading(true)
+      const employee = await getEmployeeById(employeeId);
+      const resolvedEmail = getEmployeeEmailValue(employee);
+      const nextEmail = String(resolvedEmail || "").trim();
+
+      if (!nextEmail || !isValidEmail(nextEmail)) {
+        setEmailValidationError(
+          t(
+            "documents.emailUnavailable",
+            "No valid employee email was found for this document.",
+          ),
+        );
+        return;
+      }
+
+      setEmailTo(nextEmail);
+    } catch (err) {
+      const message =
+        err?.message ||
+        t(
+          "documents.emailLoadError",
+          "The employee email could not be loaded right now.",
+        );
+
+      setEmailValidationError(message);
+      toast({
+        type: "error",
+        message: t("documents.emailLoadErrorTitle", "Unable to load recipient"),
+        description: message,
+      });
+    } finally {
+      setIsLoadingRecipientEmail(false);
+    }
+  };
+
+  const handleConfirmAction = async () => {
+    if (!documentId) return;
+
+    const trimmedEmail = emailTo.trim();
+    if (confirmType === "sendEmail") {
+      if (!trimmedEmail || !isValidEmail(trimmedEmail)) {
+        setEmailValidationError(
+          t(
+            "documents.emailInvalid",
+            "Please enter a valid recipient email address.",
+          ),
+        );
+        return;
+      }
+      setEmailValidationError("");
+    }
+
+    setActionLoading(true);
+    setIsConfirming(true);
+
     try {
-      await sendDocumentEmail(documentId, email.trim() || null)
-      alert(t("documents.emailSentSuccess", "Email sent successfully!"))
-      await loadDocument()
-    } catch (err) {
-      alert(t("documents.emailSendError", "Failed to send email. " + (err.message || "")))
-    } finally {
-      setActionLoading(false)
-    }
-  }
+      if (confirmType === "finalize") {
+        await finalizeDocument(documentId);
+        toast({
+          type: "success",
+          message: t(
+            "documents.finalizeSuccess",
+            "Document finalized successfully.",
+          ),
+        });
+      } else if (confirmType === "sendEmail") {
+        await sendDocumentEmail(documentId, trimmedEmail || null);
+        toast({
+          type: "success",
+          message: t("documents.emailSentSuccess", "Email sent successfully!"),
+        });
+      }
 
-  const status = pick(document, ["status"])
-  const lifecycleCopyKey = getLifecycleCopyKey(status)
-  const errorCopy = useMemo(() => error ? getErrorCopy(t, error) : null, [error, t])
+      setConfirmType(null);
+      setEmailTo("");
+      setEmailValidationError("");
+      await loadDocument();
+    } catch (err) {
+      toast({
+        type: "error",
+        message:
+          confirmType === "finalize"
+            ? t("documents.finalizeFailedTitle", "Failed to finalize document")
+            : t("documents.emailFailedTitle", "Failed to send email"),
+        description: err?.message,
+      });
+    } finally {
+      setActionLoading(false);
+      setIsConfirming(false);
+    }
+  };
+
+  const handleDownloadPdf = async () => {
+    if (!document?.pdfUrl || isDownloadingPdf) return;
+
+    setIsDownloadingPdf(true);
+
+    try {
+      const absoluteUrl = getImageUrl(document.pdfUrl);
+      if (!absoluteUrl) {
+        throw new Error("The PDF URL is missing.");
+      }
+
+      const link = window.document.createElement("a");
+      link.href = absoluteUrl;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.download = "document.pdf";
+      window.document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (err) {
+      toast({
+        type: "error",
+        message: t("documents.downloadFailedTitle", "Download failed"),
+        description:
+          err?.message ||
+          t(
+            "documents.downloadFailedDesc",
+            "The PDF could not be downloaded. Please try again.",
+          ),
+      });
+    } finally {
+      setIsDownloadingPdf(false);
+    }
+  };
+
+  const status = pick(document, ["status"]);
+  const lifecycleCopyKey = getLifecycleCopyKey(status);
+  const errorCopy = useMemo(
+    () => (error ? getErrorCopy(t, error) : null),
+    [error, t],
+  );
 
   return (
     <PageShell
       eyebrow={t("documents.reviewEyebrow")}
       title={document ? getTitle(document, t) : t("documents.reviewTitle")}
-      description={t("documents.reviewDescription")}
-    >
+      description={t("documents.reviewDescription")}>
       <div className="flex flex-wrap items-center gap-3">
-        <Button type="button" variant="secondary" size="sm" onClick={() => navigate("/hr/documents")}>
+        <Button
+          type="button"
+          variant="secondary"
+          size="sm"
+          onClick={() => navigate("/hr/documents")}>
           <ArrowLeft className="h-4 w-4 rtl:rotate-180" aria-hidden="true" />
           {t("documents.backToDocuments")}
         </Button>
@@ -324,11 +504,17 @@ export function DocumentReviewPage() {
       ) : error ? (
         <section className="rounded-md border border-(--border-default) bg-(--bg-card) p-5 shadow-(--shadow-1)">
           <EmptyState
-            illustrationType={isDocumentApiUnavailableError(error) ? "document" : "offline"}
+            illustrationType={
+              isDocumentApiUnavailableError(error) ? "document" : "offline"
+            }
             title={errorCopy.title}
             description={errorCopy.description}
             actionText={errorCopy.actionText}
-            onActionClick={errorCopy.canRetry ? loadDocument : () => navigate("/hr/documents")}
+            onActionClick={
+              errorCopy.canRetry
+                ? loadDocument
+                : () => navigate("/hr/documents")
+            }
           />
         </section>
       ) : document ? (
@@ -351,7 +537,40 @@ export function DocumentReviewPage() {
 
             <DocumentPreview
               title={getTitle(document, t)}
-              content={getContent(document, t)}
+              content={
+                document?.pdfUrl ? (
+                  <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
+                    <div className="rounded-full bg-(--bg-muted) p-4">
+                      <FileText className="h-8 w-8 text-(--legal-primary)" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-(--text-primary)">
+                        {t("documents.finalizedPdfTitle", "Document Finalized")}
+                      </p>
+                      <p className="text-sm text-(--text-secondary)">
+                        {t(
+                          "documents.finalizedPdfDesc",
+                          "This document is finalized and available as a PDF.",
+                        )}
+                      </p>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      onClick={handleDownloadPdf}
+                      isLoading={isDownloadingPdf}
+                      loadingText={t(
+                        "documents.downloading",
+                        "Downloading...",
+                      )}>
+                      {t("documents.downloadPdf", "Download PDF")}
+                    </Button>
+                  </div>
+                ) : (
+                  getContent(document, t)
+                )
+              }
               isAiGenerated={isAiGeneratedDocument(document)}
               showCitationFooter={false}
             />
@@ -362,47 +581,64 @@ export function DocumentReviewPage() {
 
             <section className="rounded-md border border-(--border-default) bg-(--bg-card) p-5 text-start shadow-(--shadow-1)">
               <div className="mb-3 flex items-center gap-2 text-(--text-primary)">
-                <FileText className="h-4 w-4 text-(--legal-primary)" aria-hidden="true" />
-                <h3 className="text-sm font-semibold">{t("documents.reviewActions")}</h3>
+                <FileText
+                  className="h-4 w-4 text-(--legal-primary)"
+                  aria-hidden="true"
+                />
+                <h3 className="text-sm font-semibold">
+                  {t("documents.reviewActions")}
+                </h3>
               </div>
               <div className="flex flex-col gap-3 mt-4">
                 {String(status).toLowerCase() === "draft" && (
-                  <Button 
-                    type="button" 
-                    variant="primary" 
+                  <Button
+                    type="button"
+                    variant="primary"
                     className="w-full justify-center"
-                    onClick={handleFinalize}
-                    disabled={actionLoading}
-                  >
-                    {actionLoading ? t("common.loading", "Loading...") : t("documents.actionFinalize", "Finalize Document")}
+                    onClick={openFinalizeConfirm}
+                    disabled={actionLoading || isConfirming}>
+                    {actionLoading
+                      ? t("common.loading", "Loading...")
+                      : t("documents.actionFinalize", "Finalize Document")}
                   </Button>
                 )}
                 {String(status).toLowerCase() === "finalized" && (
-                  <Button 
-                    type="button" 
-                    variant="outline" 
+                  <Button
+                    type="button"
+                    variant="outline"
                     className="w-full justify-center"
-                    onClick={handleSendEmail}
-                    disabled={actionLoading}
-                  >
-                    {actionLoading ? t("common.loading", "Loading...") : t("documents.actionSendEmail", "Send Email")}
+                    onClick={openSendEmailConfirm}
+                    disabled={
+                      actionLoading || isConfirming || isLoadingRecipientEmail
+                    }>
+                    {isLoadingRecipientEmail
+                      ? t("common.loading", "Loading...")
+                      : actionLoading
+                        ? t("common.loading", "Loading...")
+                        : t("documents.actionSendEmail", "Send Email")}
                   </Button>
                 )}
-                {String(status).toLowerCase() !== "draft" && String(status).toLowerCase() !== "finalized" && (
-                   <p className="text-sm leading-relaxed text-(--text-secondary)">
-                     {t("documents.noReviewActions")}
-                   </p>
-                )}
+                {String(status).toLowerCase() !== "draft" &&
+                  String(status).toLowerCase() !== "finalized" && (
+                    <p className="text-sm leading-relaxed text-(--text-secondary)">
+                      {t("documents.noReviewActions")}
+                    </p>
+                  )}
               </div>
             </section>
 
             {getEmployee(document) && (
               <section className="rounded-md border border-(--border-default) bg-(--bg-card) p-5 text-start shadow-(--shadow-1)">
                 <div className="mb-3 flex items-center gap-2 text-(--text-primary)">
-                  <UserRound className="h-4 w-4 text-(--legal-primary)" aria-hidden="true" />
-                  <h3 className="text-sm font-semibold">{t("documents.employeeContext")}</h3>
+                  <UserRound
+                    className="h-4 w-4 text-(--legal-primary)"
+                    aria-hidden="true"
+                  />
+                  <h3 className="text-sm font-semibold">
+                    {t("documents.employeeContext")}
+                  </h3>
                 </div>
-                <p className="break-words text-sm text-(--text-secondary)">
+                <p className="wrap-break-word text-sm text-(--text-secondary)">
                   {getEmployee(document)}
                 </p>
               </section>
@@ -420,6 +656,57 @@ export function DocumentReviewPage() {
           />
         </section>
       )}
+
+      <ConfirmDialog
+        open={confirmType === "finalize"}
+        onOpenChange={(open) => !open && closeConfirm()}
+        title={t("documents.confirmFinalizeTitle", "Finalize document?")}
+        description={t(
+          "documents.confirmFinalizeDescription",
+          "Once finalized, this document can no longer be edited.",
+        )}
+        confirmText={t("documents.actionFinalize", "Finalize Document")}
+        isLoading={isConfirming}
+        onConfirm={handleConfirmAction}
+      />
+
+      <ConfirmDialog
+        open={confirmType === "sendEmail"}
+        onOpenChange={(open) => !open && closeConfirm()}
+        title={t("documents.confirmSendEmailTitle", "Send document by email?")}
+        description={t(
+          "documents.confirmSendEmailDescription",
+          "Are you sure you want to send this finalized document by email?",
+        )}
+        confirmText={t("documents.actionSendEmail", "Send Email")}
+        isLoading={isConfirming || isLoadingRecipientEmail}
+        onConfirm={handleConfirmAction}>
+        <Input
+          type="email"
+          label={t("documents.emailToLabel", "Send to")}
+          placeholder={t(
+            "documents.emailToPlaceholder",
+            "Enter the recipient email",
+          )}
+          value={emailTo}
+          onChange={(event) => {
+            setEmailTo(event.target.value);
+            if (emailValidationError) setEmailValidationError("");
+          }}
+          disabled={isConfirming || isLoadingRecipientEmail}
+          aria-invalid={Boolean(emailValidationError)}
+          aria-describedby={
+            emailValidationError ? "send-email-validation-error" : undefined
+          }
+        />
+        {emailValidationError && (
+          <p
+            id="send-email-validation-error"
+            className="mt-2 text-sm text-(--status-error-fg)">
+            {emailValidationError}
+          </p>
+        )}
+      </ConfirmDialog>
     </PageShell>
-  )
+  );
 }

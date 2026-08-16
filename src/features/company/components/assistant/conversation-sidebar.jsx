@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { MessageSquarePlus, MessagesSquare, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "../../../../components/ui/button";
+import { ConfirmDialog } from "../../../../components/overlay/confirm-dialog";
 import { Skeleton } from "../../../../components/ui/skeleton";
 import { CONVERSATION_LIST_STATUS } from "../../services/assistant-service";
 import { cn } from "../../../../lib/utils";
@@ -18,12 +19,21 @@ const isYesterday = (date) => {
 };
 
 function groupConversations(conversations) {
-  return conversations.reduce((groups, conversation) => {
-    const date = conversation.updatedAt ? new Date(conversation.updatedAt) : new Date();
-    const key = isToday(date) ? "today" : isYesterday(date) ? "yesterday" : "earlier";
-    groups[key].push(conversation);
-    return groups;
-  }, { today: [], yesterday: [], earlier: [] });
+  return conversations.reduce(
+    (groups, conversation) => {
+      const date = conversation.updatedAt
+        ? new Date(conversation.updatedAt)
+        : new Date();
+      const key = isToday(date)
+        ? "today"
+        : isYesterday(date)
+          ? "yesterday"
+          : "earlier";
+      groups[key].push(conversation);
+      return groups;
+    },
+    { today: [], yesterday: [], earlier: [] },
+  );
 }
 
 export function ConversationSidebar({
@@ -37,12 +47,31 @@ export function ConversationSidebar({
   className,
 }) {
   const { t } = useTranslation();
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const groups = groupConversations(conversations);
   const hasConversations = conversations.length > 0;
-  const isPendingBackend = status === CONVERSATION_LIST_STATUS.PENDING_BACKEND_CONTRACT;
+  const isPendingBackend =
+    status === CONVERSATION_LIST_STATUS.PENDING_BACKEND_CONTRACT;
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+
+    setIsDeleting(true);
+    try {
+      await onDeleteConversation?.(deleteTarget.id);
+      setDeleteTarget(null);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   return (
-    <aside className={cn("flex h-full min-h-0 flex-col border-e border-(--border-default) bg-(--bg-card-subtle)", className)}>
+    <aside
+      className={cn(
+        "flex h-full min-h-0 flex-col border-e border-(--border-default) bg-(--bg-card-subtle)",
+        className,
+      )}>
       <div className="border-b border-(--border-default) p-4">
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0 text-start">
@@ -59,8 +88,7 @@ export function ConversationSidebar({
             size="sm"
             className="h-9 w-9 shrink-0 p-0"
             onClick={onNewConversation}
-            aria-label={t("assistant.conversations.new")}
-          >
+            aria-label={t("assistant.conversations.new")}>
             <MessageSquarePlus className="h-4 w-4" />
           </Button>
         </div>
@@ -110,13 +138,13 @@ export function ConversationSidebar({
                             isActive
                               ? "border-(--ai-primary) bg-(--ai-surface) text-(--brand-primary)"
                               : "border-transparent text-(--text-primary) hover:border-(--border-default) hover:bg-(--bg-card)",
-                          )}
-                        >
+                          )}>
                           <button
                             type="button"
-                            onClick={() => onSelectConversation(conversation.id)}
-                            className="flex-1 min-w-0 text-start"
-                          >
+                            onClick={() =>
+                              onSelectConversation(conversation.id)
+                            }
+                            className="flex-1 min-w-0 text-start">
                             <span className="block truncate text-sm font-semibold">
                               {conversation.title}
                             </span>
@@ -126,18 +154,15 @@ export function ConversationSidebar({
                               </span>
                             )}
                           </button>
-                          
+
                           <button
                             type="button"
                             onClick={(e) => {
                               e.stopPropagation();
-                              if (window.confirm(t("assistant.conversations.confirmDelete") || "Are you sure you want to delete this conversation?")) {
-                                onDeleteConversation?.(conversation.id);
-                              }
+                              setDeleteTarget(conversation);
                             }}
                             className="ms-2 hidden shrink-0 rounded-sm p-1 text-(--text-secondary) opacity-0 transition-opacity hover:bg-black/10 hover:text-(--status-error-fg) group-hover:block group-hover:opacity-100"
-                            aria-label={t("common.delete")}
-                          >
+                            aria-label={t("common.delete")}>
                             <Trash2 className="h-4 w-4" />
                           </button>
                         </div>
@@ -150,7 +175,23 @@ export function ConversationSidebar({
           </div>
         )}
       </div>
+
+      <ConfirmDialog
+        open={Boolean(deleteTarget)}
+        onOpenChange={(open) => !open && !isDeleting && setDeleteTarget(null)}
+        title={t(
+          "assistant.conversations.confirmDeleteTitle",
+          "Delete conversation?",
+        )}
+        description={t(
+          "assistant.conversations.confirmDeleteDescription",
+          "This action cannot be undone. Are you sure you want to delete this conversation?",
+        )}
+        confirmText={t("common.delete", "Delete")}
+        variant="danger"
+        isLoading={isDeleting}
+        onConfirm={handleConfirmDelete}
+      />
     </aside>
   );
 }
-
