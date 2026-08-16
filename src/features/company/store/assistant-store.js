@@ -8,7 +8,8 @@ import {
   deleteConversation as deleteConversationService,
 } from "../services/assistant-service";
 
-const createLocalId = (prefix) => `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+const createLocalId = (prefix) =>
+  `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
 const initialState = {
   conversations: [],
@@ -25,7 +26,9 @@ const initialState = {
 };
 
 const deriveConversationTitle = (messages, fallback) => {
-  const firstUserMessage = messages.find((message) => message.role === "user" && message.content?.trim());
+  const firstUserMessage = messages.find(
+    (message) => message.role === "user" && message.content?.trim(),
+  );
   const source = firstUserMessage?.content || fallback || "New conversation";
   return source.length > 48 ? `${source.slice(0, 45)}...` : source;
 };
@@ -50,7 +53,10 @@ const upsertConversation = (conversations, conversation) => {
 const getPendingFieldsFromMessages = (messages) => {
   const lastAssistantWithFields = [...messages]
     .reverse()
-    .find((message) => message.role === "assistant" && message.missingFields?.length > 0);
+    .find(
+      (message) =>
+        message.role === "assistant" && message.missingFields?.length > 0,
+    );
 
   if (!lastAssistantWithFields) return null;
 
@@ -69,9 +75,10 @@ export const useAssistantStore = create((set, get) => ({
     try {
       const result = await getConversations();
       set((state) => ({
-        conversations: result.status === CONVERSATION_LIST_STATUS.PENDING_BACKEND_CONTRACT
-          ? state.conversations
-          : result.conversations || [],
+        conversations:
+          result.status === CONVERSATION_LIST_STATUS.PENDING_BACKEND_CONTRACT
+            ? state.conversations
+            : result.conversations || [],
         conversationListStatus: result.status || CONVERSATION_LIST_STATUS.READY,
         isLoadingConversations: false,
       }));
@@ -120,7 +127,9 @@ export const useAssistantStore = create((set, get) => ({
           id: conversationId,
           title: deriveConversationTitle(messages),
           lastMessage: messages[messages.length - 1]?.content || "",
-          updatedAt: messages[messages.length - 1]?.createdAt || new Date().toISOString(),
+          updatedAt:
+            messages[messages.length - 1]?.createdAt ||
+            new Date().toISOString(),
         }),
       }));
     } catch (error) {
@@ -137,10 +146,12 @@ export const useAssistantStore = create((set, get) => ({
     // Optimistically update UI
     const currentConversations = get().conversations;
     const activeId = get().activeConversationId;
-    
+
     set((state) => ({
       conversations: state.conversations.filter((c) => c.id !== conversationId),
-      ...(activeId === conversationId ? { activeConversationId: null, messages: [] } : {})
+      ...(activeId === conversationId
+        ? { activeConversationId: null, messages: [] }
+        : {}),
     }));
 
     try {
@@ -150,7 +161,9 @@ export const useAssistantStore = create((set, get) => ({
       // Revert if failed
       set({
         conversations: currentConversations,
-        ...(activeId === conversationId ? { activeConversationId: activeId } : {}),
+        ...(activeId === conversationId
+          ? { activeConversationId: activeId }
+          : {}),
         error: normalizeAssistantError(error),
       });
       return false;
@@ -209,19 +222,23 @@ export const useAssistantStore = create((set, get) => ({
         fieldValues,
       });
 
-      const nextConversationId = assistantMessage.conversationId || activeConversationId;
+      const nextConversationId =
+        assistantMessage.conversationId || activeConversationId;
       const assistantWithConversation = {
         ...assistantMessage,
         conversationId: nextConversationId,
       };
 
       set((state) => {
-        const messagesWithConversation = state.messages.map((item) => (
+        const messagesWithConversation = state.messages.map((item) =>
           item.conversationId || !nextConversationId
             ? item
-            : { ...item, conversationId: nextConversationId }
-        ));
-        const nextMessages = [...messagesWithConversation, assistantWithConversation];
+            : { ...item, conversationId: nextConversationId },
+        );
+        const nextMessages = [
+          ...messagesWithConversation,
+          assistantWithConversation,
+        ];
 
         return {
           messages: nextMessages,
@@ -229,7 +246,10 @@ export const useAssistantStore = create((set, get) => ({
           isSending: false,
           retryableMessage: null,
           pendingMissingFields: assistantWithConversation.missingFields?.length
-            ? { messageId: assistantWithConversation.id, fields: assistantWithConversation.missingFields }
+            ? {
+                messageId: assistantWithConversation.id,
+                fields: assistantWithConversation.missingFields,
+              }
             : null,
           progressiveMessageId: assistantWithConversation.id,
           conversations: upsertConversation(state.conversations, {
@@ -256,8 +276,19 @@ export const useAssistantStore = create((set, get) => ({
     const activeConversationId = get().activeConversationId;
     if (!activeConversationId) return null;
 
+    const pendingFields = get().pendingMissingFields?.fields || [];
+    const composedMessage = pendingFields
+      .filter((field) => {
+        const value = fieldValues?.[field.name];
+        return (
+          value !== undefined && value !== null && String(value).trim() !== ""
+        );
+      })
+      .map((field) => `${field.label} is ${fieldValues[field.name]}`)
+      .join(", ");
+
     return get().sendMessage({
-      message: "Continue",
+      message: composedMessage || "Continue",
       language,
       fieldValues,
       displayMessage,

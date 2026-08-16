@@ -55,7 +55,9 @@ describe("assistant-store", () => {
 
   it("stores the first returned conversation id and reuses it on the second message", async () => {
     serviceMocks.sendMessage
-      .mockResolvedValueOnce(assistantMessage("conv-1", "Long annual leave answer"))
+      .mockResolvedValueOnce(
+        assistantMessage("conv-1", "Long annual leave answer"),
+      )
       .mockResolvedValueOnce(assistantMessage("conv-1", "Arabic summary"));
 
     await useAssistantStore.getState().sendMessage({
@@ -70,7 +72,11 @@ describe("assistant-store", () => {
       fieldValues: null,
     });
     expect(useAssistantStore.getState().activeConversationId).toBe("conv-1");
-    expect(useAssistantStore.getState().messages.every((message) => message.conversationId === "conv-1")).toBe(true);
+    expect(
+      useAssistantStore
+        .getState()
+        .messages.every((message) => message.conversationId === "conv-1"),
+    ).toBe(true);
 
     await useAssistantStore.getState().sendMessage({
       message: "summarize it and write the response in arabic",
@@ -124,7 +130,9 @@ describe("assistant-store", () => {
     expect(serviceMocks.getChatHistory).toHaveBeenCalledWith("conv-a");
     expect(useAssistantStore.getState().activeConversationId).toBe("conv-a");
     expect(useAssistantStore.getState().messages).toHaveLength(1);
-    expect(useAssistantStore.getState().messages[0].conversationId).toBe("conv-a");
+    expect(useAssistantStore.getState().messages[0].conversationId).toBe(
+      "conv-a",
+    );
   });
 
   it("loads conversations from backend successfully", async () => {
@@ -144,10 +152,10 @@ describe("assistant-store", () => {
 
     // Start loading
     const loadPromise = useAssistantStore.getState().loadConversations();
-    
+
     // Should be loading immediately
     expect(useAssistantStore.getState().isLoadingConversations).toBe(true);
-    
+
     await loadPromise;
 
     // Loading done, data populated
@@ -158,7 +166,9 @@ describe("assistant-store", () => {
   });
 
   it("handles getConversations failure gracefully", async () => {
-    serviceMocks.getConversations.mockRejectedValueOnce(new Error("Network Error"));
+    serviceMocks.getConversations.mockRejectedValueOnce(
+      new Error("Network Error"),
+    );
 
     await useAssistantStore.getState().loadConversations();
 
@@ -166,5 +176,41 @@ describe("assistant-store", () => {
     expect(useAssistantStore.getState().error).toBeDefined();
     // Conversations remain unchanged (empty from reset)
     expect(useAssistantStore.getState().conversations).toHaveLength(0);
+  });
+
+  it("submits a readable summary of missing fields instead of a generic continue message", async () => {
+    useAssistantStore.setState({
+      activeConversationId: "conv-1",
+      pendingMissingFields: {
+        messageId: "assistant-1",
+        fields: [
+          { name: "employee_name", label: "Employee Name" },
+          { name: "job_title", label: "Job Title" },
+        ],
+      },
+    });
+
+    serviceMocks.sendMessage.mockResolvedValueOnce(
+      assistantMessage("conv-1", "Thank you."),
+    );
+
+    await useAssistantStore.getState().submitMissingFields({
+      fieldValues: {
+        employee_name: "Ahmed",
+        job_title: "Programmer",
+      },
+      language: "EN",
+      displayMessage: "Continue",
+    });
+
+    expect(serviceMocks.sendMessage).toHaveBeenCalledWith({
+      conversationId: "conv-1",
+      message: "Employee Name is Ahmed, Job Title is Programmer",
+      language: "EN",
+      fieldValues: {
+        employee_name: "Ahmed",
+        job_title: "Programmer",
+      },
+    });
   });
 });
