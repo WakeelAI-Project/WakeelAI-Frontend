@@ -75,6 +75,7 @@ const markdownComponents = {
   blockquote({ node: _node, ...props }) {
     return (
       <blockquote
+        dir="auto"
         {...props}
         className="border-s-2 border-(--ai-primary) ps-3 text-(--text-secondary)"
       />
@@ -92,22 +93,22 @@ const markdownComponents = {
     );
   },
   h1({ node: _node, ...props }) {
-    return <h3 {...props} className="text-base font-semibold leading-snug text-(--text-primary)" />;
+    return <h3 dir="auto" {...props} className="text-base font-semibold leading-snug text-(--text-primary)" />;
   },
   h2({ node: _node, ...props }) {
-    return <h3 {...props} className="text-base font-semibold leading-snug text-(--text-primary)" />;
+    return <h3 dir="auto" {...props} className="text-base font-semibold leading-snug text-(--text-primary)" />;
   },
   h3({ node: _node, ...props }) {
-    return <h4 {...props} className="text-sm font-semibold leading-snug text-(--text-primary)" />;
+    return <h4 dir="auto" {...props} className="text-sm font-semibold leading-snug text-(--text-primary)" />;
   },
   h4({ node: _node, ...props }) {
-    return <h4 {...props} className="text-sm font-semibold leading-snug text-(--text-primary)" />;
+    return <h4 dir="auto" {...props} className="text-sm font-semibold leading-snug text-(--text-primary)" />;
   },
   h5({ node: _node, ...props }) {
-    return <h5 {...props} className="text-sm font-semibold leading-snug text-(--text-primary)" />;
+    return <h5 dir="auto" {...props} className="text-sm font-semibold leading-snug text-(--text-primary)" />;
   },
   h6({ node: _node, ...props }) {
-    return <h6 {...props} className="text-xs font-semibold uppercase leading-snug text-(--text-secondary)" />;
+    return <h6 dir="auto" {...props} className="text-xs font-semibold uppercase leading-snug text-(--text-secondary)" />;
   },
   hr({ node: _node, ...props }) {
     return <hr {...props} className="border-(--border-default)" />;
@@ -116,14 +117,15 @@ const markdownComponents = {
     return <li {...props} className="ps-1" />;
   },
   ol({ node: _node, ...props }) {
-    return <ol {...props} className="list-decimal space-y-1 ps-5" />;
+    return <ol dir="auto" {...props} className="list-decimal space-y-1 ps-5" />;
   },
   p({ node: _node, ...props }) {
-    return <p {...props} className="whitespace-pre-wrap" />;
+    return <p dir="auto" {...props} className="whitespace-pre-wrap" />;
   },
   pre({ node: _node, ...props }) {
     return (
       <pre
+        dir="auto"
         {...props}
         className="max-w-full overflow-x-auto rounded-md border border-(--border-default) bg-(--bg-card-subtle) p-3 text-start"
       />
@@ -131,7 +133,7 @@ const markdownComponents = {
   },
   table({ node: _node, ...props }) {
     return (
-      <div className="max-w-full overflow-x-auto rounded-md border border-(--border-default)">
+      <div dir="auto" className="max-w-full overflow-x-auto rounded-md border border-(--border-default)">
         <table {...props} className="min-w-full border-collapse text-start text-xs" />
       </div>
     );

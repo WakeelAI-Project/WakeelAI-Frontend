@@ -47,11 +47,11 @@ export function DocumentPreview({
       </div>
 
       {/* Main Document Body */}
-      <div className="flex-1 overflow-y-auto pr-2 font-serif text-sm leading-relaxed text-(--text-primary) dark:text-(--text-primary) [unicode-bidi:plaintext]">
+      <div className="flex-1 overflow-y-auto pr-2 font-serif text-sm leading-relaxed text-(--text-primary)">
         {hasTextContent ? (
           <MarkdownRenderer
-            text={content}
-            className="document-draft-markdown space-y-4 text-sm leading-7 text-(--text-primary) dark:text-(--text-primary) [&_*]:[unicode-bidi:plaintext] [&_a]:text-(--accent-primary) [&_blockquote]:border-(--border-emphasis) [&_blockquote]:text-(--text-secondary) [&_code]:text-(--text-primary) [&_h3]:font-sans [&_h3]:text-xl [&_h3]:font-semibold [&_h3]:text-(--text-primary) [&_h4]:font-sans [&_h4]:text-base [&_h4]:font-semibold [&_h4]:text-(--text-primary) [&_h5]:font-sans [&_h5]:text-sm [&_h5]:font-semibold [&_li]:my-1 [&_table]:text-(--text-primary) [&_td]:text-(--text-primary) [&_th]:text-(--text-primary)"
+            text={hasTextContent ? content.replace(/(^|\n)(#{1,6})(?=[^\s#])/g, '$1$2 ') : content}
+            className="document-draft-markdown space-y-4 text-sm leading-7 [&_a]:text-(--accent-primary) [&_blockquote]:border-(--border-emphasis) [&_h3]:font-sans [&_h3]:text-xl [&_h4]:font-sans [&_h4]:text-base [&_h5]:font-sans [&_h5]:text-sm [&_li]:my-1"
           />
         ) : hasRenderableContent ? (
           content
