@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
 import {
-  Bell,
   Moon,
   Search,
   Settings,
@@ -23,7 +22,6 @@ export function Topbar({
   activeId,
   onSearchClick,
   onAssistantToggle,
-  notificationsCount = 3,
   userInitials = "MH",
   onLogout,
   rolePrefix = "/hr",
@@ -117,19 +115,6 @@ export function Topbar({
             <Sparkles className="h-4 w-4" />
           </Button>
         )}
-
-        <div className="relative">
-          <Button
-            variant="ghost"
-            size="xs"
-            className="h-8 w-8 p-0 cursor-pointer"
-            title={t("topbar.notifications")}>
-            <Bell className="h-4 w-4" />
-            {notificationsCount > 0 && (
-              <span className="absolute top-1 right-1 flex h-2 w-2 rounded-full bg-(--status-error-fg)" />
-            )}
-          </Button>
-        </div>
 
         <div className="w-px h-5 bg-(--border-default) hidden sm:block" />
 
