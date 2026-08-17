@@ -1,3 +1,5 @@
+import { API_BASE_URL } from "../lib/config.js";
+
 export function getImageUrl(value) {
   if (value === null || value === undefined || value === "") {
     return null;
@@ -21,13 +23,11 @@ export function getImageUrl(value) {
     return trimmedValue;
   }
 
-  const baseUrl = import.meta.env.VITE_API_BASE_URL;
-
-  if (!baseUrl) {
+  if (!API_BASE_URL) {
     return trimmedValue;
   }
 
   return trimmedValue.startsWith("/")
-    ? `${baseUrl}${trimmedValue}`
-    : `${baseUrl}/${trimmedValue}`;
+    ? `${API_BASE_URL}${trimmedValue}`
+    : `${API_BASE_URL}/${trimmedValue}`;
 }

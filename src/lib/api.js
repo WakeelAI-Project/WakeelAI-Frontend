@@ -1,5 +1,6 @@
 import axios from "axios";
 import Cookies from "js-cookie";
+import { API_URL } from "./config.js";
 
 let authToken = Cookies.get("wkl_access_token") ?? null;
 
@@ -13,18 +14,18 @@ export function configureAuthStore(getStateFn) {
   _getStoreState = getStateFn;
 }
 
-if (!import.meta.env.VITE_API_URL) {
-  console.error(
-    "[api] VITE_API_URL is not defined. Add it to your .env file:\n  VITE_API_URL=http://localhost:5032/api"
-  );
-}
-
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: API_URL,
   headers: {
     "Content-Type": "application/json",
   },
 });
+
+// ---------------------------------------------------------------------------
+// Auth endpoint allowlist — used by both request and response interceptors
+// ---------------------------------------------------------------------------
+const AUTH_ENDPOINTS = ["/auth/login", "/auth/register", "/auth/refresh", "/auth/logout", "/auth/forgot-password", "/auth/reset-password"];
+const isAuthEndpoint = (url = "") => AUTH_ENDPOINTS.some((p) => url.includes(p));
 
 async function getAuthHelpers() {
   const [{ refreshAccessToken, normalizeAuthResponse }, { isTokenExpired }] = await Promise.all([
@@ -81,7 +82,11 @@ async function performRefresh() {
       _getStoreState().clearAuth();
     }
     if (typeof window !== "undefined") {
-      window.location.href = "/login";
+      const publicPaths = ["/login", "/register", "/forgot-password", "/reset-password"];
+      const isPublic = publicPaths.some((p) => window.location.pathname.startsWith(p));
+      if (!isPublic) {
+        window.location.href = "/login?session_expired=1";
+      }
     }
 
     throw refreshError;
@@ -95,7 +100,7 @@ async function performRefresh() {
 // ---------------------------------------------------------------------------
 api.interceptors.request.use(
   async (config) => {
-    if (config.url?.includes("/auth/")) {
+    if (isAuthEndpoint(config.url)) {
       return config;
     }
 
@@ -131,11 +136,22 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
+    // Handle 403 password_change_required before 401
+    if (
+      error.response?.status === 403 &&
+      error.response?.data?.error === "password_change_required"
+    ) {
+      if (typeof window !== "undefined" && !window.location.pathname.includes("/change-password")) {
+        window.location.href = "/change-password";
+      }
+      return Promise.reject(error);
+    }
+
     if (!error.response || error.response.status !== 401) {
       return Promise.reject(error);
     }
 
-    if (originalRequest.url?.includes("/auth/")) {
+    if (isAuthEndpoint(originalRequest.url)) {
       return Promise.reject(error);
     }
 
