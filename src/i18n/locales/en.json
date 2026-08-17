@@ -419,7 +419,7 @@
     "confirmDeactivateTitle": "Deactivate template?",
     "confirmDeactivateDescription": "New documents will stop using this template once it is inactive.",
     "confirmDeleteTitle": "Delete template?",
-    "confirmDeleteDescription": "This will permanently delete \"{{name}}\" if backend business rules allow it.",
+    "confirmDeleteDescription": "Are you sure you want to delete \"{{name}}\"?\nThis action cannot be undone.",
     "filters": {
       "all": "All types"
     },
@@ -483,6 +483,7 @@
       "conflict": "This template cannot be changed right now.",
       "server": "Template service is unavailable. Please try again later.",
       "generic": "Something went wrong while working with templates.",
+      "deleteFailed": "Unable to delete this template. Please try again.",
       "noRelevantSources": "No sufficiently relevant legal or company-policy sources were found. Please adjust the request or add the required company policy."
     },
     "generateLegalClauses": "Generate Legal Clauses",

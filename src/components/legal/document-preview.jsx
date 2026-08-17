@@ -4,6 +4,7 @@ import { VerificationBadge } from "./verification-badge"
 import { Button } from "../ui/button"
 import { cn } from "../../lib/utils"
 import { useTranslation } from "react-i18next"
+import { MarkdownRenderer } from "../../features/company/components/assistant/markdown-renderer"
 
 export function DocumentPreview({
   title,
@@ -18,6 +19,8 @@ export function DocumentPreview({
 }) {
   const { t } = useTranslation()
   const shouldShowCitationFooter = showCitationFooter ?? (isAiGenerated || Boolean(citation))
+  const hasTextContent = typeof content === "string" && content.trim().length > 0
+  const hasRenderableContent = hasTextContent || React.isValidElement(content)
 
   return (
     <div
@@ -44,8 +47,15 @@ export function DocumentPreview({
       </div>
 
       {/* Main Document Body */}
-      <div className="flex-1 overflow-y-auto pr-2 font-serif text-(--text-primary) text-sm leading-relaxed whitespace-pre-wrap dark:text-(--bg-disabled)">
-        {content || (
+      <div className="flex-1 overflow-y-auto pr-2 font-serif text-sm leading-relaxed text-(--text-primary) dark:text-(--text-primary) [unicode-bidi:plaintext]">
+        {hasTextContent ? (
+          <MarkdownRenderer
+            text={content}
+            className="document-draft-markdown space-y-4 text-sm leading-7 text-(--text-primary) dark:text-(--text-primary) [&_*]:[unicode-bidi:plaintext] [&_a]:text-(--accent-primary) [&_blockquote]:border-(--border-emphasis) [&_blockquote]:text-(--text-secondary) [&_code]:text-(--text-primary) [&_h3]:font-sans [&_h3]:text-xl [&_h3]:font-semibold [&_h3]:text-(--text-primary) [&_h4]:font-sans [&_h4]:text-base [&_h4]:font-semibold [&_h4]:text-(--text-primary) [&_h5]:font-sans [&_h5]:text-sm [&_h5]:font-semibold [&_li]:my-1 [&_table]:text-(--text-primary) [&_td]:text-(--text-primary) [&_th]:text-(--text-primary)"
+          />
+        ) : hasRenderableContent ? (
+          content
+        ) : (
           <div className="h-full flex flex-col items-center justify-center text-(--text-muted) gap-2">
             <FileText className="h-10 w-10 opacity-30" />
             <span>{t("common.noContent")}</span>
