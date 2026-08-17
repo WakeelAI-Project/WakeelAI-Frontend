@@ -59,7 +59,20 @@
     "invalidOtp": "Enter the 6-digit verification code.",
     "roleMismatch": "This account does not match the selected user type. Check the selection and try again.",
     "loginFailed": "Unable to log in. Please try again.",
-    "registerFailed": "Unable to create the account. Please try again."
+    "registerFailed": "Unable to create the account. Please try again.",
+    "changePasswordTitle": "Change Your Password",
+    "changePasswordDesc": "You must change your password before continuing.",
+    "firstLoginNotice": "This is your first login. Please set a new password to secure your account.",
+    "currentPassword": "Current Password",
+    "confirmNewPassword": "Confirm New Password",
+    "changePasswordButton": "Change Password",
+    "changingPassword": "Changing password...",
+    "passwordChanged": "Password changed successfully. Please log in with your new password.",
+    "passwordChangeFailed": "Failed to change password. Please try again.",
+    "missingCurrentPassword": "Current password is required.",
+    "passwordMismatch": "Passwords do not match",
+    "changePasswordFooter": "After changing your password, you will be redirected to log in again.",
+    "sessionExpired": "Your session expired. Please log in again."
   },
   "validation": {
     "required": "This field is required",

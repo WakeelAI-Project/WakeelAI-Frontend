@@ -21,8 +21,21 @@ export function LoginPage() {
   const [successMessage, setSuccessMessage] = useState(
     location.state?.message || "",
   );
+  const [sessionExpiredMessage, setSessionExpiredMessage] = useState("");
   const { isRtl } = useLocale();
   const { t } = useTranslation();
+
+  // Check for session_expired query param
+  React.useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    if (searchParams.get("session_expired") === "1") {
+      setSessionExpiredMessage(
+        t("auth.sessionExpired", { defaultValue: "Your session expired. Please log in again." })
+      );
+      // Clean up the URL
+      navigate(location.pathname, { replace: true });
+    }
+  }, [location.search, location.pathname, navigate, t]);
   const {
     register,
     handleSubmit,
@@ -35,6 +48,7 @@ export function LoginPage() {
   const onSubmit = async ({ email, password }) => {
     setSubmitError("");
     setSuccessMessage("");
+    setSessionExpiredMessage("");
 
     try {
       // Use the auth store's login method which handles temporary password storage
@@ -58,8 +72,11 @@ export function LoginPage() {
 
       // Check must_change_password and redirect if needed
       if (normalized.mustChangePassword) {
-        // Redirect to change password page
-        navigate("/change-password", { replace: true });
+        // Redirect to change password page with password in navigation state
+        navigate("/change-password", { 
+          replace: true,
+          state: { currentPassword: password }
+        });
         return;
       }
 
@@ -106,6 +123,14 @@ export function LoginPage() {
             role="status"
             className="rounded-md border border-(--status-success-fg) bg-(--status-success-bg) px-4 py-3 text-sm text-(--status-success-fg)">
             {successMessage}
+          </div>
+        )}
+
+        {sessionExpiredMessage && (
+          <div
+            role="status"
+            className="rounded-md border border-(--status-warning-fg) bg-(--status-warning-bg) px-4 py-3 text-sm text-(--status-warning-fg)">
+            {sessionExpiredMessage}
           </div>
         )}
 

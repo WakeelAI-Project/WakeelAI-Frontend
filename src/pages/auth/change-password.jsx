@@ -1,6 +1,6 @@
 import React, { useState } from "react"
 import { useForm } from "react-hook-form"
-import { useNavigate } from "react-router"
+import { useLocation, useNavigate } from "react-router"
 import { AuthLayout } from "../../components/auth/auth-layout"
 import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
@@ -13,8 +13,13 @@ const PASSWORD_MIN_LENGTH = 8
 export function ChangePasswordPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { isAuthenticated, logout, temporaryPassword, mustChangePassword, clearTemporaryPassword } = useAuth()
+  const location = useLocation()
+  const { isAuthenticated, logout, clearMustChangePassword } = useAuth()
   const [submitError, setSubmitError] = useState("")
+
+  // Get the current password from navigation state (passed from login page)
+  // If user refreshes the page, this will be empty and they'll need to provide it
+  const temporaryPassword = location.state?.currentPassword ?? ""
 
   const {
     register,
@@ -22,7 +27,11 @@ export function ChangePasswordPage() {
     watch,
     formState: { errors, isSubmitting },
   } = useForm({
-    defaultValues: { new_password: "", confirm_password: "" },
+    defaultValues: { 
+      current_password: temporaryPassword, // Pre-fill from navigation state if available
+      new_password: "", 
+      confirm_password: "" 
+    },
   })
 
   // eslint-disable-next-line react-hooks/incompatible-library
@@ -35,35 +44,28 @@ export function ChangePasswordPage() {
     }
   }, [isAuthenticated, navigate])
 
-  const onSubmit = async ({ new_password }) => {
+  const onSubmit = async ({ current_password, new_password }) => {
     setSubmitError("")
 
     try {
-      // For first-login password change, use the temporary password stored during login
-      // For normal password change, temporaryPassword will be null and the UI should
-      // have a field for current password (not implemented yet as this is first-login flow)
-      const currentPassword = mustChangePassword && temporaryPassword ? temporaryPassword : ""
-      
-      if (!currentPassword && mustChangePassword) {
+      // current_password is now either from the form input or pre-filled from navigation state
+      if (!current_password) {
         setSubmitError(t("auth.missingCurrentPassword", { 
-          defaultValue: "Unable to change password. Please log in again." 
+          defaultValue: "Current password is required." 
         }))
-        // Clear auth and redirect to login
-        await logout()
-        navigate("/login", { replace: true })
         return
       }
 
       await changePassword({
-        current_password: currentPassword,
+        current_password: current_password,
         new_password: new_password,
       })
 
-      // Clear the temporary password after successful change
-      clearTemporaryPassword()
+      // Clear the mustChangePassword flag after successful change
+      clearMustChangePassword()
 
       // After successful password change, logout and redirect to login
-      // This clears the mustChangePassword flag and forces re-authentication
+      // This clears auth state and forces re-authentication
       await logout()
       navigate("/login", { 
         replace: true,
@@ -93,6 +95,17 @@ export function ChangePasswordPage() {
             {submitError}
           </div>
         )}
+
+        <Input
+          type="password"
+          label={t("auth.currentPassword", { defaultValue: "Current Password" })}
+          autoComplete="current-password"
+          required
+          errorText={errors.current_password?.message}
+          {...register("current_password", {
+            required: t("validation.required"),
+          })}
+        />
 
         <Input
           type="password"
