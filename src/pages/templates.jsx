@@ -1,8 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
-import { Eye, FileText, Plus, Power, Trash2 } from "lucide-react";
+import { FileText, Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Table } from "../components/data-display/table";
 import { EmptyState } from "../components/layout/empty-state";
 import { Pagination } from "../components/navigation/pagination";
 import {
@@ -51,15 +50,6 @@ function getErrorMessage(t, error) {
   }
   if (error?.status >= 500) return t("templates.errors.server");
   return error?.message || t("templates.errors.generic");
-}
-
-function statusBadge(t, template) {
-  const active = getTemplateIsActive(template);
-  return (
-    <Badge variant={active ? "success" : "employee"} shape="pill">
-      {active ? t("templates.active") : t("templates.inactive")}
-    </Badge>
-  );
 }
 
 function TemplatesLoading() {
@@ -146,87 +136,6 @@ export function TemplatesPage() {
     [documentTypeFilter, filteredTemplates],
   );
 
-  const columns = useMemo(
-    () => [
-      {
-        title: t("templates.columns.name"),
-        key: "name",
-        render: (_value, row) => (
-          <div className="flex min-w-0 items-center gap-2">
-            <FileText
-              className="h-4 w-4 shrink-0 text-(--legal-primary)"
-              aria-hidden="true"
-            />
-            <span className="truncate font-medium">{getTemplateName(row)}</span>
-          </div>
-        ),
-      },
-      {
-        title: t("templates.columns.documentType"),
-        key: "document_type",
-        render: (_value, row) =>
-          t(getDocumentTypeLabelKey(getTemplateDocumentType(row))),
-      },
-      {
-        title: t("templates.columns.status"),
-        key: "is_active",
-        render: (_value, row) => statusBadge(t, row),
-      },
-      {
-        title: t("templates.columns.actions"),
-        key: "actions",
-        render: (_value, row) => {
-          const templateId = getTemplateId(row);
-          const active = getTemplateIsActive(row);
-
-          return (
-            <div
-              className="flex flex-wrap items-center gap-2"
-              onClick={(event) => event.stopPropagation()}>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                disabled={!templateId}
-                onClick={() =>
-                  navigate(
-                    `/hr/templates/${encodeURIComponent(String(templateId))}/edit`,
-                  )
-                }>
-                <Eye className="h-4 w-4" aria-hidden="true" />
-                {t("templates.edit")}
-              </Button>
-              {capabilities?.canToggleActive && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  disabled={!templateId}
-                  onClick={() => setToggleTarget(row)}>
-                  <Power className="h-4 w-4" aria-hidden="true" />
-                  {active ? t("templates.deactivate") : t("templates.activate")}
-                </Button>
-              )}
-              {capabilities?.canDelete && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="text-(--status-error-fg) hover:text-(--status-error-fg)"
-                  disabled={!templateId}
-                  onClick={() => setDeleteTarget(row)}>
-                  <Trash2 className="h-4 w-4" aria-hidden="true" />
-                  {t("templates.delete")}
-                </Button>
-              )}
-            </div>
-          );
-        },
-      },
-    ],
-    [capabilities?.canDelete, capabilities?.canToggleActive, navigate, t],
-  );
-
   const confirmToggle = async () => {
     if (!toggleTarget) return;
 
@@ -262,10 +171,19 @@ export function TemplatesPage() {
       toast({ type: "success", message: t("templates.messages.deleted") });
       loadTemplates();
     } catch (err) {
+      if (import.meta.env.DEV) {
+        console.error("[TemplatesPage] Failed to delete template", {
+          templateId: getTemplateId(deleteTarget),
+          status: err?.status ?? err?.response?.status,
+          code: err?.code ?? err?.response?.data?.error?.code,
+          message: err?.message,
+          response: err?.response?.data,
+        });
+      }
+
       toast({
         type: "error",
-        message: t("common.error"),
-        description: getErrorMessage(t, err),
+        message: t("templates.errors.deleteFailed"),
       });
     } finally {
       setIsMutating(false);
