@@ -389,7 +389,13 @@ export function TemplateEditorPage({ mode = "create" }) {
   };
 
   const handleGenerateClauses = async () => {
-    if (!templateId) return;
+    if (!templateId) {
+      setGenerationError(
+        t("templates.errors.templateIdRequired") ||
+          "Template ID is required to generate clauses.",
+      );
+      return;
+    }
 
     setGenerationError("");
     setIsGeneratingClauses(true);
@@ -579,23 +585,25 @@ export function TemplateEditorPage({ mode = "create" }) {
         </div>
 
         <div className="flex items-center gap-2">
-          <Button
-            type="button"
-            variant="ai"
-            size="sm"
-            onClick={() => {
-              setGenerationError("");
-              setGenerationForm(EMPTY_CLAUSE_GENERATION_FORM);
-              setGeneratedClauses([]);
-              setSelectedClauseIds([]);
-              setEditingClauseId(null);
-              setEditingDraft("");
-              setIsGenerateClauseDialogOpen(true);
-            }}
-            disabled={loading || isSubmitting}>
-            <Sparkles className="h-4 w-4" aria-hidden="true" />
-            {t("templates.generateLegalClauses")}
-          </Button>
+          {isEdit && (
+            <Button
+              type="button"
+              variant="ai"
+              size="sm"
+              onClick={() => {
+                setGenerationError("");
+                setGenerationForm(EMPTY_CLAUSE_GENERATION_FORM);
+                setGeneratedClauses([]);
+                setSelectedClauseIds([]);
+                setEditingClauseId(null);
+                setEditingDraft("");
+                setIsGenerateClauseDialogOpen(true);
+              }}
+              disabled={loading || isSubmitting}>
+              <Sparkles className="h-4 w-4" aria-hidden="true" />
+              {t("templates.generateLegalClauses")}
+            </Button>
+          )}
           <Button
             type="button"
             variant="secondary"

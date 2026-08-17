@@ -276,19 +276,11 @@ export const useAssistantStore = create((set, get) => ({
     const activeConversationId = get().activeConversationId;
     if (!activeConversationId) return null;
 
-    const pendingFields = get().pendingMissingFields?.fields || [];
-    const composedMessage = pendingFields
-      .filter((field) => {
-        const value = fieldValues?.[field.name];
-        return (
-          value !== undefined && value !== null && String(value).trim() !== ""
-        );
-      })
-      .map((field) => `${field.label} is ${fieldValues[field.name]}`)
-      .join(", ");
-
+    // Send a clean continuation message with structured field_values.
+    // The AI service will extract and merge these values into the pending operation.
+    // DO NOT send a text-based "Field is value" message as it can cause extraction failures.
     return get().sendMessage({
-      message: composedMessage || "Continue",
+      message: "Continue with the provided information",
       language,
       fieldValues,
       displayMessage,

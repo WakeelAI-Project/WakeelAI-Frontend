@@ -59,8 +59,8 @@ const Button = React.forwardRef(
       <button
         className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
-        disabled={props.disabled || isLoading}
         {...props}
+        disabled={props.disabled || isLoading}
       >
         {content}
       </button>

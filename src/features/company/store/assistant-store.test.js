@@ -178,7 +178,7 @@ describe("assistant-store", () => {
     expect(useAssistantStore.getState().conversations).toHaveLength(0);
   });
 
-  it("submits a readable summary of missing fields instead of a generic continue message", async () => {
+  it("submits structured field_values with clean continuation message", async () => {
     useAssistantStore.setState({
       activeConversationId: "conv-1",
       pendingMissingFields: {
@@ -200,17 +200,48 @@ describe("assistant-store", () => {
         job_title: "Programmer",
       },
       language: "EN",
-      displayMessage: "Continue",
+      displayMessage: "Provided the requested details",
     });
 
+    // CRITICAL REGRESSION TEST: Must send structured field_values with clean message
+    // NOT text-based "Field is value" message that could cause extraction failures
     expect(serviceMocks.sendMessage).toHaveBeenCalledWith({
       conversationId: "conv-1",
-      message: "Employee Name is Ahmed, Job Title is Programmer",
+      message: "Continue with the provided information",
       language: "EN",
       fieldValues: {
         employee_name: "Ahmed",
         job_title: "Programmer",
       },
+    });
+  });
+
+  it("submitMissingFields sends structured field_values even with empty fields", async () => {
+    useAssistantStore.setState({
+      activeConversationId: "conv-1",
+      pendingMissingFields: {
+        messageId: "assistant-1",
+        fields: [
+          { name: "employee_name", label: "Employee Name" },
+        ],
+      },
+    });
+
+    serviceMocks.sendMessage.mockResolvedValueOnce(
+      assistantMessage("conv-1", "OK"),
+    );
+
+    await useAssistantStore.getState().submitMissingFields({
+      fieldValues: {},
+      language: "EN",
+      displayMessage: "Continue",
+    });
+
+    expect(serviceMocks.sendMessage).toHaveBeenCalledWith({
+      conversationId: "conv-1",
+      message: "Continue with the provided information",
+      language: "EN",
+      fieldValues: {},
     });
   });
 });
