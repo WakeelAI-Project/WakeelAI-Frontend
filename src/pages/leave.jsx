@@ -23,6 +23,7 @@ import {
   DialogFooter,
 } from "../components/overlay/dialog"
 import { ExternalLink, Eye } from "lucide-react"
+import { getImageUrl } from "../utils/get-image-url"
 
 export function LeavePage() {
   const { t } = useTranslation()
@@ -421,14 +422,14 @@ export function LeavePage() {
           <div className="flex-1 w-full h-full min-h-0 bg-(--bg-page-alt) rounded-sm overflow-hidden border border-(--border-default) mt-4 relative">
             {activeAttachmentUrl?.toLowerCase().endsWith(".pdf") ? (
               <iframe
-                src={activeAttachmentUrl}
+                src={getImageUrl(activeAttachmentUrl)}
                 title={t("leave.attachment")}
                 className="w-full h-full border-none"
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center p-4 overflow-auto">
                 <img
-                  src={activeAttachmentUrl}
+                  src={getImageUrl(activeAttachmentUrl)}
                   alt={t("leave.attachment")}
                   className="max-w-full max-h-full object-contain"
                 />
@@ -437,7 +438,7 @@ export function LeavePage() {
           </div>
           <DialogFooter className="flex-none mt-4 flex justify-between items-center w-full">
             <a
-              href={activeAttachmentUrl}
+              href={getImageUrl(activeAttachmentUrl)}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 text-xs text-(--brand-primary) hover:underline font-semibold"
