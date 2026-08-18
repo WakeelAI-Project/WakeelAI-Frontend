@@ -53,11 +53,7 @@ export async function uploadLeaveAttachment(file) {
   const formData = new FormData();
   formData.append("file", file);
 
-  const response = await api.post("/leave-requests/attachments", formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
+  const response = await api.post("/leave-requests/attachments", formData);
   
   return response.data;
 }

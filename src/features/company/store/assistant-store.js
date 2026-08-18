@@ -119,25 +119,38 @@ export const useAssistantStore = create((set, get) => ({
       retryableMessage: null,
       pendingMissingFields: null,
       progressiveMessageId: null,
+      // Clear stale targetContext immediately when switching conversations.
+      // Will be restored from the persisted conversation once history loads.
+      targetContext: null,
     });
 
     try {
       const history = await getChatHistory(conversationId);
       const messages = history.messages || [];
 
-      set((state) => ({
-        messages,
-        isLoadingHistory: false,
-        pendingMissingFields: getPendingFieldsFromMessages(messages),
-        conversations: upsertConversation(state.conversations, {
-          id: conversationId,
-          title: deriveConversationTitle(messages),
-          lastMessage: messages[messages.length - 1]?.content || "",
-          updatedAt:
-            messages[messages.length - 1]?.createdAt ||
-            new Date().toISOString(),
-        }),
-      }));
+      set((state) => {
+        // Find this conversation in the list (normalized by getConversations / upsert)
+        // to restore its persisted target employee context.
+        const existing = state.conversations.find((c) => c.id === conversationId);
+        const restoredTargetContext = existing?.targetEmployeeId
+          ? { targetEmployeeId: existing.targetEmployeeId, targetEmployeeName: existing.targetEmployeeName }
+          : null;
+
+        return {
+          messages,
+          isLoadingHistory: false,
+          pendingMissingFields: getPendingFieldsFromMessages(messages),
+          targetContext: restoredTargetContext,
+          conversations: upsertConversation(state.conversations, {
+            id: conversationId,
+            title: deriveConversationTitle(messages),
+            lastMessage: messages[messages.length - 1]?.content || "",
+            updatedAt:
+              messages[messages.length - 1]?.createdAt ||
+              new Date().toISOString(),
+          }),
+        };
+      });
     } catch (error) {
       set({
         error: normalizeAssistantError(error),

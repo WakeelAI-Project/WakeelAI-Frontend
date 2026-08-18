@@ -34,6 +34,7 @@ export function EmployeesPage() {
   const { t } = useTranslation()
   const { toast } = useToast()
   const navigate = useNavigate()
+  const { currentUser } = useApp()
 
   // ── Backend-driven state ─────────────────────────────────────────────────
   // allEmployees holds the raw list returned by the backend for the current
@@ -294,6 +295,7 @@ export function EmployeesPage() {
               onEdit={handleEditClick}
               onDeactivate={handleDeactivate}
               onAskAI={handleAskAI}
+              canAskAI={currentUser?.role === 'HR_Manager'}
               editLoading={editLoading}
               deactivating={deleting}
             />

@@ -136,14 +136,16 @@ export function MissingFieldsForm({ fields = [], isSending, onSubmit }) {
                     {t("assistant.missingFields.fileUploadPending", { defaultValue: "Uploading..." })}
                   </p>
                 )}
-                <Input
-                  type="url"
-                  label={t("assistant.missingFields.fileUrlLabel")}
-                  placeholder="https://..."
-                  value={value}
-                  errorText={errorText}
-                  onChange={(event) => setFieldValue(field.name, event.target.value)}
-                />
+                <div className="hidden">
+                  <Input
+                    type="url"
+                    label={t("assistant.missingFields.fileUrlLabel")}
+                    placeholder="https://..."
+                    value={value}
+                    errorText={errorText}
+                    onChange={(event) => setFieldValue(field.name, event.target.value)}
+                  />
+                </div>
               </div>
             );
           }
@@ -162,7 +164,13 @@ export function MissingFieldsForm({ fields = [], isSending, onSubmit }) {
       </div>
 
       <div className="mt-4 flex justify-end">
-        <Button type="submit" variant="ai" size="sm" isLoading={isSending}>
+        <Button 
+          type="submit" 
+          variant="ai" 
+          size="sm" 
+          isLoading={isSending} 
+          disabled={isSending || Object.values(uploadingFiles).some(Boolean)}
+        >
           {t("assistant.missingFields.continue")}
         </Button>
       </div>
