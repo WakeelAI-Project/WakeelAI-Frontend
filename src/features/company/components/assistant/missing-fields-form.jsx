@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from "../../../../components/ui/select";
 import { FileUpload } from "../../../../components/forms/file-upload";
+import { uploadLeaveAttachment } from "../../services/leave-service";
 
 const normalizeNumber = (value) => {
   if (value === "" || value === null || value === undefined) return "";
@@ -22,7 +23,7 @@ export function MissingFieldsForm({ fields = [], isSending, onSubmit }) {
   const { t } = useTranslation();
   const [values, setValues] = useState({});
   const [errors, setErrors] = useState({});
-  const [selectedFiles, setSelectedFiles] = useState({});
+  const [uploadingFiles, setUploadingFiles] = useState({});
 
   const initialValues = useMemo(() => (
     fields.reduce((acc, field) => {
@@ -109,15 +110,30 @@ export function MissingFieldsForm({ fields = [], isSending, onSubmit }) {
               <div key={field.id} className="flex flex-col gap-2">
                 <FileUpload
                   label={field.label}
-                  onFileDrop={(files) => {
-                    setSelectedFiles((current) => ({ ...current, [field.name]: files }));
+                  onFileDrop={async (files) => {
+                    const file = files[0];
+                    if (!file) return;
+
+                    setUploadingFiles((current) => ({ ...current, [field.name]: true }));
                     setErrors((current) => ({ ...current, [field.name]: null }));
+
+                    try {
+                      const result = await uploadLeaveAttachment(file);
+                      setFieldValue(field.name, result.attachment_url);
+                    } catch (error) {
+                      setErrors((current) => ({
+                        ...current,
+                        [field.name]: t("assistant.errors.fileUploadFailed", { defaultValue: "Failed to upload file." }),
+                      }));
+                    } finally {
+                      setUploadingFiles((current) => ({ ...current, [field.name]: false }));
+                    }
                   }}
                   className="[&>div:nth-child(2)]:h-32"
                 />
-                {selectedFiles[field.name]?.length > 0 && (
-                  <p className="text-xs text-(--text-secondary)">
-                    {t("assistant.missingFields.fileUploadPending")}
+                {uploadingFiles[field.name] && (
+                  <p className="text-xs text-(--text-secondary) animate-pulse">
+                    {t("assistant.missingFields.fileUploadPending", { defaultValue: "Uploading..." })}
                   </p>
                 )}
                 <Input

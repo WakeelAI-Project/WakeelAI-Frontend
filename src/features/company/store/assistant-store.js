@@ -23,6 +23,7 @@ const initialState = {
   pendingMissingFields: null,
   progressiveMessageId: null,
   conversationListStatus: CONVERSATION_LIST_STATUS.READY,
+  targetContext: null,
 };
 
 const deriveConversationTitle = (messages, fallback) => {
@@ -99,7 +100,12 @@ export const useAssistantStore = create((set, get) => ({
       pendingMissingFields: null,
       progressiveMessageId: null,
       isLoadingHistory: false,
+      targetContext: null,
     });
+  },
+
+  setTargetContext: (targetContext) => {
+    set({ targetContext });
   },
 
   selectConversation: async (conversationId) => {
@@ -178,7 +184,9 @@ export const useAssistantStore = create((set, get) => ({
     appendUserMessage = true,
   }) => {
     const trimmedMessage = message?.trim() || "";
-    const hasFieldValues = fieldValues && Object.keys(fieldValues).length > 0;
+    const targetContext = get().targetContext;
+    const finalFieldValues = { ...fieldValues, ...targetContext };
+    const hasFieldValues = finalFieldValues && Object.keys(finalFieldValues).length > 0;
 
     if (get().isSending || (!trimmedMessage && !hasFieldValues)) {
       return null;
@@ -219,7 +227,7 @@ export const useAssistantStore = create((set, get) => ({
         conversationId: activeConversationId,
         message: trimmedMessage,
         language,
-        fieldValues,
+        fieldValues: finalFieldValues,
       });
 
       const nextConversationId =
