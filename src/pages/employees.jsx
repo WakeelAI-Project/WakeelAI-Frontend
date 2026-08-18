@@ -1,4 +1,4 @@
-import React, {
+import {
   useCallback,
   useDeferredValue,
   useEffect,
@@ -6,6 +6,7 @@ import React, {
   useState,
   useTransition,
 } from "react"
+import { useNavigate } from "react-router"
 import { Plus } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { EmployeeTable } from "../features/company/components/employee-table"
@@ -32,6 +33,8 @@ const PAGE_SIZE = 20
 export function EmployeesPage() {
   const { t } = useTranslation()
   const { toast } = useToast()
+  const navigate = useNavigate()
+  const { currentUser } = useApp()
 
   // ── Backend-driven state ─────────────────────────────────────────────────
   // allEmployees holds the raw list returned by the backend for the current
@@ -216,6 +219,15 @@ export function EmployeesPage() {
     toast({ type: "success", message: t("employees.updateSuccess") })
   }
 
+  const handleAskAI = useCallback((row) => {
+    navigate("/assistant", {
+      state: {
+        targetEmployeeId: row.record_id,
+        targetEmployeeName: row.full_name
+      }
+    })
+  }, [navigate])
+
   // ── Render ────────────────────────────────────────────────────────────────
   return (
     <PageShell
@@ -282,6 +294,8 @@ export function EmployeesPage() {
               employees={pagedEmployees}
               onEdit={handleEditClick}
               onDeactivate={handleDeactivate}
+              onAskAI={handleAskAI}
+              canAskAI={currentUser?.role === 'HR_Manager'}
               editLoading={editLoading}
               deactivating={deleting}
             />

@@ -285,6 +285,8 @@ export function normalizeConversationDto(rawConversation) {
     lastMessage: "",
     createdAt,
     updatedAt,
+    targetEmployeeId: rawConversation.targetEmployeeId || null,
+    targetEmployeeName: rawConversation.targetEmployeeName || null,
   };
 }
 

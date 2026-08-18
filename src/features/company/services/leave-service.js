@@ -40,3 +40,21 @@ export async function updateLeaveRequest(requestId, status, hrNote) {
   return response.data;
 }
 
+/**
+ * Upload a medical report attachment for sick leave.
+ *
+ * POST /leave-requests/attachments
+ * Body: multipart/form-data
+ *
+ * @param {File} file
+ * @returns {Promise<object>} { attachment_url: string }
+ */
+export async function uploadLeaveAttachment(file) {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const response = await api.post("/leave-requests/attachments", formData);
+  
+  return response.data;
+}
+

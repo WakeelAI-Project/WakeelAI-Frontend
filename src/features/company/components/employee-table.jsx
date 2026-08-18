@@ -1,5 +1,5 @@
 import React from "react"
-import { Pencil, Trash2 } from "lucide-react"
+import { Pencil, Trash2, MessageSquare } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { Table } from "../../../components/data-display/table"
 import { Badge } from "../../../components/ui/badge"
@@ -11,7 +11,7 @@ function statusVariant(status) {
   return "employee"
 }
 
-export function EmployeeTable({ employees = [], onEdit = () => {}, onDeactivate = () => {}, editLoading = false, deactivating = false }) {
+export function EmployeeTable({ employees = [], onEdit = () => {}, onDeactivate = () => {}, onAskAI = () => {}, canAskAI = false, editLoading = false, deactivating = false }) {
   const { t } = useTranslation()
 
   const columns = [
@@ -43,6 +43,18 @@ export function EmployeeTable({ employees = [], onEdit = () => {}, onDeactivate 
             <Pencil className="h-4 w-4" aria-hidden="true" />
             {t("employees.editActionShort")}
           </Button>
+          {canAskAI && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => onAskAI(row)}
+              aria-label={t("employees.askAiAction", { name: row.full_name })}
+            >
+              <MessageSquare className="h-4 w-4" aria-hidden="true" />
+              {t("employees.askAiActionShort")}
+            </Button>
+          )}
           {row.employment_status === "Active" && (
             <Button
               type="button"

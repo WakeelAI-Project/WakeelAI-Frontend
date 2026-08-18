@@ -23,6 +23,7 @@ const initialState = {
   pendingMissingFields: null,
   progressiveMessageId: null,
   conversationListStatus: CONVERSATION_LIST_STATUS.READY,
+  targetContext: null,
 };
 
 const deriveConversationTitle = (messages, fallback) => {
@@ -99,7 +100,12 @@ export const useAssistantStore = create((set, get) => ({
       pendingMissingFields: null,
       progressiveMessageId: null,
       isLoadingHistory: false,
+      targetContext: null,
     });
+  },
+
+  setTargetContext: (targetContext) => {
+    set({ targetContext });
   },
 
   selectConversation: async (conversationId) => {
@@ -113,25 +119,38 @@ export const useAssistantStore = create((set, get) => ({
       retryableMessage: null,
       pendingMissingFields: null,
       progressiveMessageId: null,
+      // Clear stale targetContext immediately when switching conversations.
+      // Will be restored from the persisted conversation once history loads.
+      targetContext: null,
     });
 
     try {
       const history = await getChatHistory(conversationId);
       const messages = history.messages || [];
 
-      set((state) => ({
-        messages,
-        isLoadingHistory: false,
-        pendingMissingFields: getPendingFieldsFromMessages(messages),
-        conversations: upsertConversation(state.conversations, {
-          id: conversationId,
-          title: deriveConversationTitle(messages),
-          lastMessage: messages[messages.length - 1]?.content || "",
-          updatedAt:
-            messages[messages.length - 1]?.createdAt ||
-            new Date().toISOString(),
-        }),
-      }));
+      set((state) => {
+        // Find this conversation in the list (normalized by getConversations / upsert)
+        // to restore its persisted target employee context.
+        const existing = state.conversations.find((c) => c.id === conversationId);
+        const restoredTargetContext = existing?.targetEmployeeId
+          ? { targetEmployeeId: existing.targetEmployeeId, targetEmployeeName: existing.targetEmployeeName }
+          : null;
+
+        return {
+          messages,
+          isLoadingHistory: false,
+          pendingMissingFields: getPendingFieldsFromMessages(messages),
+          targetContext: restoredTargetContext,
+          conversations: upsertConversation(state.conversations, {
+            id: conversationId,
+            title: deriveConversationTitle(messages),
+            lastMessage: messages[messages.length - 1]?.content || "",
+            updatedAt:
+              messages[messages.length - 1]?.createdAt ||
+              new Date().toISOString(),
+          }),
+        };
+      });
     } catch (error) {
       set({
         error: normalizeAssistantError(error),
@@ -178,7 +197,9 @@ export const useAssistantStore = create((set, get) => ({
     appendUserMessage = true,
   }) => {
     const trimmedMessage = message?.trim() || "";
-    const hasFieldValues = fieldValues && Object.keys(fieldValues).length > 0;
+    const targetContext = get().targetContext;
+    const finalFieldValues = { ...fieldValues, ...targetContext };
+    const hasFieldValues = finalFieldValues && Object.keys(finalFieldValues).length > 0;
 
     if (get().isSending || (!trimmedMessage && !hasFieldValues)) {
       return null;
@@ -219,7 +240,7 @@ export const useAssistantStore = create((set, get) => ({
         conversationId: activeConversationId,
         message: trimmedMessage,
         language,
-        fieldValues,
+        fieldValues: finalFieldValues,
       });
 
       const nextConversationId =

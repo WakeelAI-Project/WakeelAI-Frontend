@@ -191,6 +191,8 @@
     "missingDocument": "Missing document"
   },
   "employees": {
+    "askAiAction": "Ask Wakeel AI about {{name}}",
+    "askAiActionShort": "Ask AI",
     "peopleOps": "People Operations",
     "title": "Employees",
     "description": "A focused view for employee records, pay context, and compliance-sensitive profile data.",
@@ -542,7 +544,8 @@
     "chat": {
       "newTitle": "New conversation",
       "activeTitle": "Conversation",
-      "newDescription": "Send a message to start a new HR assistant conversation."
+      "newDescription": "Send a message to start a new HR assistant conversation.",
+      "askingAbout": "Asking about {{name}}"
     },
     "conversations": {
       "title": "Conversations",

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Menu, RotateCcw } from "lucide-react";
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router";
 import { useTranslation } from "react-i18next";
 import { Button } from "../../../../components/ui/button";
 import { Skeleton } from "../../../../components/ui/skeleton";
@@ -100,9 +100,13 @@ export function AssistantChat({ className }) {
   const { t } = useTranslation();
   const { language } = useLocale();
   const navigate = useNavigate();
+  const location = useLocation();
   const [composerValue, setComposerValue] = useState("");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const scrollRef = useRef(null);
+
+  const locationTargetEmployeeId = location.state?.targetEmployeeId;
+  const locationTargetEmployeeName = location.state?.targetEmployeeName;
 
   const {
     conversations,
@@ -123,6 +127,8 @@ export function AssistantChat({ className }) {
     retryLastMessage,
     markProgressiveComplete,
     deleteConversation,
+    targetContext,
+    setTargetContext,
   } = useAssistantStore();
 
   useEffect(() => {
@@ -132,6 +138,20 @@ export function AssistantChat({ className }) {
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ block: "end", behavior: "smooth" });
   }, [messages, isSending, progressiveMessageId]);
+
+  useEffect(() => {
+    if (locationTargetEmployeeId && locationTargetEmployeeName) {
+      startNewConversation();
+      setTargetContext({
+        targetEmployeeId: locationTargetEmployeeId,
+        targetEmployeeName: locationTargetEmployeeName,
+      });
+      navigate(".", { replace: true, state: {} });
+    }
+  }, [locationTargetEmployeeId, locationTargetEmployeeName, startNewConversation, setTargetContext, navigate]);
+
+  const activeConversation = conversations.find((c) => c.id === activeConversationId);
+  const currentTargetName = activeConversation?.targetEmployeeName || targetContext?.targetEmployeeName;
 
   const requestLanguage = getRequestLanguage(language);
 
@@ -193,7 +213,7 @@ export function AssistantChat({ className }) {
                 {activeConversationId ? t("assistant.chat.activeTitle") : t("assistant.chat.newTitle")}
               </h2>
               <p className="mt-0.5 truncate text-xs text-(--text-secondary)">
-                {activeConversationId || t("assistant.chat.newDescription")}
+                {currentTargetName ? t("assistant.chat.askingAbout", { name: currentTargetName }) : (activeConversationId || t("assistant.chat.newDescription"))}
               </p>
             </div>
             <div className="flex items-center gap-2">
