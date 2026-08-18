@@ -9,6 +9,7 @@ import {
 import { useNavigate } from "react-router"
 import { Plus } from "lucide-react"
 import { useTranslation } from "react-i18next"
+import { useAuth } from "../features/auth/hooks/use-auth"
 import { EmployeeTable } from "../features/company/components/employee-table"
 import { EmployeeFormModal } from "../features/company/components/employee-form-modal"
 import { listEmployees, getEmployee, deactivateEmployee } from "../features/company/services/employee-service"
@@ -34,7 +35,7 @@ export function EmployeesPage() {
   const { t } = useTranslation()
   const { toast } = useToast()
   const navigate = useNavigate()
-  const { currentUser } = useApp()
+  const { currentUser } = useAuth()
 
   // ── Backend-driven state ─────────────────────────────────────────────────
   // allEmployees holds the raw list returned by the backend for the current
@@ -220,7 +221,7 @@ export function EmployeesPage() {
   }
 
   const handleAskAI = useCallback((row) => {
-    navigate("/assistant", {
+    navigate("/hr/assistant", {
       state: {
         targetEmployeeId: row.record_id,
         targetEmployeeName: row.full_name
