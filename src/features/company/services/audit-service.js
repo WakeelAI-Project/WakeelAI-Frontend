@@ -3,12 +3,17 @@ import api from "../../../lib/api";
 function normalizeAuditLog(record) {
   if (!record) return null;
 
+  const rawUserId = record.user_id ?? record.userId ?? null;
+  const userName = record.user_name ?? record.userName ?? null;
+
   return {
     id: record.id ?? null,
     action: record.action ?? "",
     details: record.details ?? "",
-    userId: record.user_id ?? record.userId ?? null,
-    userIdDisplay: record.user_id ?? record.userId ?? "—",
+    userId: rawUserId,
+    userName,
+    // Show full name when available; fall back to GUID, then dash
+    userIdDisplay: userName || rawUserId || "—",
     createdAt: record.created_at ?? record.createdAt ?? null,
     timestamp: record.created_at ?? record.createdAt ?? null,
     resourceType: record.resource_type ?? record.resourceType ?? null,

@@ -5,6 +5,7 @@ import { Button } from "../ui/button"
 import { cn } from "../../lib/utils"
 import { useTranslation } from "react-i18next"
 import { MarkdownRenderer } from "../../features/company/components/assistant/markdown-renderer"
+import { isPredominantlyArabic } from "../../lib/text-direction"
 
 export function DocumentPreview({
   title,
@@ -21,6 +22,7 @@ export function DocumentPreview({
   const shouldShowCitationFooter = showCitationFooter ?? (isAiGenerated || Boolean(citation))
   const hasTextContent = typeof content === "string" && content.trim().length > 0
   const hasRenderableContent = hasTextContent || React.isValidElement(content)
+  const isArabicContent = hasTextContent ? isPredominantlyArabic(content) : false
 
   return (
     <div

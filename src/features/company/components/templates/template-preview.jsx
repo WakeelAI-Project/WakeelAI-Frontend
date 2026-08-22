@@ -6,6 +6,7 @@ import {
   buildTemplatePreviewSegments,
   validateTemplateContent,
 } from "../../templates/template-placeholders";
+import { isPredominantlyArabic } from "../../../../lib/text-direction";
 
 const SAMPLE_PREVIEW = {
   employee_name: "Ahmed Hassan",
@@ -26,7 +27,7 @@ export function TemplatePreview({ content }) {
     .filter((issue) => issue.type === "unknown")
     .map((issue) => issue.token);
 
-  const isArabicContent = /[\u0600-\u06FF]/.test(content);
+  const isArabicContent = isPredominantlyArabic(content);
   
   const normalizedSegments =
     segments.length > 0 ? segments : [{ type: "text", value: "" }];
