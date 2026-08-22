@@ -15,6 +15,198 @@
     "retry": "Retry",
     "unknown": "Unknown"
   },
+  "landing": {
+    "meta": {
+      "title": "Wakeel AI - AI-assisted HR for Egyptian companies",
+      "description": "Wakeel AI brings HR operations, documents, leave workflows, compliance context and AI assistance into one focused workspace."
+    },
+    "brand": {
+      "name": "Wakeel AI",
+      "tagline": "AI-assisted HR management"
+    },
+    "nav": {
+      "ariaLabel": "Landing page navigation",
+      "mobileAriaLabel": "Mobile landing page navigation",
+      "features": "Features",
+      "howItWorks": "How It Works",
+      "pricing": "Pricing",
+      "faq": "FAQ"
+    },
+    "actions": {
+      "signIn": "Sign In",
+      "getStarted": "Get Started",
+      "openMenu": "Open navigation menu",
+      "closeMenu": "Close navigation menu"
+    },
+    "hero": {
+      "eyebrow": "AI-powered HR for modern companies",
+      "headline": "Your HR assistant, grounded in Egyptian labor law.",
+      "copy": "Wakeel AI brings employee management, leave workflows, HR documents, compliance and AI assistance into one focused workspace.",
+      "preview": {
+        "workspace": "Workspace preview",
+        "assistantTitle": "Wakeel AI Assistant",
+        "assistantStatus": "Grounded HR support",
+        "question": "What should HR check before approving annual leave?",
+        "answer": "Review the request dates, current balance, internal policy and the relevant labor-law context before approval.",
+        "sourceLabel": "Compliance context",
+        "source": "Egyptian Labor Law - relevant leave and employment context surfaced for HR review.",
+        "leaveLabel": "Leave approval",
+        "leaveTitle": "Annual leave request",
+        "leaveValue": "Balance and approval state kept visible.",
+        "employeeLabel": "Employee file",
+        "employeeTitle": "Role and department",
+        "employeeValue": "Essential HR details organized in one record.",
+        "documentLabel": "Documents",
+        "documentTitle": "Contract draft",
+        "documentValue": "Template-backed drafts ready for review."
+      }
+    },
+    "value": {
+      "items": [
+        {
+          "title": "One HR workspace",
+          "description": "Employees, leave, documents and company operations stay in one focused place."
+        },
+        {
+          "title": "AI with evidence",
+          "description": "Wakeel can support HR questions while showing the sources behind its answers."
+        },
+        {
+          "title": "Built around Egyptian HR workflows",
+          "description": "Help teams work with employment processes and Egyptian labor-law context."
+        }
+      ]
+    },
+    "features": {
+      "eyebrow": "Core workspace",
+      "title": "Everything HR needs in one workspace",
+      "cards": [
+        {
+          "title": "AI HR Assistant",
+          "description": "Ask HR questions, calculate entitlements, draft documents and get answers supported by relevant sources."
+        },
+        {
+          "title": "Employee Management",
+          "description": "Keep employee records, job details, departments, employment status and essential HR information organized."
+        },
+        {
+          "title": "Leave Management",
+          "description": "Review leave requests, track balances, manage approvals and keep time-off workflows organized."
+        },
+        {
+          "title": "Compliance Support",
+          "description": "Connect HR recommendations to the Egyptian labor-law context behind them for clearer decision-making."
+        },
+        {
+          "title": "Contracts & Documents",
+          "description": "Manage employment documents, contracts, reusable templates and AI-assisted drafts from one workspace."
+        },
+        {
+          "title": "Company & Team Management",
+          "description": "Give company owners and HR teams the right workspace and role-based access for their responsibilities."
+        }
+      ]
+    },
+    "aiHighlight": {
+      "eyebrow": "Verifiable AI support",
+      "title": "AI answers you can actually verify.",
+      "copy": "Wakeel AI is intended to help HR teams move faster while surfacing supporting legal or company-policy context where it is available.",
+      "points": [
+        "Designed for HR assistance, not autonomous legal decision-making.",
+        "Keeps supporting context close to the answer.",
+        "Works alongside company owners and HR teams."
+      ],
+      "previewTitle": "AI answer preview",
+      "previewSubtitle": "For HR review",
+      "questionLabel": "Question",
+      "question": "What are the annual leave rules?",
+      "answer": "Annual leave decisions should account for the employee record, current balance, company policy and applicable Egyptian labor-law context. Review the supporting sources before taking action.",
+      "sourcesLabel": "Sources",
+      "source": "Egyptian Labor Law - relevant annual leave context. Company policy may also apply when available."
+    },
+    "howItWorks": {
+      "eyebrow": "Simple setup",
+      "title": "Get started in three steps",
+      "steps": [
+        {
+          "number": "01",
+          "title": "Create your company workspace",
+          "description": "Create the company-owner account and set up the organization."
+        },
+        {
+          "number": "02",
+          "title": "Organize your HR team",
+          "description": "Add departments, employees and authorized HR users."
+        },
+        {
+          "number": "03",
+          "title": "Let Wakeel support daily HR",
+          "description": "Manage employees, leave, documentation and HR questions from the same workspace."
+        }
+      ]
+    },
+    "pricing": {
+      "eyebrow": "One company offering",
+      "title": "Simple pricing for your company",
+      "subtitle": "Everything your HR team needs in one Wakeel AI workspace.",
+      "planTitle": "Wakeel AI company workspace",
+      "planDescription": "One complete company workspace with monthly or yearly billing.",
+      "monthly": "Monthly",
+      "yearly": "Yearly",
+      "bestValue": "Best value",
+      "perMonth": "per company / month",
+      "perYear": "per company / year",
+      "includes": [
+        "Wakeel AI Assistant",
+        "Employee management",
+        "Department management",
+        "Leave workflows",
+        "Compliance support",
+        "HR documents and templates",
+        "Company workspace",
+        "HR team access"
+      ]
+    },
+    "faq": {
+      "eyebrow": "Questions",
+      "title": "Frequently asked questions",
+      "items": [
+        {
+          "question": "What is Wakeel AI?",
+          "answer": "Wakeel AI is an AI-assisted HR workspace designed to bring HR management, documentation, compliance context and everyday HR assistance together."
+        },
+        {
+          "question": "Who is Wakeel AI for?",
+          "answer": "Wakeel AI is built for companies, company owners and HR teams that need a focused place to manage HR operations."
+        },
+        {
+          "question": "Does Wakeel AI work with Egyptian labor law?",
+          "answer": "Wakeel is designed to use Egyptian labor-law context as part of its HR assistance. It does not replace professional legal advice."
+        },
+        {
+          "question": "Can company owners and HR staff have different access?",
+          "answer": "Yes. Wakeel AI supports a role-based approach so company owners and HR staff can access the workspace responsibilities relevant to them."
+        },
+        {
+          "question": "How much does Wakeel AI cost?",
+          "answer": "Wakeel AI costs $30 per company per month or $300 per company per year."
+        }
+      ]
+    },
+    "finalCta": {
+      "eyebrow": "Ready when your team is",
+      "title": "Give your HR team a smarter workspace.",
+      "copy": "Bring employees, leave, documents, compliance and AI assistance together with Wakeel AI.",
+      "signInPrompt": "Already have an account? Sign in"
+    },
+    "footer": {
+      "ariaLabel": "Footer navigation",
+      "description": "AI-assisted HR management for modern companies.",
+      "privacy": "Privacy",
+      "terms": "Terms",
+      "copyright": "2026 Wakeel AI. All rights reserved."
+    }
+  },
   "auth": {
     "welcomeBack": "Welcome back",
     "welcomeDesc": "Sign in as the company owner or an invited HR user.",

@@ -19,6 +19,7 @@ import { DocumentReviewPage } from "./pages/document-review";
 import { DocumentsPage } from "./pages/documents";
 import { EmployeesPage } from "./pages/employees";
 import { LeavePage } from "./pages/leave";
+import { LandingPage } from "./pages/landing";
 import { LoginPage } from "./pages/auth/login";
 import { RegisterPage } from "./pages/auth/register";
 import { ForgotPasswordPage } from "./pages/auth/forgot-password";
@@ -137,13 +138,16 @@ function DashboardShell() {
 
 const router = createBrowserRouter([
   {
+    path: "/",
+    element: <LandingPage />,
+  },
+  {
     element: <GuestRoute />,
     children: [
       { path: "/login", element: <LoginPage /> },
       { path: "/register", element: <RegisterPage /> },
       { path: "/forgot-password", element: <ForgotPasswordPage /> },
       { path: "/reset-password", element: <ResetPasswordPage /> },
-      { path: "/", element: <Navigate to="/login" replace /> },
     ],
   },
   {
