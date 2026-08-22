@@ -3,8 +3,8 @@ import { AssistantChat } from "../features/company/components/assistant/assistan
 
 export function AssistantPage() {
   return (
-    <main className="flex min-h-full bg-(--bg-page) p-3 sm:p-4 lg:p-6">
-      <div className="flex min-h-[calc(100vh-8.5rem)] w-full">
+    <main className="flex min-h-full min-w-0 bg-(--bg-page) p-2 sm:p-4 lg:p-6">
+      <div className="flex min-h-[calc(100dvh-8.5rem)] w-full min-w-0">
         <AssistantChat className="w-full flex-1" />
       </div>
     </main>

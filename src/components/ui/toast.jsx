@@ -38,7 +38,7 @@ export function ToastProvider({ children }) {
   return (
     <ToastContext.Provider value={{ toast }}>
       {children}
-      <div className="fixed bottom-6 inset-s-6 z-50 flex flex-col gap-3 max-w-sm w-full select-none pointer-events-none">
+      <div className="fixed inset-x-4 bottom-4 z-50 flex w-auto max-w-sm select-none flex-col gap-3 pointer-events-none sm:inset-x-auto sm:bottom-6 sm:inset-s-6 sm:w-full">
         <AnimatePresence>
           {toasts.map((t) => {
             const Icon = toastIcons[t.type || "info"]
@@ -50,21 +50,21 @@ export function ToastProvider({ children }) {
                 exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.15 } }}
                 layout
                 className={cn(
-                  "pointer-events-auto w-full bg-(--bg-card) text-(--text-primary) rounded-md p-4 shadow-(--shadow-3) border-s-4 flex items-start gap-3 justify-between",
+                  "pointer-events-auto flex w-full items-start justify-between gap-3 rounded-md border-s-4 bg-(--bg-card) p-4 text-(--text-primary) shadow-(--shadow-3)",
                   toastBorders[t.type || "info"]
                 )}
               >
-                <div className="flex gap-3 text-start">
+                <div className="flex min-w-0 gap-3 text-start">
                   <Icon className={cn("h-5 w-5 shrink-0 mt-0.5", {
                     "text-(--status-success-fg)": t.type === "success",
                     "text-(--status-warning-fg)": t.type === "warning",
                     "text-(--status-error-fg)": t.type === "error",
                     "text-(--status-info-fg)": t.type === "info",
                   })} />
-                  <div className="flex flex-col gap-1">
-                    <span className="text-sm font-semibold">{t.message}</span>
+                  <div className="flex min-w-0 flex-col gap-1">
+                    <span className="wrap-break-word text-sm font-semibold">{t.message}</span>
                     {t.description && (
-                      <span className="text-xs text-(--text-muted) leading-relaxed">
+                      <span className="wrap-break-word text-xs leading-relaxed text-(--text-muted)">
                         {t.description}
                       </span>
                     )}

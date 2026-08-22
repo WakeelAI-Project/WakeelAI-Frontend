@@ -25,15 +25,15 @@ export function DocumentPreview({
   return (
     <div
       className={cn(
-        "relative rounded-lg border border-(--border-default) bg-paper shadow-(--shadow-1) p-8 flex flex-col gap-6 dark:bg-(--bg-card) dark:border-(--bg-card-raised) text-start min-h-150 select-none",
+        "relative flex min-h-120 flex-col gap-5 rounded-md border border-(--border-default) bg-paper p-4 text-start shadow-(--shadow-1) select-none sm:min-h-150 sm:gap-6 sm:p-8 dark:bg-(--bg-card) dark:border-(--bg-card-raised)",
         className
       )}
     >
       {/* Top action header */}
-      <div className="flex items-center justify-between border-b border-(--border-default) pb-4 dark:border-(--bg-card-raised) shrink-0">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-(--border-default) pb-4 dark:border-(--bg-card-raised) shrink-0">
+        <div className="flex min-w-0 items-center gap-2">
           <FileText className="h-5 w-5 text-(--accent-primary)" />
-          <span className="font-semibold text-base text-(--text-primary)">{title}</span>
+          <span className="wrap-break-word min-w-0 text-base font-semibold text-(--text-primary)">{title}</span>
         </div>
         <div className="flex items-center gap-2">
           {isAiGenerated && (
@@ -47,11 +47,11 @@ export function DocumentPreview({
       </div>
 
       {/* Main Document Body */}
-      <div className="flex-1 overflow-y-auto pr-2 font-serif text-sm leading-relaxed text-(--text-primary)">
+      <div className="flex-1 overflow-y-auto pe-2 font-serif text-sm leading-relaxed text-(--text-primary)">
         {hasTextContent ? (
           <MarkdownRenderer
             text={hasTextContent ? content.replace(/(^|\n)(#{1,6})(?=[^\s#])/g, '$1$2 ') : content}
-            className="document-draft-markdown space-y-4 text-sm leading-7 [&_a]:text-(--accent-primary) [&_blockquote]:border-(--border-emphasis) [&_h3]:font-sans [&_h3]:text-xl [&_h4]:font-sans [&_h4]:text-base [&_h5]:font-sans [&_h5]:text-sm [&_li]:my-1"
+            className="document-draft-markdown space-y-4 text-sm leading-7 [&_*]:[unicode-bidi:plaintext] [&_a]:text-(--accent-primary) [&_blockquote]:border-(--border-emphasis) [&_h3]:font-sans [&_h3]:text-xl [&_h4]:font-sans [&_h4]:text-base [&_h5]:font-sans [&_h5]:text-sm [&_li]:my-1"
           />
         ) : hasRenderableContent ? (
           content

@@ -59,8 +59,8 @@ export function Table({
   }
 
   return (
-    <div className={cn("w-full overflow-x-auto rounded-md border border-(--border-default) dark:border-(--bg-card-raised) bg-paper dark:bg-(--bg-card)", className)}>
-      <table className="w-full border-collapse text-sm text-start select-none">
+    <div className={cn("max-w-full overflow-x-auto rounded-md border border-(--border-default) bg-paper dark:border-(--bg-card-raised) dark:bg-(--bg-card)", className)}>
+      <table className="w-full min-w-[42rem] border-collapse text-start text-sm select-none">
         <thead className="bg-(--bg-card-raised) dark:bg-(--bg-page-alt) border-b border-(--border-default) dark:border-(--bg-card-raised)">
           <tr>
             {/* Expand indicator column */}
@@ -84,11 +84,12 @@ export function Table({
                 className={cn(
                   "px-4 py-3 font-semibold text-(--text-secondary) text-start",
                   col.sortable && "cursor-pointer hover:text-(--text-primary)",
-                  col.isNumeric && "text-end font-mono"
+                  col.isNumeric && "text-end font-mono",
+                  col.priority === "low" && "hidden md:table-cell",
                 )}
               >
-                <div className={cn("flex items-center gap-1.5", col.isNumeric && "justify-end")}>
-                  <span>{col.title}</span>
+                <div className={cn("flex min-w-0 items-center gap-1.5", col.isNumeric && "justify-end")}>
+                  <span className="min-w-0 truncate">{col.title}</span>
                   {col.sortable && <ArrowUpDown className="h-3.5 w-3.5 opacity-55" />}
                 </div>
               </th>
@@ -148,10 +149,13 @@ export function Table({
                         key={col.key}
                         className={cn(
                           "px-4 py-3.5 text-(--text-primary) text-start align-middle",
-                          col.isNumeric && "text-end font-mono tracking-tight text-xs"
+                          col.isNumeric && "text-end font-mono tracking-tight text-xs",
+                          col.priority === "low" && "hidden md:table-cell",
                         )}
                       >
-                        {col.render ? col.render(cellValue, row) : cellValue}
+                        <div className="wrap-break-word min-w-0 max-w-72">
+                          {col.render ? col.render(cellValue, row) : cellValue}
+                        </div>
                       </td>
                     )
                   })}

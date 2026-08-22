@@ -48,19 +48,19 @@ export function TemplatePreview({ content }) {
         )}
       </div>
 
-      <div className="rounded-[18px] border border-(--border-default) bg-[#f8f7f3] p-3 shadow-[0_18px_40px_rgba(16,31,61,0.08)]">
-        <div className="mx-auto max-w-190 rounded-lg border border-(--border-emphasis) bg-white p-8 shadow-inner shadow-slate-200/60">
+      <div className="rounded-md border border-(--border-default) bg-[#f8f7f3] p-2 shadow-[0_18px_40px_rgba(16,31,61,0.08)] sm:p-3">
+        <div className="mx-auto max-w-190 rounded-md border border-(--border-emphasis) bg-white p-4 shadow-inner shadow-slate-200/60 sm:p-8">
           <div className="mb-8 border-b border-slate-200 pb-6">
-            <div className="flex items-start justify-between gap-4">
-              <div>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div className="min-w-0">
                 <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-500">
                   Wakeel Company
                 </div>
-                <div className="mt-2 text-xl font-semibold text-slate-900">
+                <div className="wrap-break-word mt-2 text-lg font-semibold text-slate-900 sm:text-xl">
                   Employment Agreement
                 </div>
               </div>
-              <div className="text-right text-[11px] text-slate-500">
+              <div className="text-start text-[11px] text-slate-500 sm:text-end">
                 <div>Prepared</div>
                 <div className="mt-1 font-medium text-slate-700">
                   {SAMPLE_PREVIEW.date}

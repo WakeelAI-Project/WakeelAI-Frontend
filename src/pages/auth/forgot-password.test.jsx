@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import "@testing-library/jest-dom/vitest";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
@@ -74,7 +74,6 @@ vi.mock("../../features/auth/services/auth-service", () => {
 });
 
 import { ForgotPasswordPage } from "./forgot-password";
-import { forgotPassword } from "../../features/auth/services/auth-service";
 import { ThemeProvider } from "../../components/providers/theme-provider";
 
 describe("ForgotPasswordPage", () => {

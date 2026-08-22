@@ -10,6 +10,7 @@ import {
 import { CommandPalette } from "./components/layout/command-palette";
 import { Sidebar } from "./components/layout/sidebar";
 import { Topbar } from "./components/layout/topbar";
+import { Drawer, DrawerContent } from "./components/overlay/drawer";
 import { ThemeProvider, useTheme } from "./components/providers/theme-provider";
 import { ToastProvider, useToast } from "./components/ui/toast";
 import { AppProvider, useApp } from "./context/app-context";
@@ -19,6 +20,7 @@ import { DocumentReviewPage } from "./pages/document-review";
 import { DocumentsPage } from "./pages/documents";
 import { EmployeesPage } from "./pages/employees";
 import { LeavePage } from "./pages/leave";
+import { LandingPage } from "./pages/landing";
 import { LoginPage } from "./pages/auth/login";
 import { RegisterPage } from "./pages/auth/register";
 import { ForgotPasswordPage } from "./pages/auth/forgot-password";
@@ -51,6 +53,7 @@ function DashboardShell() {
   const { activeCompany, currentUser: defaultUser, notifications } = useApp();
   const { currentUser: authUser, logout } = useAuth();
   const [isCommandOpen, setIsCommandOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { isRtl } = useLocale();
@@ -86,8 +89,13 @@ function DashboardShell() {
     }
   };
 
+  const handleSidebarNavSelect = (navId) => {
+    setIsSidebarOpen(false);
+    navigate(`${rolePrefix}/${navId}`);
+  };
+
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-(--bg-page) text-(--text-primary)">
+    <div className="flex h-dvh w-full overflow-hidden bg-(--bg-page) text-(--text-primary)">
       <Sidebar
         activeId={activeId}
         companyName={
@@ -96,11 +104,13 @@ function DashboardShell() {
         userRole={currentUser?.role}
         rolePrefix={rolePrefix}
         onNavSelect={(navId) => navigate(`${rolePrefix}/${navId}`)}
+        className="hidden lg:flex"
       />
 
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar
           activeId={activeId}
+          onMenuClick={() => setIsSidebarOpen(true)}
           onSearchClick={() => setIsCommandOpen(true)}
           onAssistantToggle={
             isHrUser ? () => navigate(`${rolePrefix}/assistant`) : undefined
@@ -111,7 +121,7 @@ function DashboardShell() {
           rolePrefix={rolePrefix}
         />
 
-        <div className="flex items-center justify-end gap-2 border-b border-(--border-default) bg-(--bg-card-subtle) px-6 py-2">
+        <div className="flex items-center justify-end gap-2 border-b border-(--border-default) bg-(--bg-card-subtle) px-3 py-2 sm:px-4 lg:px-6">
           <button
             type="button"
             onClick={toggleDirection}
@@ -125,6 +135,21 @@ function DashboardShell() {
         </div>
       </div>
 
+      <Drawer open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
+        <DrawerContent side="start" className="w-[min(18rem,calc(100vw-2rem))] max-w-none p-0">
+          <Sidebar
+            activeId={activeId}
+            companyName={
+              (isRtl ? activeCompany?.name : activeCompany?.nameEn) || ""
+            }
+            userRole={currentUser?.role}
+            rolePrefix={rolePrefix}
+            onNavSelect={handleSidebarNavSelect}
+            className="h-full w-full border-e-0"
+          />
+        </DrawerContent>
+      </Drawer>
+
       <CommandPalette
         isOpen={isCommandOpen}
         onClose={() => setIsCommandOpen(false)}
@@ -137,13 +162,16 @@ function DashboardShell() {
 
 const router = createBrowserRouter([
   {
+    path: "/",
+    element: <LandingPage />,
+  },
+  {
     element: <GuestRoute />,
     children: [
       { path: "/login", element: <LoginPage /> },
       { path: "/register", element: <RegisterPage /> },
       { path: "/forgot-password", element: <ForgotPasswordPage /> },
       { path: "/reset-password", element: <ResetPasswordPage /> },
-      { path: "/", element: <Navigate to="/login" replace /> },
     ],
   },
   {

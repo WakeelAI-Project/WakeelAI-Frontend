@@ -12,7 +12,7 @@ export function SegmentedControl({
   return (
     <div
       className={cn(
-        "inline-flex h-10 items-center justify-center rounded-sm bg-(--bg-page-alt) p-1 text-(--text-muted) dark:bg-(--bg-card) border border-(--border-default)",
+        "inline-flex h-10 max-w-full items-center justify-start overflow-x-auto rounded-sm border border-(--border-default) bg-(--bg-page-alt) p-1 text-(--text-muted) dark:bg-(--bg-card)",
         className
       )}
     >
@@ -24,7 +24,7 @@ export function SegmentedControl({
             type="button"
             onClick={() => onChange(option.value)}
             className={cn(
-              "relative z-10 flex h-full items-center justify-center px-4 py-1.5 text-sm font-medium transition-all select-none cursor-pointer rounded-sm hover:text-(--text-primary) focus-visible:outline-none",
+              "relative z-10 flex h-full shrink-0 items-center justify-center rounded-sm px-4 py-1.5 text-sm font-medium transition-all select-none cursor-pointer hover:text-(--text-primary) focus-visible:outline-none",
               isActive ? "text-(--text-primary)" : "text-(--text-secondary)"
             )}
           >

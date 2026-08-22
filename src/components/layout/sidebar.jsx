@@ -17,7 +17,6 @@ import {
 import { cn } from "../../lib/utils";
 import { SealMark } from "../brand/seal-mark";
 import { useTranslation } from "react-i18next";
-import { useLocale } from "../../hooks/use-locale";
 
 export const NAV_ITEMS = [
   { id: "dashboard", labelKey: "sidebar.dashboard", icon: Building2 },
@@ -52,9 +51,9 @@ export function Sidebar({
   onCompanySwitch,
   userRole,
   rolePrefix = "",
+  className,
 }) {
   const { t } = useTranslation();
-  const { isRtl } = useLocale();
   const isHrManager = userRole?.toLowerCase() === "hr_manager";
 
   // Filter visible items based on role
@@ -76,14 +75,19 @@ export function Sidebar({
         );
 
   return (
-    <aside className="w-60 xl:w-66 h-screen bg-(--bg-sidebar) text-(--text-on-brand) flex flex-col justify-between select-none border-e border-(--brand-primary-hover) shrink-0">
-      <div className="p-6 flex items-center gap-3 border-b border-(--brand-primary-hover)">
+    <aside
+      className={cn(
+        "flex h-dvh w-60 shrink-0 flex-col justify-between border-e border-(--brand-primary-hover) bg-(--bg-sidebar) text-(--text-on-brand) select-none xl:w-66",
+        className,
+      )}
+    >
+      <div className="flex items-center gap-3 border-b border-(--brand-primary-hover) p-5 sm:p-6">
         <SealMark className="shrink-0" />
-        <div className="flex flex-col text-start leading-none">
-          <span className="font-display text-lg font-semibold tracking-wide">
+        <div className="flex min-w-0 flex-col text-start leading-none">
+          <span className="truncate font-display text-lg font-semibold tracking-wide">
             {t("common.appName")}
           </span>
-          <span className="text-[10px] text-(--text-muted) mt-0.5">
+          <span className="mt-0.5 truncate text-[10px] text-(--text-muted)">
             {t("common.subTitle")}
           </span>
         </div>
@@ -100,7 +104,7 @@ export function Sidebar({
               to={`${rolePrefix}/${item.id}`}
               onClick={() => onNavSelect?.(item.id)}
               className={cn(
-                "relative z-0 w-full flex items-center gap-3 overflow-hidden px-3 py-2.5 rounded-sm text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-paper select-none text-start cursor-pointer",
+                "relative z-0 flex w-full items-center gap-3 overflow-hidden rounded-sm px-3 py-2.5 text-start text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-paper select-none cursor-pointer",
                 isActive
                   ? "text-(--brand-primary)"
                   : "text-(--text-muted) hover:text-paper hover:bg-(--bg-sidebar-hover)",
@@ -113,7 +117,7 @@ export function Sidebar({
                 />
               )}
               <Icon className="relative z-10 h-5 w-5 shrink-0" />
-              <span className="relative z-10">{t(item.labelKey)}</span>
+              <span className="relative z-10 min-w-0 truncate">{t(item.labelKey)}</span>
             </NavLink>
           );
         })}
@@ -122,10 +126,10 @@ export function Sidebar({
       <div className="p-4 border-t border-(--brand-primary-hover) shrink-0">
         <button
           onClick={onCompanySwitch}
-          className="w-full flex items-center justify-between p-2 rounded-sm hover:bg-(--bg-sidebar-hover) transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-paper text-start cursor-pointer">
-          <div className="flex items-center gap-3">
+          className="flex w-full items-center justify-between rounded-sm p-2 text-start transition-colors hover:bg-(--bg-sidebar-hover) focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-paper cursor-pointer">
+          <div className="flex min-w-0 items-center gap-3">
             <Building2 className="h-5 w-5 text-(--text-muted) shrink-0" />
-            <div className="flex flex-col overflow-hidden max-w-32.5 xl:max-w-37.5">
+            <div className="flex min-w-0 max-w-32.5 flex-col overflow-hidden xl:max-w-37.5">
               <span className="text-xs font-semibold truncate text-(--text-on-brand)">
                 {companyName}
               </span>

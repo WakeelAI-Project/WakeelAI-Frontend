@@ -5,7 +5,7 @@ import { Loader2 } from "lucide-react"
 import { cn } from "../../lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-semibold transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--border-focus) disabled:pointer-events-none disabled:bg-(--bg-disabled) disabled:text-(--text-secondary) disabled:border-none select-none cursor-pointer",
+  "inline-flex max-w-full items-center justify-center gap-2 whitespace-nowrap text-sm font-semibold transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--border-focus) disabled:pointer-events-none disabled:bg-(--bg-disabled) disabled:text-(--text-secondary) disabled:border-none select-none cursor-pointer",
   {
     variants: {
       variant: {
@@ -13,6 +13,7 @@ const buttonVariants = cva(
         legal: "bg-(--official-primary) text-(--text-inverse) hover:bg-(--brand-primary-hover) active:bg-(--brand-primary-active) shadow-(--shadow-1)",
         ai: "bg-(--ai-primary) text-(--text-on-accent) hover:bg-(--accent-primary-hover) active:bg-(--accent-primary-active) shadow-(--shadow-1)",
         secondary: "bg-(--bg-card) text-(--text-primary) border border-(--border-default) hover:bg-(--bg-card-raised) active:bg-(--bg-page-alt)",
+        outline: "bg-(--bg-card) text-(--text-primary) border border-(--border-default) hover:bg-(--bg-card-raised) active:bg-(--bg-page-alt)",
         ghost: "text-(--brand-primary) hover:bg-(--bg-page-alt) active:bg-(--bg-card-raised)",
         danger: "bg-(--status-error-fg) text-(--color-paper) hover:bg-[#962e2e] active:bg-[#7a2323] shadow-sm",
         fab: "fixed bottom-6 end-6 bg-(--ai-primary) text-(--text-on-accent) hover:bg-(--accent-primary-hover) active:bg-(--accent-primary-active) shadow-(--shadow-3) z-50 rounded-2xl"
@@ -50,7 +51,7 @@ const Button = React.forwardRef(
           ref={ref}
           {...props}
         >
-          {content}
+          {children}
         </Comp>
       )
     }
