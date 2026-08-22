@@ -22,7 +22,7 @@ export function AssistantComposer({ value, onChange, onSubmit, isSending }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex items-end gap-2">
+    <form onSubmit={handleSubmit} className="flex min-w-0 items-end gap-2">
       <Textarea
         ref={textareaRef}
         value={value}
@@ -32,7 +32,7 @@ export function AssistantComposer({ value, onChange, onSubmit, isSending }) {
         aria-label={t("assistant.composerLabel")}
         rows={1}
         disabled={false}
-        className="max-h-36 min-h-11 resize-none rounded-md py-3"
+        className="max-h-36 min-h-11 min-w-0 resize-none rounded-md py-3"
       />
       <Button
         type="submit"

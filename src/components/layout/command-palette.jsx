@@ -5,7 +5,6 @@ import {
   Calendar,
   FileText,
   Search,
-  ShieldCheck,
   Sparkles,
   User,
 } from "lucide-react";

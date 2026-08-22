@@ -161,7 +161,7 @@ export function ConversationSidebar({
                               e.stopPropagation();
                               setDeleteTarget(conversation);
                             }}
-                            className="ms-2 hidden shrink-0 rounded-sm p-1 text-(--text-secondary) opacity-0 transition-opacity hover:bg-black/10 hover:text-(--status-error-fg) group-hover:block group-hover:opacity-100"
+                            className="ms-2 shrink-0 rounded-sm p-1 text-(--text-secondary) opacity-100 transition-opacity hover:bg-black/10 hover:text-(--status-error-fg) sm:opacity-0 sm:group-hover:opacity-100"
                             aria-label={t("common.delete")}>
                             <Trash2 className="h-4 w-4" />
                           </button>

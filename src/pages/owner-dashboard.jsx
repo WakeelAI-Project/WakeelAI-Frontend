@@ -112,7 +112,7 @@ export function OwnerDashboardPage() {
               pattern: { value: EMAIL_PATTERN, message: t("validation.invalidEmail") },
             })}
           />
-          <Button type="submit" variant="primary" size="lg" className="self-end cursor-pointer" isLoading={isSubmitting} loadingText={t("dashboard.sending")}>
+          <Button type="submit" variant="primary" size="lg" className="w-full cursor-pointer md:w-auto md:self-end" isLoading={isSubmitting} loadingText={t("dashboard.sending")}>
             <Send className="h-4 w-4" />
             {t("dashboard.sendInvite")}
           </Button>

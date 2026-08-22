@@ -69,7 +69,7 @@ describe("assistant-store", () => {
       conversationId: null,
       message: "What are the annual leave rules under Egyptian Labor Law?",
       language: "EN",
-      fieldValues: null,
+      fieldValues: {},
     });
     expect(useAssistantStore.getState().activeConversationId).toBe("conv-1");
     expect(
@@ -87,7 +87,7 @@ describe("assistant-store", () => {
       conversationId: "conv-1",
       message: "summarize it and write the response in arabic",
       language: "AR",
-      fieldValues: null,
+      fieldValues: {},
     });
   });
 

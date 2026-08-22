@@ -48,9 +48,11 @@ i18n.on("languageChanged", (lng) => {
   updateDocumentAttributes(lng);
 });
 
+i18n.on("initialized", () => {
+  updateDocumentAttributes(i18n.resolvedLanguage || i18n.language || "en");
+});
+
 // Run initially
-if (i18n.language) {
-  updateDocumentAttributes(i18n.language);
-}
+updateDocumentAttributes(i18n.resolvedLanguage || i18n.language || "en");
 
 export default i18n;

@@ -120,7 +120,7 @@ export function MissingFieldsForm({ fields = [], isSending, onSubmit }) {
                     try {
                       const result = await uploadLeaveAttachment(file);
                       setFieldValue(field.name, result.attachment_url);
-                    } catch (error) {
+                    } catch {
                       setErrors((current) => ({
                         ...current,
                         [field.name]: t("assistant.errors.fileUploadFailed", { defaultValue: "Failed to upload file." }),

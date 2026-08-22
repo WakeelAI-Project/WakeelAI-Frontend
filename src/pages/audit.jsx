@@ -1,14 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
   AlertTriangle,
-  ArrowUpDown,
   Clock3,
-  Filter,
   RefreshCcw,
   ShieldCheck,
   User,
 } from "lucide-react";
-import { useTranslation } from "react-i18next";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { Input } from "../components/ui/input";
@@ -57,7 +54,6 @@ function AuditLoadingState() {
 }
 
 export function AuditPage() {
-  const { t } = useTranslation();
   const [events, setEvents] = useState([]);
   const [page, setPage] = useState(1);
   const [limit] = useState(PAGE_SIZE);
@@ -204,7 +200,7 @@ export function AuditPage() {
         ) : (
           <div className="overflow-hidden rounded-md border border-(--border-default)">
             <div className="overflow-x-auto">
-              <table className="min-w-full border-collapse text-left text-sm">
+              <table className="min-w-[48rem] border-collapse text-start text-sm">
                 <thead className="bg-(--bg-card-raised) text-(--text-secondary)">
                   <tr>
                     <th className="px-4 py-3 font-semibold">Action</th>
@@ -230,7 +226,7 @@ export function AuditPage() {
                       <td className="px-4 py-3 text-(--text-primary)">
                         <div className="flex items-center gap-2">
                           <User className="h-4 w-4 text-(--text-muted)" />
-                          <span className="font-medium">
+                          <span className="wrap-break-word font-medium">
                             {event.userIdDisplay || "System"}
                           </span>
                         </div>
@@ -238,7 +234,7 @@ export function AuditPage() {
                       <td className="px-4 py-3 text-(--text-secondary)">
                         <div className="space-y-1">
                           {event.resourceType ? (
-                            <p className="font-medium text-(--text-primary)">
+                            <p className="wrap-break-word font-medium text-(--text-primary)">
                               {event.resourceType}
                             </p>
                           ) : (
@@ -247,12 +243,14 @@ export function AuditPage() {
                             </p>
                           )}
                           {event.resourceId && (
-                            <p className="text-xs">{event.resourceId}</p>
+                            <p className="wrap-break-word text-xs">{event.resourceId}</p>
                           )}
                         </div>
                       </td>
                       <td className="max-w-md px-4 py-3 text-(--text-secondary)">
+                        <div className="wrap-break-word">
                         {event.details || "No details provided."}
+                        </div>
                       </td>
                       <td className="px-4 py-3 text-(--text-secondary)">
                         <div className="flex items-center gap-2 whitespace-nowrap">

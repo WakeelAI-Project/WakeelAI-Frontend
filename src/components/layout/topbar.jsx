@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import {
+  Menu,
   Moon,
   Search,
   Settings,
@@ -14,12 +15,12 @@ import { Button } from "../ui/button";
 import { useTheme } from "../providers/theme-provider";
 import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
-import { useLocale } from "../../hooks/use-locale";
 import { useAuth } from "../../features/auth/hooks/use-auth";
 import { NAV_ITEMS } from "./sidebar";
 
 export function Topbar({
   activeId,
+  onMenuClick,
   onSearchClick,
   onAssistantToggle,
   userInitials = "MH",
@@ -31,7 +32,6 @@ export function Topbar({
   const menuRef = useRef(null);
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { isRtl } = useLocale();
   const { currentUser } = useAuth();
 
   // Check if current user is Owner (hide My Profile for owners)
@@ -52,18 +52,34 @@ export function Topbar({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const activeItem =
-    NAV_ITEMS.find((item) => item.id === activeId) || NAV_ITEMS[0];
+  const activeItem = NAV_ITEMS.find((item) => item.id === activeId);
+  const activeTitle =
+    activeItem
+      ? t(activeItem.labelKey)
+      : activeId === "account-settings"
+        ? t("topbar.accountSettingsMenu", { defaultValue: "Account Settings" })
+        : t("sidebar.dashboard");
 
   return (
-    <header className="h-16 w-full bg-(--bg-card) border-b border-(--border-default) px-6 flex items-center justify-between shrink-0">
+    <header className="flex min-h-16 w-full shrink-0 items-center justify-between gap-2 border-b border-(--border-default) bg-(--bg-card) px-3 sm:px-4 lg:px-6">
       <div className="flex min-w-0 items-center gap-3">
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={onMenuClick}
+          className="h-9 w-9 shrink-0 p-0 lg:hidden"
+          aria-label={t("topbar.openNavigation", { defaultValue: "Open navigation" })}
+          title={t("topbar.openNavigation", { defaultValue: "Open navigation" })}
+        >
+          <Menu className="h-5 w-5" aria-hidden="true" />
+        </Button>
         <h1 className="font-display text-lg font-semibold text-(--text-primary) truncate">
-          {t(activeItem.labelKey)}
+          {activeTitle}
         </h1>
       </div>
 
-      <div className="flex-1 max-w-md mx-6 hidden md:block">
+      <div className="mx-4 hidden max-w-md flex-1 md:block lg:mx-6">
         <button
           onClick={onSearchClick}
           className="w-full flex items-center justify-between px-3 h-10 rounded-sm border border-(--border-default) bg-(--bg-card-subtle) hover:bg-(--bg-card-raised) text-sm text-(--text-muted) transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-(--border-focus) cursor-pointer text-start">
@@ -77,12 +93,12 @@ export function Topbar({
         </button>
       </div>
 
-      <div className="flex items-center gap-3 select-none">
+      <div className="flex shrink-0 items-center gap-1.5 select-none sm:gap-2 lg:gap-3">
         <Button
           variant="ghost"
           size="xs"
           onClick={toggleContrast}
-          className="h-8 px-2 flex items-center gap-1.5 text-xs cursor-pointer"
+          className="h-8 px-2 text-xs cursor-pointer"
           title={t("topbar.toggleContrast")}>
           {contrast === "high" ? (
             <ToggleRight className="h-5 w-5 text-(--ai-primary)" />
@@ -128,7 +144,7 @@ export function Topbar({
 
           {showMenu && (
             <div
-              className={`absolute ${isRtl ? "left-0" : "right-0"} mt-2 w-48 rounded-sm border border-(--border-default) bg-(--bg-card) p-1 shadow-md z-50`}>
+              className="absolute end-0 z-50 mt-2 w-48 rounded-sm border border-(--border-default) bg-(--bg-card) p-1 shadow-md">
               {!isOwner && (
                 <button
                   onClick={() => {

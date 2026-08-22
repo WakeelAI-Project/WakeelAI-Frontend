@@ -113,8 +113,8 @@ export function DashboardSummaryCards({ className }) {
 
   return (
     <div className={cn("grid gap-4 sm:grid-cols-2 lg:grid-cols-4", className)}>
-      {cards.map((card) => (
-        <SummaryCard key={card.key} {...card} />
+      {cards.map(({ key, ...card }) => (
+        <SummaryCard key={key} {...card} />
       ))}
     </div>
   );

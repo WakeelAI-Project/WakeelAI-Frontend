@@ -202,12 +202,12 @@ export function AssistantChat({ className }) {
   );
 
   return (
-    <section className={cn("flex min-h-[calc(100vh-8.5rem)] flex-col overflow-hidden rounded-lg border border-(--border-default) bg-(--bg-card) shadow-(--shadow-2)", className)}>
+    <section className={cn("flex min-h-[calc(100dvh-8.5rem)] min-w-0 flex-col overflow-hidden rounded-lg border border-(--border-default) bg-(--bg-card) shadow-(--shadow-2)", className)}>
       <div className="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-[18rem_minmax(0,1fr)]">
         <div className="hidden min-h-0 lg:block">{sidebar}</div>
 
         <div className="flex min-h-0 min-w-0 flex-col">
-          <div className="flex items-center justify-between gap-3 border-b border-(--border-default) bg-(--bg-card-subtle) px-4 py-3">
+          <div className="flex flex-col gap-3 border-b border-(--border-default) bg-(--bg-card-subtle) px-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-4">
             <div className="min-w-0 text-start">
               <h2 className="truncate text-sm font-semibold text-(--text-primary)">
                 {activeConversationId ? t("assistant.chat.activeTitle") : t("assistant.chat.newTitle")}
@@ -216,18 +216,18 @@ export function AssistantChat({ className }) {
                 {currentTargetName ? t("assistant.chat.askingAbout", { name: currentTargetName }) : (activeConversationId || t("assistant.chat.newDescription"))}
               </p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex min-w-0 flex-wrap items-center gap-2">
               <Button
                 type="button"
                 variant="secondary"
                 size="sm"
-                className="lg:hidden"
+                className="min-w-0 flex-1 sm:flex-none lg:hidden"
                 onClick={() => setIsDrawerOpen(true)}
               >
                 <Menu className="h-4 w-4" />
                 {t("assistant.conversations.title")}
               </Button>
-              <Button type="button" variant="ghost" size="sm" onClick={handleNewConversation}>
+              <Button type="button" variant="ghost" size="sm" className="min-w-0 flex-1 sm:flex-none" onClick={handleNewConversation}>
                 {t("assistant.conversations.new")}
               </Button>
             </div>
@@ -239,7 +239,7 @@ export function AssistantChat({ className }) {
             ) : messages.length === 0 ? (
               <AssistantEmptyState onSelectPrompt={handlePrompt} />
             ) : (
-              <div className="flex flex-col gap-5 p-4">
+              <div className="flex min-w-0 flex-col gap-5 p-3 sm:p-4">
                 {messages.map((message) => (
                   <ChatMessage
                     key={message.id}
@@ -257,7 +257,7 @@ export function AssistantChat({ className }) {
             )}
           </div>
 
-          <div className="border-t border-(--border-default) bg-(--bg-card) p-4">
+          <div className="border-t border-(--border-default) bg-(--bg-card) p-3 sm:p-4">
             <ErrorBanner error={error} canRetry={Boolean(retryableMessage)} onRetry={retryLastMessage} />
             <AssistantComposer
               value={composerValue}
