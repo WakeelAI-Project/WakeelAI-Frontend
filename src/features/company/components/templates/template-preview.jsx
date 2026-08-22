@@ -26,6 +26,8 @@ export function TemplatePreview({ content }) {
     .filter((issue) => issue.type === "unknown")
     .map((issue) => issue.token);
 
+  const isArabicContent = /[\u0600-\u06FF]/.test(content);
+  
   const normalizedSegments =
     segments.length > 0 ? segments : [{ type: "text", value: "" }];
 
@@ -48,28 +50,31 @@ export function TemplatePreview({ content }) {
         )}
       </div>
 
-      <div className="rounded-md border border-(--border-default) bg-[#f8f7f3] p-2 shadow-[0_18px_40px_rgba(16,31,61,0.08)] sm:p-3">
-        <div className="mx-auto max-w-190 rounded-md border border-(--border-emphasis) bg-white p-4 shadow-inner shadow-slate-200/60 sm:p-8">
-          <div className="mb-8 border-b border-slate-200 pb-6">
+      <div className="rounded-md border border-(--border-default) bg-paper dark:bg-(--bg-card-raised) p-2 shadow-(--shadow-1) sm:p-3">
+        <div className="mx-auto max-w-190 rounded-md border border-(--border-emphasis) bg-white dark:bg-(--bg-card) p-4 shadow-inner shadow-slate-200/60 dark:shadow-none sm:p-8">
+          <div className="mb-8 border-b border-(--border-emphasis) pb-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0">
-                <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-500">
+                <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-(--text-muted)">
                   Wakeel Company
                 </div>
-                <div className="wrap-break-word mt-2 text-lg font-semibold text-slate-900 sm:text-xl">
+                <div className="wrap-break-word mt-2 text-lg font-semibold text-(--text-primary) sm:text-xl">
                   Employment Agreement
                 </div>
               </div>
-              <div className="text-start text-[11px] text-slate-500 sm:text-end">
+              <div className="text-start text-[11px] text-(--text-muted) sm:text-end">
                 <div>Prepared</div>
-                <div className="mt-1 font-medium text-slate-700">
+                <div className="mt-1 font-medium text-(--text-primary)">
                   {SAMPLE_PREVIEW.date}
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="space-y-5 text-[14px] leading-7 text-slate-700">
+          <div 
+            className={`space-y-5 text-[14px] leading-7 text-(--text-primary) ${isArabicContent ? 'text-right' : 'text-left'}`} 
+            dir={isArabicContent ? "rtl" : "ltr"}
+          >
             {normalizedSegments.length === 1 &&
             normalizedSegments[0].value === "" ? (
               <div className="flex min-h-48 items-center justify-center text-center text-sm text-(--text-secondary)">

@@ -65,6 +65,60 @@ const EMPTY_CLAUSE_GENERATION_FORM = {
   instruction: "",
 };
 
+const BOILERPLATE_TEMPLATES = {
+  Contract: `## Employment Contract
+
+This Employment Contract is made on {{date}} between {{company_name}} ("the Company") and {{employee_name}} ("the Employee").
+
+1. Position: The Employee is engaged as {{job_title}} in the {{department}} department.
+2. Commencement: Employment begins on {{hire_date}} under a {{contract_type}} contract.
+3. Remuneration: The Company shall pay the Employee a gross monthly salary of {{salary}} EGP.
+4. Working Hours & Leave: Working hours and leave entitlements are governed by Egyptian Labor Law (Law No. 12 of 2003).
+5. Obligations: The Employee shall perform the duties of the role diligently and maintain confidentiality of Company information.
+6. Termination: Either party may terminate this contract in accordance with the notice periods set by Egyptian Labor Law.
+
+Employee Signature: ____________________    Date: ____________________
+For the Company: ____________________       Date: ____________________`,
+
+  Warning_Letter: `## Warning Letter
+
+Date: {{date}}
+To: {{employee_name}} — {{job_title}}, {{department}}
+From: {{company_name}} — Human Resources
+
+Dear {{employee_name}},
+
+This letter serves as an official written warning regarding [describe the specific incident/conduct here].
+
+1. Nature of the issue: [Describe the policy or conduct that was violated].
+2. Expected corrective action: [State the required improvement and timeframe].
+3. Consequences: Failure to correct this matter may lead to further disciplinary action, up to and including termination, in accordance with Egyptian Labor Law.
+
+We trust you will treat this matter with the seriousness it requires.
+
+Employee Acknowledgement: ____________________    Date: ____________________
+HR Representative: ____________________            Date: ____________________`,
+
+  Termination_Letter: `## Termination Letter
+
+Date: {{date}}
+To: {{employee_name}} — {{job_title}}, {{department}}
+From: {{company_name}} — Human Resources
+
+Dear {{employee_name}},
+
+This letter is to formally notify you that your employment with {{company_name}} will be terminated effective [termination date].
+
+1. Reason for termination: [State the reason for termination].
+2. Notice period: This termination is issued in accordance with the notice period required under Egyptian Labor Law.
+3. End-of-service settlement: Your end-of-service entitlements and final salary settlement will be calculated in accordance with Egyptian Labor Law and paid on your final working day.
+4. Company property: Please return all Company property and complete the clearance/handover process.
+
+We thank you for your service and wish you success in your future endeavors.
+
+HR Representative: ____________________    Date: ____________________`,
+};
+
 const FORM_FIELDS = new Set([
   "name",
   "document_type",
@@ -259,6 +313,31 @@ export function TemplateEditorPage({ mode = "create" }) {
   const { toast } = useToast();
   const contentRef = useRef(null);
 
+  // Holds the id once the template exists (edit mode: from route; create mode: after first save)
+  const [ensuredTemplateId, setEnsuredTemplateId] = useState(templateId ?? null);
+
+  // Ensures a template row exists so clause generation (which needs an id) can run in create mode.
+  const ensureTemplatePersisted = useCallback(
+    async (values) => {
+      if (ensuredTemplateId) return ensuredTemplateId;
+      if (templateId) {
+        setEnsuredTemplateId(templateId);
+        return templateId;
+      }
+      const created = await createTemplate({
+        name: (values?.name || "Untitled template").trim(),
+        document_type: values?.document_type || "Contract",
+        content_template: values?.content_template || " ",
+        is_active: false,
+      });
+      const newId =
+        created?.template_id ?? created?.templateId ?? created?.id ?? null;
+      setEnsuredTemplateId(newId);
+      return newId;
+    },
+    [ensuredTemplateId, templateId],
+  );
+
   const [loading, setLoading] = useState(isEdit);
   const [loadError, setLoadError] = useState(null);
   const [isGenerateClauseDialogOpen, setIsGenerateClauseDialogOpen] =
@@ -282,6 +361,7 @@ export function TemplateEditorPage({ mode = "create" }) {
     setError,
     clearErrors,
     setValue,
+    getValues,
     formState: { errors, isSubmitting },
   } = useForm({ defaultValues: EMPTY_TEMPLATE_FORM });
 
@@ -389,21 +469,24 @@ export function TemplateEditorPage({ mode = "create" }) {
   };
 
   const handleGenerateClauses = async () => {
-    if (!templateId) {
-      setGenerationError(
-        t("templates.errors.templateIdRequired") ||
-          "Template ID is required to generate clauses.",
-      );
-      return;
-    }
-
     setGenerationError("");
     setIsGeneratingClauses(true);
     setGenerationPhase("context");
 
     try {
+      // Grab the current form values so we can persist a draft in create mode.
+      const currentValues = getValues();
+      const effectiveTemplateId = await ensureTemplatePersisted(currentValues);
+      if (!effectiveTemplateId) {
+        setGenerationError(
+          t("templates.errors.templateIdRequired") ||
+            "Could not prepare the template for clause generation.",
+        );
+        return;
+      }
+
       setGenerationPhase("clauses");
-      const response = await generateLegalClauses(templateId, {
+      const response = await generateLegalClauses(effectiveTemplateId, {
         language: generationForm.language,
         include_labor_law: generationForm.include_labor_law,
         include_company_policy: generationForm.include_company_policy,
@@ -539,14 +622,15 @@ export function TemplateEditorPage({ mode = "create" }) {
     };
 
     try {
-      if (isEdit) {
-        await updateTemplate(templateId, sharedPayload);
+      if (isEdit || ensuredTemplateId) {
+        await updateTemplate(templateId ?? ensuredTemplateId, sharedPayload);
         toast({ type: "success", message: t("templates.messages.updated") });
       } else {
-        await createTemplate({
+        const created = await createTemplate({
           ...sharedPayload,
           document_type: values.document_type,
         });
+        setEnsuredTemplateId(created?.template_id ?? created?.templateId ?? created?.id ?? null);
         toast({ type: "success", message: t("templates.messages.created") });
       }
 
@@ -585,7 +669,6 @@ export function TemplateEditorPage({ mode = "create" }) {
         </div>
 
         <div className="flex items-center gap-2">
-          {isEdit && (
             <Button
               type="button"
               variant="ai"
@@ -603,7 +686,6 @@ export function TemplateEditorPage({ mode = "create" }) {
               <Sparkles className="h-4 w-4" aria-hidden="true" />
               {t("templates.generateLegalClauses")}
             </Button>
-          )}
           <Button
             type="button"
             variant="secondary"
@@ -748,6 +830,47 @@ export function TemplateEditorPage({ mode = "create" }) {
                     </div>
                   )}
                 />
+              </div>
+            </section>
+
+            <section className="rounded-md border border-(--border-default) bg-(--bg-card) p-5 text-start shadow-(--shadow-1)">
+              <div className="mb-3">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-(--text-secondary)">
+                  Quick start
+                </p>
+                <h3 className="mt-1 text-sm font-semibold text-(--text-primary)">
+                  Insert standard boilerplate
+                </h3>
+              </div>
+              <div className="grid gap-2 sm:grid-cols-3">
+                {[
+                  ["Employment Contract", "Contract"],
+                  ["Warning Letter", "Warning_Letter"],
+                  ["Termination Letter", "Termination_Letter"],
+                ].map(([label, docType]) => (
+                  <Button
+                    key={docType}
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    disabled={isSubmitting}
+                    onClick={() => {
+                      if (!isEdit) {
+                        setValue("document_type", docType, {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        });
+                      }
+                      setValue("content_template", BOILERPLATE_TEMPLATES[docType], {
+                        shouldDirty: true,
+                        shouldTouch: true,
+                        shouldValidate: true,
+                      });
+                    }}
+                    className="justify-start text-left">
+                    {label}
+                  </Button>
+                ))}
               </div>
             </section>
 

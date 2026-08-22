@@ -47,7 +47,10 @@ export function DocumentPreview({
       </div>
 
       {/* Main Document Body */}
-      <div className="flex-1 overflow-y-auto pe-2 font-serif text-sm leading-relaxed text-(--text-primary)">
+      <div 
+        className={cn("flex-1 overflow-y-auto pe-2 font-serif text-sm leading-relaxed text-(--text-primary)", isArabicContent && "text-right")}
+        dir={isArabicContent ? "rtl" : "ltr"}
+      >
         {hasTextContent ? (
           <MarkdownRenderer
             text={hasTextContent ? content.replace(/(^|\n)(#{1,6})(?=[^\s#])/g, '$1$2 ') : content}
