@@ -202,7 +202,7 @@ export function AssistantChat({ className }) {
   );
 
   return (
-    <section className={cn("flex min-h-[calc(100dvh-8.5rem)] min-w-0 flex-col overflow-hidden rounded-lg border border-(--border-default) bg-(--bg-card) shadow-(--shadow-2)", className)}>
+    <section className={cn("flex h-full min-w-0 flex-col overflow-hidden rounded-lg border border-(--border-default) bg-(--bg-card) shadow-(--shadow-2)", className)}>
       <div className="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-[18rem_minmax(0,1fr)]">
         <div className="hidden min-h-0 lg:block">{sidebar}</div>
 

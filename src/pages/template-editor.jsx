@@ -19,6 +19,7 @@ import { EmptyState } from "../components/layout/empty-state";
 import { Alert } from "../components/ui/alert";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
+import { cn } from "../lib/utils";
 import { Input, Textarea } from "../components/ui/input";
 import {
   Select,
@@ -66,7 +67,8 @@ const EMPTY_CLAUSE_GENERATION_FORM = {
 };
 
 const BOILERPLATE_TEMPLATES = {
-  Contract: `## Employment Contract
+  en: {
+    Contract: `## Employment Contract
 
 This Employment Contract is made on {{date}} between {{company_name}} ("the Company") and {{employee_name}} ("the Employee").
 
@@ -80,7 +82,7 @@ This Employment Contract is made on {{date}} between {{company_name}} ("the Comp
 Employee Signature: ____________________    Date: ____________________
 For the Company: ____________________       Date: ____________________`,
 
-  Warning_Letter: `## Warning Letter
+    Warning_Letter: `## Warning Letter
 
 Date: {{date}}
 To: {{employee_name}} — {{job_title}}, {{department}}
@@ -99,7 +101,7 @@ We trust you will treat this matter with the seriousness it requires.
 Employee Acknowledgement: ____________________    Date: ____________________
 HR Representative: ____________________            Date: ____________________`,
 
-  Termination_Letter: `## Termination Letter
+    Termination_Letter: `## Termination Letter
 
 Date: {{date}}
 To: {{employee_name}} — {{job_title}}, {{department}}
@@ -117,7 +119,68 @@ This letter is to formally notify you that your employment with {{company_name}}
 We thank you for your service and wish you success in your future endeavors.
 
 HR Representative: ____________________    Date: ____________________`,
+  },
+  ar: {
+    Contract: `## عقد عمل فردي
+
+تم إبرام هذا العقد في يوم {{date}} بين كل من:
+الطرف الأول: {{company_name}} (ويشار إليها فيما بعد بـ "الشركة")
+الطرف الثاني: السيد/السيدة {{employee_name}} (ويشار إليه فيما بعد بـ "الموظف")
+
+١. المسمى الوظيفي: يعين الموظف بوظيفة {{job_title}} في قسم {{department}}.
+٢. تاريخ بدء العمل: يبدأ العمل اعتباراً من {{hire_date}} بنظام عقد {{contract_type}}.
+٣. الراتب والبدلات: تلتزم الشركة بسداد راتب شهري إجمالي قدره {{salary}} جنيه مصري.
+٤. ساعات العمل والإجازات: تخضع ساعات العمل والإجازات لأحكام قانون العمل المصري رقم 12 لسنة 2003 وتعديلاته ولائحة الشركة الداخلية.
+٥. التزامات الموظف: يتعهد الموظف بأداء مهام عمله بدقة وأمانة والحفاظ التام على سرية بيانات ومعلومات الشركة.
+٦. إنهاء العقد: يجوز لأي من الطرفين إنهاء هذا العقد وفقاً للمدد والإخطارات المحددة في قانون العمل المصري.
+
+توقيع الموظف: ____________________    التاريخ: ____________________
+عن الشركة: ____________________       التاريخ: ____________________`,
+
+    Warning_Letter: `## خطاب إنذار كتابي
+
+التاريخ: {{date}}
+إلى: {{employee_name}} — {{job_title}}، {{department}}
+من: {{company_name}} — إدارة الموارد البشرية
+
+تحية طيبة وبعد،
+
+يوجه هذا الإنذار الرسمي إليكم بشأن [اذكر الواقعة أو المخالفة المحددة هنا].
+
+١. طبيعة المخالفة: [اذكر السياسة أو السلوك المخالف وفقاً للائحة العمل].
+٢. الإجراء التصحيحي المطلوب: [حدد المطلوب تنفيذه والمهلة الزمنية الممنوحة].
+٣. الآثار المترتبة: نود التنبيه إلى أن تكرار هذا التصرف أو عدم تداركه سيعرضكم لاتخاذ إجراءات تأديبية أشد تصل إلى إنهاء التعاقد وفقاً لقانون العمل المصري رقم 12 لسنة 2003.
+
+نأمل منكم الالتزام وحسن التعاون لتفادي أي إجراءات أخرى مستقبلاً.
+
+توقيع الموظف بالعلم: ____________________    التاريخ: ____________________
+مسؤول الموارد البشرية: ____________________    التاريخ: ____________________`,
+
+    Termination_Letter: `## إخطار بإنهاء علاقة العمل
+
+التاريخ: {{date}}
+إلى: {{employee_name}} — {{job_title}}، {{department}}
+من: {{company_name}} — إدارة الموارد البشرية
+
+السيد/السيدة {{employee_name}}،
+
+نحيطكم علماً بقرار إنهاء خدمتكم لدى {{company_name}} اعتباراً من تاريخ [تاريخ إنهاء الخدمة].
+
+١. سبب إنهاء التعاقد: [اذكر سبب إنهاء الخدمة وفقاً لقانون العمل].
+٢. مهلة الإخطار: تم منحكم مهلة الإخطار القانونية المقررة وفقاً لأحكام قانون العمل المصري.
+٣. مستحقات نهاية الخدمة: سيتم تسوية كافة المستحقات المالية والرواتب المتبقية ومكافأة نهاية الخدمة وصرفها عند إتمام إخلاء الطرف.
+٤. عهد وممتلكات الشركة: يرجى تسليم كافة العهد والأجهزة والمستندات الخاصة بالشركة واستكمال إجراءات تسليم العمل.
+
+نشكركم على جهودكم خلال فترة عملكم ونتمنى لكم التوفيق في مسيرتكم المهنية.
+
+مسؤول الموارد البشرية: ____________________    التاريخ: ____________________`,
+  },
 };
+
+// Backward-compatibility aliases
+BOILERPLATE_TEMPLATES.Contract = BOILERPLATE_TEMPLATES.en.Contract;
+BOILERPLATE_TEMPLATES.Warning_Letter = BOILERPLATE_TEMPLATES.en.Warning_Letter;
+BOILERPLATE_TEMPLATES.Termination_Letter = BOILERPLATE_TEMPLATES.en.Termination_Letter;
 
 const FORM_FIELDS = new Set([
   "name",
@@ -315,6 +378,7 @@ export function TemplateEditorPage({ mode = "create" }) {
 
   // Holds the id once the template exists (edit mode: from route; create mode: after first save)
   const [ensuredTemplateId, setEnsuredTemplateId] = useState(templateId ?? null);
+  const [boilerplateLang, setBoilerplateLang] = useState("en");
 
   // Ensures a template row exists so clause generation (which needs an id) can run in create mode.
   const ensureTemplatePersisted = useCallback(
@@ -834,22 +898,57 @@ export function TemplateEditorPage({ mode = "create" }) {
             </section>
 
             <section className="rounded-md border border-(--border-default) bg-(--bg-card) p-5 text-start shadow-(--shadow-1)">
-              <div className="mb-3">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-(--text-secondary)">
-                  Quick start
-                </p>
-                <h3 className="mt-1 text-sm font-semibold text-(--text-primary)">
-                  Insert standard boilerplate
-                </h3>
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-(--text-secondary)">
+                    Quick start
+                  </p>
+                  <h3 className="mt-1 text-sm font-semibold text-(--text-primary)">
+                    Insert standard boilerplate
+                  </h3>
+                </div>
+                <div className="flex items-center gap-1 rounded-sm border border-(--border-default) bg-(--bg-page-alt) p-0.5">
+                  <button
+                    type="button"
+                    onClick={() => setBoilerplateLang("en")}
+                    className={cn(
+                      "rounded-xs px-2 py-0.5 text-xs font-medium transition-colors",
+                      boilerplateLang === "en"
+                        ? "bg-(--bg-card) text-(--text-primary) shadow-(--shadow-1)"
+                        : "text-(--text-muted) hover:text-(--text-primary)"
+                    )}
+                  >
+                    English
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setBoilerplateLang("ar")}
+                    className={cn(
+                      "rounded-xs px-2 py-0.5 text-xs font-medium transition-colors",
+                      boilerplateLang === "ar"
+                        ? "bg-(--bg-card) text-(--text-primary) shadow-(--shadow-1)"
+                        : "text-(--text-muted) hover:text-(--text-primary)"
+                    )}
+                  >
+                    العربية
+                  </button>
+                </div>
               </div>
               <div className="grid gap-2 sm:grid-cols-3">
-                {[
-                  ["Employment Contract", "Contract"],
-                  ["Warning Letter", "Warning_Letter"],
-                  ["Termination Letter", "Termination_Letter"],
-                ].map(([label, docType]) => (
+                {(boilerplateLang === "ar"
+                  ? [
+                      ["عقد عمل فردي", "Contract"],
+                      ["خطاب إنذار كتابي", "Warning_Letter"],
+                      ["إخطار بإنهاء العمل", "Termination_Letter"],
+                    ]
+                  : [
+                      ["Employment Contract", "Contract"],
+                      ["Warning Letter", "Warning_Letter"],
+                      ["Termination Letter", "Termination_Letter"],
+                    ]
+                ).map(([label, docType]) => (
                   <Button
-                    key={docType}
+                    key={`${boilerplateLang}-${docType}`}
                     type="button"
                     variant="secondary"
                     size="sm"
@@ -861,7 +960,10 @@ export function TemplateEditorPage({ mode = "create" }) {
                           shouldValidate: true,
                         });
                       }
-                      setValue("content_template", BOILERPLATE_TEMPLATES[docType], {
+                      const content =
+                        BOILERPLATE_TEMPLATES[boilerplateLang]?.[docType] ||
+                        BOILERPLATE_TEMPLATES.en[docType];
+                      setValue("content_template", content, {
                         shouldDirty: true,
                         shouldTouch: true,
                         shouldValidate: true,

@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import "@testing-library/jest-dom/vitest";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 class ResizeObserverMock {
@@ -220,5 +220,37 @@ describe("TemplateEditorPage legal clause generation", () => {
     await waitFor(() => {
       expect(mocks.generateLegalClausesMock).toHaveBeenCalledTimes(2);
     });
+  });
+
+  it("inserts English and Arabic Quick Start boilerplates and synchronizes document type", async () => {
+    render(<TemplateEditorPage mode="create" />);
+    const quickStartSection = screen.getAllByText("Quick start")[0].closest("section");
+
+    // Initial English buttons exist
+    expect(within(quickStartSection).getByRole("button", { name: "Employment Contract" })).toBeInTheDocument();
+    expect(within(quickStartSection).getByRole("button", { name: "Warning Letter" })).toBeInTheDocument();
+    expect(within(quickStartSection).getByRole("button", { name: "Termination Letter" })).toBeInTheDocument();
+
+    // English toggle button is visible
+    expect(within(quickStartSection).getByRole("button", { name: "English" })).toBeInTheDocument();
+    expect(within(quickStartSection).getByRole("button", { name: "العربية" })).toBeInTheDocument();
+
+    // Switch to Arabic
+    fireEvent.click(within(quickStartSection).getByRole("button", { name: "العربية" }));
+
+    // Arabic template buttons should now be present
+    expect(await within(quickStartSection).findByRole("button", { name: "عقد عمل فردي" })).toBeInTheDocument();
+    expect(within(quickStartSection).getByRole("button", { name: "خطاب إنذار كتابي" })).toBeInTheDocument();
+    expect(within(quickStartSection).getByRole("button", { name: "إخطار بإنهاء العمل" })).toBeInTheDocument();
+
+    // English buttons should no longer be visible when Arabic is selected
+    expect(within(quickStartSection).queryByRole("button", { name: "Employment Contract" })).not.toBeInTheDocument();
+
+    // Switch back to English
+    fireEvent.click(within(quickStartSection).getByRole("button", { name: "English" }));
+
+    // English buttons should reappear
+    expect(await within(quickStartSection).findByRole("button", { name: "Employment Contract" })).toBeInTheDocument();
+    expect(within(quickStartSection).queryByRole("button", { name: "عقد عمل فردي" })).not.toBeInTheDocument();
   });
 });
