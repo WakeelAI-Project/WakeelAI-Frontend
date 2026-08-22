@@ -30,12 +30,12 @@ export function FaqSection() {
                 value={`faq-${index}`}
               >
                 <Accordion.Header>
-                  <Accordion.Trigger className="group flex w-full items-center justify-between gap-4 px-5 py-4 text-start text-base font-semibold text-(--text-primary) outline-none">
-                    <span>{item.question}</span>
+                  <Accordion.Trigger className="group flex w-full items-center justify-between gap-4 rounded-md px-5 py-4 text-start text-base font-semibold text-(--text-primary) outline-none transition-colors hover:bg-(--bg-card-subtle) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--border-focus)">
+                    <span className="flex-1">{item.question}</span>
                     <ChevronDown className="h-4 w-4 shrink-0 text-(--text-muted) transition-transform group-data-[state=open]:rotate-180" />
                   </Accordion.Trigger>
                 </Accordion.Header>
-                <Accordion.Content className="overflow-hidden px-5 pb-5 text-sm leading-7 text-(--text-secondary) data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
+                <Accordion.Content className="overflow-hidden px-5 pb-5 text-start text-sm leading-7 text-(--text-secondary) data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
                   {item.answer}
                 </Accordion.Content>
               </Accordion.Item>
@@ -46,4 +46,3 @@ export function FaqSection() {
     </section>
   )
 }
-

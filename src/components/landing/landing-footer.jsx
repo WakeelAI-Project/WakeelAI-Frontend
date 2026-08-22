@@ -28,7 +28,10 @@ export function LandingFooter() {
     <footer className="border-t border-(--border-default) bg-(--bg-card)">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 py-8 sm:px-6 lg:flex-row lg:items-start lg:justify-between lg:px-8">
         <div className="max-w-sm">
-          <Link to="/" className="inline-flex items-center gap-3 rounded-sm">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-3 rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--border-focus)"
+          >
             <img alt="" className="h-8 w-8" src="/wakeel-logo.svg" />
             <span className="font-display text-lg font-semibold text-(--text-primary)">
               {t("landing.brand.name")}
@@ -46,7 +49,7 @@ export function LandingFooter() {
           {FOOTER_LINKS.map((item) =>
             item.route ? (
               <Link
-                className="rounded-sm hover:text-(--text-primary)"
+                className="rounded-sm hover:text-(--text-primary) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--border-focus)"
                 key={item.href}
                 to={item.href}
               >
@@ -54,7 +57,7 @@ export function LandingFooter() {
               </Link>
             ) : (
               <a
-                className="rounded-sm hover:text-(--text-primary)"
+                className="rounded-sm hover:text-(--text-primary) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--border-focus)"
                 href={item.href}
                 key={item.href}
                 onClick={(event) => handleSectionClick(event, item.href)}
@@ -73,4 +76,3 @@ export function LandingFooter() {
     </footer>
   )
 }
-

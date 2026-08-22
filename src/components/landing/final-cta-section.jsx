@@ -18,22 +18,19 @@ export function FinalCtaSection() {
         <h2 className="mt-3 font-display text-3xl font-semibold sm:text-4xl">
           {t("landing.finalCta.title")}
         </h2>
-        <p className="mx-auto mt-4 max-w-2xl text-base leading-8 text-(--text-muted)">
+        <p className="mx-auto mt-4 max-w-2xl text-base leading-8 text-(--text-on-brand) opacity-80">
           {t("landing.finalCta.copy")}
         </p>
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <Button asChild size="lg" variant="ai">
+          <Button asChild className="w-full min-w-40 sm:w-auto" size="md" variant="ai">
             <Link to="/register">
-              {t("landing.actions.getStarted")}
+              <span>{t("landing.actions.getStarted")}</span>
               <ArrowIcon className="h-4 w-4" />
             </Link>
           </Button>
-          <Link
-            className="rounded-sm px-3 py-2 text-sm font-semibold text-(--text-on-brand) underline-offset-4 hover:underline"
-            to="/login"
-          >
-            {t("landing.finalCta.signInPrompt")}
-          </Link>
+          <Button asChild className="w-full sm:w-auto" size="md" variant="secondary">
+            <Link to="/login">{t("landing.finalCta.signInPrompt")}</Link>
+          </Button>
         </div>
       </AnimatedContent>
     </section>

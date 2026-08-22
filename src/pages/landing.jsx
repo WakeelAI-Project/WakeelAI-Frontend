@@ -19,7 +19,7 @@ export function LandingPage() {
   }, [t])
 
   return (
-    <div className="min-h-screen bg-(--bg-page) text-(--text-primary)">
+    <div className="min-h-screen overflow-x-clip bg-(--bg-page) text-(--text-primary)">
       <LandingNavbar />
       <main>
         <HeroSection />
@@ -35,4 +35,3 @@ export function LandingPage() {
     </div>
   )
 }
-

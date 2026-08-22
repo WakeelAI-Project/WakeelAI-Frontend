@@ -15,6 +15,7 @@ import { Badge } from "../ui/badge"
 import { SplitText } from "../react-bits/split-text"
 import { AnimatedContent } from "../react-bits/animated-content"
 import { useLocale } from "../../hooks/use-locale"
+import { cn } from "../../lib/utils"
 
 export function HeroSection() {
   const { t, isRtl } = useLocale()
@@ -22,34 +23,44 @@ export function HeroSection() {
 
   return (
     <section className="relative overflow-hidden border-b border-(--border-default) bg-(--bg-page)">
-      <div className="mx-auto grid min-h-[calc(100vh-72px)] w-full max-w-7xl items-center gap-12 px-4 py-14 sm:px-6 sm:py-18 lg:grid-cols-[minmax(0,1fr)_minmax(380px,0.9fr)] lg:px-8 lg:py-20">
-        <div className="max-w-3xl text-start">
+      <div className="mx-auto grid w-full max-w-7xl items-center gap-10 px-4 py-12 sm:px-6 sm:py-14 lg:min-h-[720px] lg:py-16 xl:grid-cols-[minmax(0,1.02fr)_minmax(420px,0.9fr)] xl:gap-14 xl:px-8">
+        <div className="max-w-[43rem] text-start">
           <Badge className="mb-5" shape="pill" variant="ai">
             {t("landing.hero.eyebrow")}
           </Badge>
           <SplitText
-            className="font-display text-4xl font-semibold leading-[1.08] text-(--text-primary) sm:text-5xl lg:text-6xl"
+            className={cn(
+              "font-display font-semibold text-(--text-primary)",
+              isRtl
+                ? "text-[clamp(2.45rem,4.2vw,3.9rem)] leading-[1.24]"
+                : "text-[clamp(2.45rem,4.6vw,4.15rem)] leading-[1.1]",
+            )}
             splitType="words"
             tag="h1"
             text={t("landing.hero.headline")}
           />
-          <p className="mt-6 max-w-2xl text-base leading-8 text-(--text-secondary) sm:text-lg">
+          <p
+            className={cn(
+              "mt-6 max-w-[41rem] text-base text-(--text-secondary) sm:text-lg",
+              isRtl ? "leading-9" : "leading-8",
+            )}
+          >
             {t("landing.hero.copy")}
           </p>
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Button asChild size="lg" variant="ai">
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+            <Button asChild className="w-full min-w-40 sm:w-auto" size="lg" variant="primary">
               <Link to="/register">
-                {t("landing.actions.getStarted")}
+                <span>{t("landing.actions.getStarted")}</span>
                 <ArrowIcon className="h-4 w-4" />
               </Link>
             </Button>
-            <Button asChild size="lg" variant="secondary">
+            <Button asChild className="w-full min-w-32 sm:w-auto" size="lg" variant="secondary">
               <Link to="/login">{t("landing.actions.signIn")}</Link>
             </Button>
           </div>
         </div>
 
-        <AnimatedContent className="w-full" delay={0.14} distance={18}>
+        <AnimatedContent className="mx-auto w-full max-w-2xl xl:max-w-none" delay={0.14} distance={18}>
           <ProductPreview />
         </AnimatedContent>
       </div>
@@ -61,7 +72,7 @@ function ProductPreview() {
   const { t } = useLocale()
 
   return (
-    <div className="rounded-md border border-(--border-default) bg-(--bg-card) p-3 shadow-(--shadow-2)">
+    <div className="rounded-md border border-(--border-default) bg-(--bg-card) p-2 shadow-(--shadow-2) sm:p-3">
       <div className="rounded-sm border border-(--border-default) bg-(--bg-card-subtle)">
         <div className="flex items-center justify-between border-b border-(--border-default) px-4 py-3">
           <div className="flex items-center gap-2">
@@ -74,8 +85,8 @@ function ProductPreview() {
           </span>
         </div>
 
-        <div className="grid gap-3 p-4 sm:grid-cols-[1.1fr_0.9fr]">
-          <div className="flex min-h-72 flex-col rounded-sm border border-(--border-default) bg-(--bg-card) p-4">
+        <div className="grid gap-3 p-3 sm:grid-cols-[1.1fr_0.9fr] sm:p-4">
+          <div className="flex flex-col rounded-sm border border-(--border-default) bg-(--bg-card) p-4 sm:min-h-72">
             <div className="mb-4 flex items-center gap-2">
               <span className="inline-flex h-9 w-9 items-center justify-center rounded-sm bg-(--ai-surface) text-(--ai-primary)">
                 <Bot className="h-5 w-5" />
@@ -97,7 +108,7 @@ function ProductPreview() {
                 {t("landing.hero.preview.answer")}
               </div>
             </div>
-            <div className="mt-auto rounded-sm border border-(--border-default) bg-(--bg-card-subtle) p-3">
+            <div className="mt-4 rounded-sm border border-(--border-default) bg-(--bg-card-subtle) p-3 sm:mt-auto">
               <div className="mb-2 flex items-center gap-2 text-xs font-semibold text-(--text-primary)">
                 <Scale className="h-4 w-4 text-(--ai-primary)" />
                 {t("landing.hero.preview.sourceLabel")}
@@ -136,8 +147,8 @@ function ProductPreview() {
 
 function PreviewMiniCard({ icon: Icon, label, title, value }) {
   return (
-    <div className="rounded-sm border border-(--border-default) bg-(--bg-card) p-4">
-      <div className="mb-4 flex items-center justify-between gap-3">
+    <div className="rounded-sm border border-(--border-default) bg-(--bg-card) p-3 sm:p-4">
+      <div className="mb-3 flex items-center justify-between gap-3 sm:mb-4">
         <span className="inline-flex h-9 w-9 items-center justify-center rounded-sm bg-(--legal-surface) text-(--legal-primary)">
           <Icon className="h-5 w-5" />
         </span>

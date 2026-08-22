@@ -13,6 +13,7 @@ export function PricingSection() {
   const includes = t("landing.pricing.includes", { returnObjects: true })
   const includedFeatures = Array.isArray(includes) ? includes : []
   const isYearly = billing === "yearly"
+  const price = isYearly ? "$300" : "$30"
 
   return (
     <section
@@ -63,10 +64,13 @@ export function PricingSection() {
             </div>
 
             <div className="py-6">
-              <p className="flex items-end gap-2">
-                <span className="font-display text-5xl font-semibold text-(--text-primary)">
-                  {isYearly ? "$300" : "$30"}
-                </span>
+              <p className="flex flex-wrap items-end gap-x-3 gap-y-1">
+                <bdi
+                  className="font-display text-5xl font-semibold text-(--text-primary)"
+                  dir="ltr"
+                >
+                  {price}
+                </bdi>
                 <span className="pb-2 text-sm font-semibold text-(--text-secondary)">
                   {isYearly
                     ? t("landing.pricing.perYear")
@@ -86,7 +90,7 @@ export function PricingSection() {
               ))}
             </ul>
 
-            <Button asChild className="mt-6 w-full" size="lg" variant="ai">
+            <Button asChild className="mt-6 w-full" size="lg" variant="primary">
               <Link to="/register">{t("landing.actions.getStarted")}</Link>
             </Button>
           </div>
@@ -95,4 +99,3 @@ export function PricingSection() {
     </section>
   )
 }
-

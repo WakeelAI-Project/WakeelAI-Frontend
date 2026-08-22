@@ -50,7 +50,7 @@ const Button = React.forwardRef(
           ref={ref}
           {...props}
         >
-          {content}
+          {children}
         </Comp>
       )
     }
