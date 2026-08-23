@@ -377,8 +377,9 @@ export function TemplateEditorPage({ mode = "create" }) {
   const { toast } = useToast();
   const contentRef = useRef(null);
 
-  // Holds the id once the template exists (edit mode: from route; create mode: after save)
-  const [ensuredTemplateId, setEnsuredTemplateId] = useState(templateId ?? null);
+  // Holds the id once the template exists (edit mode: from route; create mode: after save).
+  // Only the setter is used today - nothing currently reads the value back.
+  const [, setEnsuredTemplateId] = useState(templateId ?? null);
   const [boilerplateLang, setBoilerplateLang] = useState("en");
 
   const [loading, setLoading] = useState(isEdit);
