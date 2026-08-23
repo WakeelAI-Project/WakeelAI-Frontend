@@ -25,12 +25,12 @@ export async function getAuditEvents({
   page = 1,
   limit = 20,
   action,
-  userId,
+  userName,
 } = {}) {
   const params = { page, limit };
 
   if (action) params.action = action;
-  if (userId) params.userId = userId;
+  if (userName) params.userName = userName;
 
   const { data } = await api.get("/AuditLogs", { params });
 

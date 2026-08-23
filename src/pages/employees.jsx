@@ -1,8 +1,7 @@
 import {
   useCallback,
-  useDeferredValue,
   useEffect,
-  useMemo,
+  useRef,
   useState,
   useTransition,
 } from "react"
@@ -31,26 +30,27 @@ import { PageShell } from "./page-shell"
 
 const PAGE_SIZE = 20
 
+// How long to wait after the user stops typing before firing an API search request.
+const SEARCH_DEBOUNCE_MS = 300
+
 export function EmployeesPage() {
   const { t } = useTranslation()
   const { toast } = useToast()
   const navigate = useNavigate()
   const { currentUser } = useAuth()
 
-  // ── Backend-driven state ─────────────────────────────────────────────────
-  // allEmployees holds the raw list returned by the backend for the current
-  // status filter and page. Search never triggers a new API call.
-  const [allEmployees, setAllEmployees] = useState([])
-  const [backendTotal, setBackendTotal] = useState(0)
+  // ── Server-driven state ──────────────────────────────────────────────────
+  const [employees, setEmployees] = useState([])
+  const [total, setTotal] = useState(0)
+  const [page, setPage] = useState(1)
   const [statusFilter, setStatusFilter] = useState("all")
-  const [backendPage, setBackendPage] = useState(1)
 
-  // ── Client-side search state ─────────────────────────────────────────────
-  // searchQuery drives the local filter; useDeferredValue keeps the UI
-  // responsive while the (synchronous) filter runs.
+  // ── Search state — debounced before it hits the backend ──────────────────
+  // searchQuery is the live input value (updated on every keystroke).
+  // committedSearch is what was actually sent to the backend (updated after debounce).
   const [searchQuery, setSearchQuery] = useState("")
-  const [searchPage, setSearchPage] = useState(1)
-  const deferredSearchQuery = useDeferredValue(searchQuery)
+  const [committedSearch, setCommittedSearch] = useState("")
+  const debounceTimerRef = useRef(null)
 
   // ── UI state ─────────────────────────────────────────────────────────────
   const [departments, setDepartments] = useState([])
@@ -62,65 +62,32 @@ export function EmployeesPage() {
   const [deleting, setDeleting] = useState(false)
   const [isPending, startTransition] = useTransition()
 
-  // ── Derived: client-side search ──────────────────────────────────────────
-  // filteredEmployees is computed from allEmployees without any API call.
-  // Runs only when allEmployees or deferredSearchQuery changes.
-  const filteredEmployees = useMemo(() => {
-    const q = deferredSearchQuery.trim().toLowerCase()
-    if (!q) return allEmployees
-
-    return allEmployees.filter((emp) => {
-      const name   = (emp.full_name         ?? "").toLowerCase()
-      const job    = (emp.job_title         ?? "").toLowerCase()
-      const dept   = (emp.department        ?? "").toLowerCase()
-      const status = (emp.employment_status ?? "").toLowerCase()
-      return (
-        name.includes(q)   ||
-        job.includes(q)    ||
-        dept.includes(q)   ||
-        status.includes(q)
-      )
-    })
-  }, [allEmployees, deferredSearchQuery])
-
-  // ── Derived: pagination ──────────────────────────────────────────────────
-  // When searching: paginate the filtered list on the frontend.
-  // When not searching: use the backend's total for the page count.
-  const isSearchActive = deferredSearchQuery.trim().length > 0
-
-  const displayedPage  = isSearchActive ? searchPage  : backendPage
-  const displayedTotal = isSearchActive ? filteredEmployees.length : backendTotal
-  const totalPages     = displayedTotal > 0 ? Math.ceil(displayedTotal / PAGE_SIZE) : 0
-
-  const pagedEmployees = useMemo(() => {
-    if (!isSearchActive) return filteredEmployees        // already paged by backend
-    const start = (searchPage - 1) * PAGE_SIZE
-    return filteredEmployees.slice(start, start + PAGE_SIZE)
-  }, [filteredEmployees, isSearchActive, searchPage])
-
-  // ── Data fetching ────────────────────────────────────────────────────────
-  // Only fires when statusFilter or backendPage changes — never on search.
+  // ── Data fetching ─────────────────────────────────────────────────────────
+  // Fires when statusFilter, page, or committedSearch changes.
+  // Search is forwarded to the backend so it filters the FULL dataset before
+  // pagination is applied — client-side filtering has been removed.
   const loadEmployees = useCallback(async () => {
     setLoading(true)
     setError(null)
 
     try {
       const response = await listEmployees({
-        page:   backendPage,
+        page,
         limit:  PAGE_SIZE,
         status: statusFilter === "all" ? undefined : statusFilter,
+        search: committedSearch || undefined,
       })
 
-      setAllEmployees(response.data  ?? [])
-      setBackendTotal(response.total ?? 0)
+      setEmployees(response.data  ?? [])
+      setTotal(response.total ?? 0)
     } catch {
-      setAllEmployees([])
-      setBackendTotal(0)
+      setEmployees([])
+      setTotal(0)
       setError(t("employees.loadError"))
     } finally {
       setLoading(false)
     }
-  }, [backendPage, statusFilter, t])
+  }, [page, statusFilter, committedSearch, t])
 
   useEffect(() => {
     loadEmployees()
@@ -149,31 +116,37 @@ export function EmployeesPage() {
     return () => { ignore = true }
   }, [t, toast])
 
+  // ── Derived: pagination ───────────────────────────────────────────────────
+  const totalPages = total > 0 ? Math.ceil(total / PAGE_SIZE) : 0
+
   // ── Handlers ─────────────────────────────────────────────────────────────
   const handleStatusChange = (value) => {
     startTransition(() => {
       setStatusFilter(value)
-      setBackendPage(1)
-      // Reset search pagination too so results start from page 1
-      setSearchPage(1)
+      setPage(1)
     })
   }
 
   const handleSearchChange = useCallback((event) => {
     const value = event.target.value
-    startTransition(() => {
-      setSearchQuery(value)
-      setSearchPage(1)   // always restart filtered pagination from page 1
-    })
+    setSearchQuery(value)
+
+    // Debounce: wait for the user to stop typing before sending to the backend
+    if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current)
+    debounceTimerRef.current = setTimeout(() => {
+      startTransition(() => {
+        setCommittedSearch(value)
+        setPage(1)   // always restart from page 1 when search changes
+      })
+    }, SEARCH_DEBOUNCE_MS)
   }, [])
 
+  // Clean up the debounce timer on unmount
+  useEffect(() => () => { if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current) }, [])
+
   const handlePageChange = useCallback((newPage) => {
-    if (isSearchActive) {
-      setSearchPage(newPage)
-    } else {
-      setBackendPage(newPage)
-    }
-  }, [isSearchActive])
+    setPage(newPage)
+  }, [])
 
   const handleDeactivate = useCallback(async (employee) => {
     setDeleting(true)
@@ -283,7 +256,7 @@ export function EmployeesPage() {
             title={t("employees.loadError")}
             description={t("employees.loadErrorDescription")}
           />
-        ) : pagedEmployees.length === 0 ? (
+        ) : employees.length === 0 ? (
           <EmptyState
             illustrationType="folder"
             title={t("employees.emptyTitle")}
@@ -292,7 +265,7 @@ export function EmployeesPage() {
         ) : (
           <>
             <EmployeeTable
-              employees={pagedEmployees}
+              employees={employees}
               onEdit={handleEditClick}
               onDeactivate={handleDeactivate}
               onAskAI={handleAskAI}
@@ -304,10 +277,10 @@ export function EmployeesPage() {
             {totalPages > 1 && (
               <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-between">
                 <p className="text-xs text-(--text-secondary)">
-                  {t("employees.pageSummary", { page: displayedPage, totalPages, total: displayedTotal })}
+                  {t("employees.pageSummary", { page, totalPages, total })}
                 </p>
                 <Pagination
-                  currentPage={displayedPage}
+                  currentPage={page}
                   totalPages={totalPages}
                   onPageChange={handlePageChange}
                 />

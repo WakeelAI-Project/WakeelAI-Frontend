@@ -8,11 +8,11 @@
  *   POST /users/invite            — ✅ Implemented
  *   GET  /users                   — ✅ Implemented (query: role, page, limit)
  *   PATCH /users/{userId}/status  — ✅ Implemented
- *   GET  /employees               — ✅ Implemented (query: page, limit, status)
+ *   GET  /employees               — ✅ Implemented (query: page, limit, status, search)
  *   GET  /employees/:id           — ✅ Implemented
  *
- * Note: GET /employees does NOT support a search query parameter.
- * Search is handled entirely on the frontend in employees.jsx.
+ * Note: GET /employees supports server-side search via the `search` query parameter.
+ * The backend filters by full_name and email before applying pagination.
  */
 
 import api from "../../../lib/api";
@@ -384,19 +384,23 @@ export async function updateEmployee(recordId, payload) {
  * Fetch a paginated list of employees.
  *
  * GET /api/employees
- * Supported query params: page, limit, status
+ * Supported query params: page, limit, status, search
  *
- * Search is NOT forwarded to the backend — it is handled entirely
- * on the frontend in employees.jsx using a useMemo filter.
+ * The backend filters by full_name and email (case-insensitive, partial match)
+ * BEFORE applying pagination, so search is server-side and covers all employees.
  *
- * @param {{ page?: number, limit?: number, status?: "Active" | "Inactive" }} params
+ * @param {{ page?: number, limit?: number, status?: "Active" | "Inactive", search?: string }} params
  * @returns {Promise<{ data: Array, page: number, total: number }>}
  */
-export async function listEmployees({ page = 1, limit = 20, status } = {}) {
+export async function listEmployees({ page = 1, limit = 20, status, search } = {}) {
   const params = { page, limit };
 
   if (status) {
     params.status = status;
+  }
+
+  if (search && search.trim()) {
+    params.search = search.trim();
   }
 
   const { data } = await api.get("/employees", { params });

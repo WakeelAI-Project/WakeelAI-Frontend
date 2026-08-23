@@ -58,7 +58,7 @@ export function AuditPage() {
   const [page, setPage] = useState(1);
   const [limit] = useState(PAGE_SIZE);
   const [actionFilter, setActionFilter] = useState("all");
-  const [userId, setUserId] = useState("");
+  const [userSearch, setUserSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [retryKey, setRetryKey] = useState(0);
   const [error, setError] = useState(null);
@@ -76,7 +76,7 @@ export function AuditPage() {
           page,
           limit,
           action: actionFilter === "all" ? undefined : actionFilter,
-          userId: userId || undefined,
+          userName: userSearch || undefined,
         });
 
         if (!isMounted) return;
@@ -99,7 +99,7 @@ export function AuditPage() {
     return () => {
       isMounted = false;
     };
-  }, [page, limit, actionFilter, userId, retryKey]);
+  }, [page, limit, actionFilter, userSearch, retryKey]);
 
   const actions = useMemo(() => {
     const unique = new Set(events.map((event) => event.action).filter(Boolean));
@@ -140,15 +140,15 @@ export function AuditPage() {
 
             <div className="w-full md:max-w-xs">
               <label className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-(--text-secondary)">
-                User ID
+                User
               </label>
               <Input
-                value={userId}
+                value={userSearch}
                 onChange={(event) => {
-                  setUserId(event.target.value);
+                  setUserSearch(event.target.value);
                   setPage(1);
                 }}
-                placeholder="Filter by user id"
+                placeholder="Filter by user"
               />
             </div>
           </div>
@@ -200,14 +200,21 @@ export function AuditPage() {
         ) : (
           <div className="overflow-hidden rounded-md border border-(--border-default)">
             <div className="overflow-x-auto">
-              <table className="min-w-[48rem] border-collapse text-start text-sm">
+              <table className="min-w-[48rem] w-full border-collapse text-start text-sm">
+                <colgroup>
+                  <col style={{ width: "18%" }} />
+                  <col style={{ width: "14%" }} />
+                  <col style={{ width: "18%" }} />
+                  <col />
+                  <col style={{ width: "18%" }} />
+                </colgroup>
                 <thead className="bg-(--bg-card-raised) text-(--text-secondary)">
                   <tr>
                     <th className="px-4 py-3 font-semibold">Action</th>
                     <th className="px-4 py-3 font-semibold">User</th>
                     <th className="px-4 py-3 font-semibold">Resource</th>
                     <th className="px-4 py-3 font-semibold">Details</th>
-                    <th className="px-4 py-3 font-semibold">Timestamp</th>
+                    <th className="px-4 py-3 font-semibold whitespace-nowrap">Timestamp</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-(--border-default) bg-(--bg-card)">
