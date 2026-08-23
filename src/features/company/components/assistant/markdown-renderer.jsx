@@ -1,10 +1,19 @@
 import React from "react";
 import ReactMarkdown from "react-markdown";
-import rehypeSanitize from "rehype-sanitize";
+import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
+import rehypeKatex from "rehype-katex";
 import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import "katex/dist/katex.min.css";
 import { cn } from "../../../../lib/utils";
 
 const SAFE_URL_PROTOCOLS = new Set(["http:", "https:", "mailto:", "tel:"]);
+
+// KaTeX (with `output: "html"`, see below) renders math as nested <span>s,
+// occasionally with <svg>/<path>/<line> for stretchy delimiters — these tags
+// aren't in rehype-sanitize's default (GFM-oriented) schema, so both the
+// sanitize schema and react-markdown's own allowlist need to admit them.
+const KATEX_TAG_NAMES = ["span", "svg", "path", "line"];
 
 const ALLOWED_MARKDOWN_ELEMENTS = [
   "a",
@@ -32,7 +41,38 @@ const ALLOWED_MARKDOWN_ELEMENTS = [
   "thead",
   "tr",
   "ul",
+  ...KATEX_TAG_NAMES,
 ];
+
+const katexSanitizeSchema = {
+  ...defaultSchema,
+  tagNames: [...(defaultSchema.tagNames || []), ...KATEX_TAG_NAMES],
+  attributes: {
+    ...defaultSchema.attributes,
+    span: ["className", "style", "ariaHidden"],
+    svg: ["xmlns", "width", "height", "viewBox", "preserveAspectRatio", "style", "className"],
+    path: ["d"],
+    line: ["x1", "x2", "y1", "y2"],
+  },
+};
+
+// The model sometimes returns LaTeX using `\[...\]` / `\(...\)` delimiters
+// instead of the `$$...$$` / `$...$` that remark-math recognizes. Convert
+// them before parsing, but never touch fenced/inline code so real code
+// samples containing backslashes or brackets aren't corrupted.
+const CODE_SEGMENT_REGEX = /(```[\s\S]*?```|`[^`\n]*`)/g;
+
+function normalizeMathDelimiters(text) {
+  return text
+    .split(CODE_SEGMENT_REGEX)
+    .map((segment, index) => {
+      if (index % 2 === 1) return segment; // code fence/span — leave untouched
+      return segment
+        .replace(/\\\[([\s\S]+?)\\\]/g, (_match, expr) => `\n\n$$${expr.trim()}$$\n\n`)
+        .replace(/\\\(([\s\S]+?)\\\)/g, (_match, expr) => `$${expr.trim()}$`);
+    })
+    .join("");
+}
 
 export function safeMarkdownUrl(value) {
   const url = String(value || "").trim();
@@ -156,16 +196,18 @@ const markdownComponents = {
 };
 
 export function MarkdownRenderer({ text, className }) {
-  const content = String(text || "").trim();
+  const raw = String(text || "").trim();
 
-  if (!content) return null;
+  if (!raw) return null;
+
+  const content = normalizeMathDelimiters(raw);
 
   return (
     <div className={cn("chat-markdown min-w-0 max-w-full space-y-3 text-sm leading-relaxed", className)}>
       <ReactMarkdown
         allowedElements={ALLOWED_MARKDOWN_ELEMENTS}
-        rehypePlugins={[rehypeSanitize]}
-        remarkPlugins={[remarkGfm]}
+        rehypePlugins={[[rehypeKatex, { output: "html", throwOnError: false, strict: false }], [rehypeSanitize, katexSanitizeSchema]]}
+        remarkPlugins={[remarkGfm, remarkMath]}
         skipHtml
         unwrapDisallowed
         urlTransform={safeMarkdownUrl}

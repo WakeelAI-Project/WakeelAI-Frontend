@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
 
 import "@testing-library/jest-dom/vitest";
-import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 class ResizeObserverMock {
   observe() {}
@@ -52,6 +52,11 @@ vi.mock("react-i18next", () => ({
           "Retrieving legal context...",
         "templates.generateLegalClausesLoadingGenerate":
           "Generating clauses...",
+        "templates.generateLegalClausesClauseType": "Clause type",
+        "templates.generateLegalClausesClauseTypeRequired":
+          "Choose a clause type before generating.",
+        "templates.fields.documentType": "Document Type",
+        "templates.fields.content": "Content Template",
         "templates.errors.aiUnavailable":
           "AI service is currently unavailable.",
         "templates.errors.noRelevantSources":
@@ -79,6 +84,15 @@ vi.mock("../components/ui/toast", () => ({
 import { TemplateEditorPage } from "./template-editor";
 
 describe("TemplateEditorPage legal clause generation", () => {
+  // Without this, renders from earlier tests stay attached to document.body
+  // (this file doesn't use vitest's `globals` mode, so RTL's automatic
+  // afterEach cleanup never registers), and global `screen`/`within` queries
+  // can silently match a stale instance from a previous test instead of the
+  // current render.
+  afterEach(() => {
+    cleanup();
+  });
+
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.getTemplateMock.mockResolvedValue({
@@ -252,5 +266,45 @@ describe("TemplateEditorPage legal clause generation", () => {
     // English buttons should reappear
     expect(await within(quickStartSection).findByRole("button", { name: "Employment Contract" })).toBeInTheDocument();
     expect(within(quickStartSection).queryByRole("button", { name: "عقد عمل فردي" })).not.toBeInTheDocument();
+  });
+
+  it("Quick Start inserts boilerplate above existing content instead of overwriting it", async () => {
+    const { container } = render(<TemplateEditorPage mode="create" />);
+
+    const contentTextarea = container.querySelector('textarea[name="content_template"]');
+    expect(contentTextarea).toBeTruthy();
+    fireEvent.change(contentTextarea, { target: { value: "My custom clause text." } });
+    expect(contentTextarea).toHaveValue("My custom clause text.");
+
+    const quickStartSection = screen.getAllByText("Quick start")[0].closest("section");
+    fireEvent.click(within(quickStartSection).getByRole("button", { name: "Employment Contract" }));
+
+    await waitFor(() => {
+      expect(contentTextarea.value).toContain("Employment Contract");
+    });
+    expect(contentTextarea.value).toContain("My custom clause text.");
+    // Boilerplate must come first, existing content preserved after it.
+    expect(contentTextarea.value.indexOf("Employment Contract")).toBeLessThan(
+      contentTextarea.value.indexOf("My custom clause text."),
+    );
+  });
+
+  it("requires a clause type to be selected before generating clauses", async () => {
+    render(<TemplateEditorPage mode="edit" />);
+
+    await waitFor(() => expect(mocks.getTemplateMock).toHaveBeenCalled());
+
+    fireEvent.click(
+      screen.getAllByRole("button", { name: /generate legal clauses/i })[0],
+    );
+
+    const clauseTypeSelect = await screen.findByLabelText(/clause type/i);
+    fireEvent.change(clauseTypeSelect, { target: { value: "" } });
+
+    const generateButton = await screen.findByRole("button", { name: /^generate$/i });
+    expect(generateButton).toBeDisabled();
+
+    fireEvent.click(generateButton);
+    expect(mocks.generateLegalClausesMock).not.toHaveBeenCalled();
   });
 });

@@ -96,6 +96,7 @@ export async function generateLegalClauses(templateId, payload) {
     include_labor_law: Boolean(payload?.include_labor_law),
     include_company_policy: Boolean(payload?.include_company_policy),
     instruction: payload?.instruction ?? "",
+    ...(payload?.clause_type ? { clause_type: payload.clause_type } : {}),
   };
 
   const { data } = await api.post(

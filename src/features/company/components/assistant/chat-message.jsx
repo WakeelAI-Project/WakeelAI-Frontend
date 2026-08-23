@@ -3,8 +3,6 @@ import { AlertTriangle, User } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { SealMark } from "../../../../components/brand/seal-mark";
 import { Avatar, AvatarFallback } from "../../../../components/ui/avatar";
-import { cn } from "../../../../lib/utils";
-import { useLocale } from "../../../../hooks/use-locale";
 import { AssistantSources } from "./assistant-sources";
 import { AssistantResultCard } from "./assistant-result-card";
 import { MissingFieldsForm } from "./missing-fields-form";
@@ -77,7 +75,6 @@ export function ChatMessage({
   onReviewDocument,
 }) {
   const { t } = useTranslation();
-  const { isRtl } = useLocale();
   const isAssistant = message.role === "assistant";
   const direction = ARABIC_TEXT_PATTERN.test(message.content) ? "rtl" : "ltr";
   const visibleText = useTypewriterText({
@@ -86,9 +83,16 @@ export function ChatMessage({
     onComplete: () => onProgressiveComplete?.(message.id),
   });
 
+  // The chat layout (which side each role sits on, header row order, bubble
+  // "tail" corner) is intentionally pinned to a fixed physical direction —
+  // it must match the English layout regardless of app language. Only the
+  // text *inside* each bubble follows its own detected direction (below).
+  // `justify-end`/`items-end`/etc. are logical (writing-mode relative), so
+  // without an explicit dir="ltr" here they'd silently flip under the app's
+  // dir="rtl" root when the UI language is Arabic.
   if (!isAssistant) {
     return (
-      <article className="flex w-full justify-end">
+      <article dir="ltr" className="flex w-full justify-end">
         <div className="flex max-w-[min(38rem,85%)] flex-col items-end gap-2">
           <div className="flex items-center gap-2">
             <span className="text-[11px] font-semibold text-(--text-secondary)">
@@ -102,10 +106,7 @@ export function ChatMessage({
           </div>
           <div
             dir={direction}
-            className={cn(
-              "rounded-xl border border-(--border-default) bg-(--bg-page-alt) p-4 text-(--text-primary)",
-              isRtl ? "rounded-tl-xs" : "rounded-tr-xs",
-            )}
+            className="rounded-xl border border-(--border-default) bg-(--bg-page-alt) p-4 text-(--text-primary) rounded-tr-xs"
           >
             <MarkdownRenderer text={message.content} />
           </div>
@@ -115,7 +116,7 @@ export function ChatMessage({
   }
 
   return (
-    <article className="flex w-full justify-start">
+    <article dir="ltr" className="flex w-full justify-start">
       <div className="flex max-w-[min(42rem,90%)] flex-col items-start gap-2">
         <div className="flex items-center gap-2">
           <SealMark className="h-7 w-7" iconClassName="h-2.5 w-2.5" />
@@ -126,10 +127,7 @@ export function ChatMessage({
 
         <div
           dir={direction}
-          className={cn(
-            "rounded-xl border border-(--border-emphasis) bg-(--ai-surface) p-4 text-(--text-primary) shadow-(--shadow-1)",
-            isRtl ? "rounded-tr-xs" : "rounded-tl-xs",
-          )}
+          className="rounded-xl border border-(--border-emphasis) bg-(--ai-surface) p-4 text-(--text-primary) shadow-(--shadow-1) rounded-tl-xs"
         >
           {visibleText ? (
             <MarkdownRenderer text={visibleText} />
