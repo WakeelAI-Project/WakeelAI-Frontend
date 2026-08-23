@@ -73,6 +73,7 @@ export function ChatMessage({
   onSubmitMissingFields,
   isSending,
   onReviewDocument,
+  onSendMessage,
 }) {
   const { t } = useTranslation();
   const isAssistant = message.role === "assistant";
@@ -137,7 +138,7 @@ export function ChatMessage({
         </div>
 
         <AssistantSources sources={message.sources} />
-        <AssistantResultCard card={message.resultCard} onReviewDocument={onReviewDocument} />
+        <AssistantResultCard card={message.resultCard} onReviewDocument={onReviewDocument} onSendMessage={onSendMessage} />
         {message.missingFields?.length > 0 && (
           <MissingFieldsForm
             fields={message.missingFields}

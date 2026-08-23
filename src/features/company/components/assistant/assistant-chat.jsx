@@ -249,6 +249,7 @@ export function AssistantChat({ className }) {
                     onSubmitMissingFields={handleSubmitMissingFields}
                     isSending={isSending}
                     onReviewDocument={handleReviewDocument}
+                    onSendMessage={handlePrompt}
                   />
                 ))}
                 {isSending && <ThinkingBubble />}

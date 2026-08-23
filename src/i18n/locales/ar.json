@@ -796,7 +796,14 @@
       "reviewRoutePending": "معرف المستند غير متاح",
       "leaveDraftCreated": "تم إنشاء مسودة إجازة",
       "attachmentUploaded": "تم الرفع",
-      "noAttachment": "لم يتم الرفع"
+      "noAttachment": "لم يتم الرفع",
+      "confirmationDefaultMessage": "هل أنت متأكد أنك تريد المتابعة؟",
+      "confirm": "تأكيد",
+      "cancel": "إلغاء",
+      "confirmReply": "نعم، تأكيد",
+      "cancelReply": "لا، إلغاء",
+      "disambiguationDefaultMessage": "وجدت أكثر من طلب مطابق. أيهما تقصد؟",
+      "disambiguationOptionFallback": "الخيار {{index}}"
     },
     "errors": {
       "title": "تعذر على وكيل إكمال الطلب",

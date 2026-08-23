@@ -798,7 +798,14 @@
       "reviewRoutePending": "Document ID unavailable",
       "leaveDraftCreated": "Leave Draft Created",
       "attachmentUploaded": "Uploaded",
-      "noAttachment": "Not uploaded"
+      "noAttachment": "Not uploaded",
+      "confirmationDefaultMessage": "Are you sure you want to proceed?",
+      "confirm": "Confirm",
+      "cancel": "Cancel",
+      "confirmReply": "Yes, confirm",
+      "cancelReply": "No, cancel",
+      "disambiguationDefaultMessage": "I found more than one matching request. Which one did you mean?",
+      "disambiguationOptionFallback": "Option {{index}}"
     },
     "errors": {
       "title": "Wakeel could not complete that request",

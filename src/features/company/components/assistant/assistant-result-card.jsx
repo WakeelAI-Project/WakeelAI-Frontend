@@ -1,5 +1,5 @@
 import React from "react";
-import { Calculator, CalendarDays, FileText, LockKeyhole } from "lucide-react";
+import { Calculator, CalendarDays, FileText, HelpCircle, LockKeyhole, ShieldQuestion } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "../../../../components/ui/button";
 import { Badge } from "../../../../components/ui/badge";
@@ -175,7 +175,65 @@ function LeaveDraftCard({ card }) {
   );
 }
 
-export function AssistantResultCard({ card, onReviewDocument }) {
+function ConfirmationCard({ card, onSendMessage }) {
+  const { t } = useTranslation();
+
+  return (
+    <ResultShell icon={ShieldQuestion} title={card.message || t("assistant.resultCards.confirmationDefaultMessage")}>
+      <div className="flex flex-wrap gap-2">
+        <Button
+          type="button"
+          variant="legal"
+          size="sm"
+          onClick={() => onSendMessage?.(card.confirmPrompt || t("assistant.resultCards.confirmReply"))}
+        >
+          {t("assistant.resultCards.confirm")}
+        </Button>
+        <Button
+          type="button"
+          variant="secondary"
+          size="sm"
+          onClick={() => onSendMessage?.(card.cancelPrompt || t("assistant.resultCards.cancelReply"))}
+        >
+          {t("assistant.resultCards.cancel")}
+        </Button>
+      </div>
+    </ResultShell>
+  );
+}
+
+function DisambiguationCard({ card, onSendMessage }) {
+  const { t } = useTranslation();
+
+  return (
+    <ResultShell icon={HelpCircle} title={card.message || t("assistant.resultCards.disambiguationDefaultMessage")}>
+      <div className="flex flex-col gap-2">
+        {card.options.map((option, index) => {
+          const label =
+            option.label ||
+            [option.leaveType, option.startDate && option.endDate ? `${option.startDate} - ${option.endDate}` : null]
+              .filter(Boolean)
+              .join(" · ");
+
+          return (
+            <Button
+              key={option.requestId || index}
+              type="button"
+              variant="secondary"
+              size="sm"
+              className="justify-start"
+              onClick={() => onSendMessage?.(label || t("assistant.resultCards.disambiguationOptionFallback", { index: index + 1 }))}
+            >
+              {label || t("assistant.resultCards.disambiguationOptionFallback", { index: index + 1 })}
+            </Button>
+          );
+        })}
+      </div>
+    </ResultShell>
+  );
+}
+
+export function AssistantResultCard({ card, onReviewDocument, onSendMessage }) {
   const { t } = useTranslation();
 
   if (!card) return null;
@@ -190,6 +248,14 @@ export function AssistantResultCard({ card, onReviewDocument }) {
 
   if (card.type === "leave_draft") {
     return <LeaveDraftCard card={card} />;
+  }
+
+  if (card.type === "confirmation") {
+    return <ConfirmationCard card={card} onSendMessage={onSendMessage} />;
+  }
+
+  if (card.type === "needs_disambiguation") {
+    return <DisambiguationCard card={card} onSendMessage={onSendMessage} />;
   }
 
   return (

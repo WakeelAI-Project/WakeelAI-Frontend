@@ -8,7 +8,7 @@ vi.mock("../../../lib/api", () => ({
 }));
 
 import api from "../../../lib/api";
-import { getChatHistory, sendMessage } from "./assistant-service";
+import { getChatHistory, sendMessage, normalizeResultCard } from "./assistant-service";
 
 describe("assistant-service", () => {
   afterEach(() => {
@@ -92,5 +92,53 @@ describe("assistant-service", () => {
       conversationId: "conv-1",
       content: "Previous answer",
     }));
+  });
+
+  // FIX-05: the assistant can now ask for confirmation before an irreversible action
+  // (e.g. submitting/cancelling a leave draft) or ask the user to disambiguate between
+  // more than one matching draft.
+  describe("normalizeResultCard", () => {
+    it("normalizes a confirmation card", () => {
+      const card = normalizeResultCard({
+        type: "confirmation",
+        message: "Submit your Annual leave from 2026-03-01 to 2026-03-03?",
+        confirm_prompt: "yes",
+        cancel_prompt: "no",
+      });
+
+      expect(card).toEqual({
+        type: "confirmation",
+        message: "Submit your Annual leave from 2026-03-01 to 2026-03-03?",
+        confirmPrompt: "yes",
+        cancelPrompt: "no",
+      });
+    });
+
+    it("normalizes a needs_disambiguation card with its option list", () => {
+      const card = normalizeResultCard({
+        type: "needs_disambiguation",
+        message: "Which draft did you mean?",
+        options: [
+          { request_id: "req-1", leave_type: "Annual", start_date: "2026-03-01", end_date: "2026-03-03" },
+          { request_id: "req-2", leave_type: "Sick", start_date: "2026-04-01", end_date: "2026-04-02" },
+        ],
+      });
+
+      expect(card.type).toBe("needs_disambiguation");
+      expect(card.message).toBe("Which draft did you mean?");
+      expect(card.options).toHaveLength(2);
+      expect(card.options[0]).toEqual({
+        requestId: "req-1",
+        leaveType: "Annual",
+        startDate: "2026-03-01",
+        endDate: "2026-03-03",
+        label: null,
+      });
+    });
+
+    it("returns null for a falsy or typeless card", () => {
+      expect(normalizeResultCard(null)).toBeNull();
+      expect(normalizeResultCard({})).toBeNull();
+    });
   });
 });
