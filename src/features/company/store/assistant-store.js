@@ -132,8 +132,10 @@ export const useAssistantStore = create((set, get) => ({
         // Find this conversation in the list (normalized by getConversations / upsert)
         // to restore its persisted target employee context.
         const existing = state.conversations.find((c) => c.id === conversationId);
-        const restoredTargetContext = existing?.targetEmployeeId
-          ? { targetEmployeeId: existing.targetEmployeeId, targetEmployeeName: existing.targetEmployeeName }
+        const restoredTargetId = history.targetEmployeeId || existing?.targetEmployeeId || null;
+        const restoredTargetName = history.targetEmployeeName || existing?.targetEmployeeName || null;
+        const restoredTargetContext = restoredTargetId
+          ? { targetEmployeeId: restoredTargetId, targetEmployeeName: restoredTargetName }
           : null;
 
         return {
@@ -145,6 +147,8 @@ export const useAssistantStore = create((set, get) => ({
             id: conversationId,
             title: deriveConversationTitle(messages),
             lastMessage: messages[messages.length - 1]?.content || "",
+            targetEmployeeId: restoredTargetId,
+            targetEmployeeName: restoredTargetName,
             updatedAt:
               messages[messages.length - 1]?.createdAt ||
               new Date().toISOString(),

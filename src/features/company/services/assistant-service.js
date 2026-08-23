@@ -174,11 +174,15 @@ export function normalizeChatResponseDto(rawResponse) {
 
 export function normalizeHistoryResponseDto(rawResponse, requestedConversationId) {
   const conversationId = pick(rawResponse, ["conversation_id", "conversationId"]) || requestedConversationId;
+  const targetEmployeeId = pick(rawResponse, ["target_employee_id", "targetEmployeeId"]) || null;
+  const targetEmployeeName = pick(rawResponse, ["target_employee_name", "targetEmployeeName"]) || null;
   const messages = toArray(rawResponse?.messages ?? rawResponse?.items ?? rawResponse?.data)
     .map((message) => normalizeChatMessageDto(message, conversationId));
 
   return {
     conversationId,
+    targetEmployeeId,
+    targetEmployeeName,
     messages,
     pagination: rawResponse?.pagination || null,
   };
