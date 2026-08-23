@@ -1,6 +1,7 @@
 import React from "react"
 import { Link } from "react-router"
 import { useReducedMotion } from "framer-motion"
+import { WakeelLogo } from "../brand/wakeel-logo"
 import { useLocale } from "../../hooks/use-locale"
 
 const FOOTER_LINKS = [
@@ -32,7 +33,7 @@ export function LandingFooter() {
             to="/"
             className="inline-flex items-center gap-3 rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--border-focus)"
           >
-            <img alt="" className="h-8 w-8" src="/wakeel-logo.svg" />
+            <WakeelLogo className="h-8 w-8" />
             <span className="font-display text-lg font-semibold text-(--text-primary)">
               {t("landing.brand.name")}
             </span>

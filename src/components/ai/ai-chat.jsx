@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { AlertTriangle, HelpCircle, Mic, Sparkles, User } from "lucide-react";
 import { cn } from "../../lib/utils";
-import { SealMark } from "../brand/seal-mark";
+import { WakeelLogo } from "../brand/wakeel-logo";
 import { useLocale } from "../../hooks/use-locale";
 
 export function AiMessageBubble({
@@ -16,7 +16,7 @@ export function AiMessageBubble({
   return (
     <div className="flex flex-col gap-2 max-w-[85%] text-start self-start">
       <div className="flex items-center gap-2">
-        <SealMark className="h-7 w-7" iconClassName="h-2.5 w-2.5" />
+        <WakeelLogo framed className="h-7 w-7 p-1" />
         <span className="text-[10px] font-semibold uppercase tracking-wide text-(--ai-primary)">
           {isRtl ? "وكيل" : "Wakeel AI"}
         </span>
@@ -34,10 +34,7 @@ export function AiMessageBubble({
         <button
           type="button"
           className="self-start inline-flex items-center gap-1.5 text-[10px] font-semibold text-(--brand-primary) bg-(--bg-card) px-2.5 py-1 rounded-(--radius-full) border border-(--ai-primary) hover:bg-(--ai-surface) cursor-pointer transition-colors shadow-(--shadow-1)">
-          <SealMark
-            className="h-4 w-4 border bg-(--bg-card)"
-            iconClassName="h-2 w-2"
-          />
+          <WakeelLogo framed className="h-4 w-4 rounded-xs p-0.5" />
           <span>{citation}</span>
           {confidence && (
             <span className="font-mono text-[9px] text-(--text-secondary)">
