@@ -61,6 +61,7 @@ const EMPTY_TEMPLATE_FORM = {
 
 const EMPTY_CLAUSE_GENERATION_FORM = {
   language: "en",
+  clause_type: "",
   include_labor_law: true,
   include_company_policy: true,
   instruction: "",
@@ -380,6 +381,13 @@ export function TemplateEditorPage({ mode = "create" }) {
   const [ensuredTemplateId, setEnsuredTemplateId] = useState(templateId ?? null);
   const [boilerplateLang, setBoilerplateLang] = useState("en");
 
+  // Document type is a single source of truth: once a template row has been persisted
+  // (either because we're editing an existing one, or because clause generation silently
+  // pre-created a draft row via ensureTemplatePersisted), the backend treats DocumentType
+  // as immutable — PATCH doesn't even accept it. Locking the Select/Quick Start here keeps
+  // the visible type and the type that will actually be saved from ever diverging.
+  const isDocumentTypeLocked = isEdit || Boolean(ensuredTemplateId);
+
   // Ensures a template row exists so clause generation (which needs an id) can run in create mode.
   const ensureTemplatePersisted = useCallback(
     async (values) => {
@@ -534,6 +542,12 @@ export function TemplateEditorPage({ mode = "create" }) {
 
   const handleGenerateClauses = async () => {
     setGenerationError("");
+
+    if (!generationForm.clause_type) {
+      setGenerationError(t("templates.generateLegalClausesClauseTypeRequired"));
+      return;
+    }
+
     setIsGeneratingClauses(true);
     setGenerationPhase("context");
 
@@ -552,6 +566,7 @@ export function TemplateEditorPage({ mode = "create" }) {
       setGenerationPhase("clauses");
       const response = await generateLegalClauses(effectiveTemplateId, {
         language: generationForm.language,
+        clause_type: generationForm.clause_type,
         include_labor_law: generationForm.include_labor_law,
         include_company_policy: generationForm.include_company_policy,
         instruction: generationForm.instruction,
@@ -715,7 +730,7 @@ export function TemplateEditorPage({ mode = "create" }) {
           ? t("templates.editDescription")
           : t("templates.createDescription")
       }>
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-(--border-default) bg-(--bg-card) px-4 py-3 shadow-(--shadow-1)">
+      <div className="sticky top-0 z-20 flex flex-wrap items-center justify-between gap-3 rounded-md border border-(--border-default) bg-(--bg-card)/95 px-4 py-3 shadow-(--shadow-1) backdrop-blur">
         <div className="flex items-center gap-3">
           <Button
             type="button"
@@ -725,7 +740,7 @@ export function TemplateEditorPage({ mode = "create" }) {
             <ArrowLeft className="h-4 w-4 rtl:rotate-180" aria-hidden="true" />
             {t("templates.backToTemplates")}
           </Button>
-          {isEdit && (
+          {isDocumentTypeLocked && (
             <Badge variant="document" shape="pill">
               {t("templates.documentTypeImmutable")}
             </Badge>
@@ -736,19 +751,26 @@ export function TemplateEditorPage({ mode = "create" }) {
             <Button
               type="button"
               variant="ai"
-              size="sm"
+              size="md"
               onClick={() => {
                 setGenerationError("");
-                setGenerationForm(EMPTY_CLAUSE_GENERATION_FORM);
+                setGenerationForm({
+                  ...EMPTY_CLAUSE_GENERATION_FORM,
+                  clause_type: getValues("document_type") || "",
+                });
                 setGeneratedClauses([]);
                 setSelectedClauseIds([]);
                 setEditingClauseId(null);
                 setEditingDraft("");
                 setIsGenerateClauseDialogOpen(true);
               }}
-              disabled={loading || isSubmitting}>
+              disabled={loading || isSubmitting}
+              className="ring-2 ring-(--ai-primary)/30 ring-offset-2 ring-offset-(--bg-card)">
               <Sparkles className="h-4 w-4" aria-hidden="true" />
               {t("templates.generateLegalClauses")}
+              <span className="ms-0.5 rounded-full bg-(--text-on-accent)/20 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide">
+                AI
+              </span>
             </Button>
           <Button
             type="button"
@@ -845,7 +867,7 @@ export function TemplateEditorPage({ mode = "create" }) {
                       <Select
                         value={field.value || ""}
                         onValueChange={field.onChange}
-                        disabled={isEdit || isSubmitting}>
+                        disabled={isDocumentTypeLocked || isSubmitting}>
                         <SelectTrigger
                           aria-label={t("templates.fields.documentType")}
                           className={
@@ -891,6 +913,9 @@ export function TemplateEditorPage({ mode = "create" }) {
                             : t("templates.inactive")
                         }
                       />
+                      <p className="mt-2 text-xs text-(--text-secondary)">
+                        {t("templates.activeTemplateRuleDescription")}
+                      </p>
                     </div>
                   )}
                 />
@@ -954,19 +979,31 @@ export function TemplateEditorPage({ mode = "create" }) {
                     size="sm"
                     disabled={isSubmitting}
                     onClick={() => {
-                      if (!isEdit) {
+                      if (!isDocumentTypeLocked) {
                         setValue("document_type", docType, {
                           shouldDirty: true,
                           shouldValidate: true,
                         });
                       }
-                      const content =
+
+                      const quickStartContent =
                         BOILERPLATE_TEMPLATES[boilerplateLang]?.[docType] ||
                         BOILERPLATE_TEMPLATES.en[docType];
-                      setValue("content_template", content, {
+                      const existingContent = (getValues("content_template") || "").trim();
+                      // Insert at the beginning — never overwrite what HR already typed.
+                      const nextContent = existingContent
+                        ? `${quickStartContent}\n\n${existingContent}`
+                        : quickStartContent;
+
+                      setValue("content_template", nextContent, {
                         shouldDirty: true,
                         shouldTouch: true,
                         shouldValidate: true,
+                      });
+
+                      window.requestAnimationFrame(() => {
+                        contentRef.current?.focus();
+                        contentRef.current?.setSelectionRange(0, 0);
                       });
                     }}
                     className="justify-start text-left">
@@ -1242,6 +1279,35 @@ function ClauseGenerationDialog({
                     <option value="ar">العربية</option>
                   </select>
                 </div>
+
+                <div className="flex flex-col gap-1.5 text-start">
+                  <label className="text-sm font-medium text-(--text-primary)">
+                    {t("templates.generateLegalClausesClauseType")}
+                    <span className="ms-1 text-(--text-muted)">*</span>
+                  </label>
+                  <select
+                    className="h-10 rounded-sm border border-(--border-default) bg-paper px-3 text-sm text-(--text-primary) focus:outline-none focus:border-(--border-focus)"
+                    value={form.clause_type}
+                    onChange={(event) =>
+                      setForm((current) => ({
+                        ...current,
+                        clause_type: event.target.value,
+                      }))
+                    }
+                    aria-label={t("templates.generateLegalClausesClauseType")}>
+                    <option value="" disabled>
+                      {t("templates.generateLegalClausesClauseTypePlaceholder")}
+                    </option>
+                    {DOCUMENT_TEMPLATE_TYPES.map((documentType) => (
+                      <option key={documentType} value={documentType}>
+                        {t(getDocumentTypeLabelKey(documentType))}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-xs text-(--text-secondary)">
+                    {t("templates.generateLegalClausesClauseTypeHint")}
+                  </p>
+                </div>
               </div>
 
               <div className="space-y-3 rounded-sm border border-(--border-default) bg-(--bg-card-subtle) p-4">
@@ -1314,6 +1380,7 @@ function ClauseGenerationDialog({
                   onClick={onGenerate}
                   disabled={
                     loading ||
+                    !form.clause_type ||
                     (!form.include_labor_law && !form.include_company_policy)
                   }>
                   <Sparkles className="h-4 w-4" aria-hidden="true" />

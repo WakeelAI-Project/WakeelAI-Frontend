@@ -210,6 +210,10 @@ export function TemplatesPage() {
           </Button>
         </div>
 
+        <Alert variant="info" title={t("templates.activeTemplateRuleTitle")} className="mb-5">
+          {t("templates.activeTemplateRuleDescription")}
+        </Alert>
+
         <div className="mb-5 overflow-x-auto pb-1">
           <SegmentedControl
             name="templates-document-type-filter"

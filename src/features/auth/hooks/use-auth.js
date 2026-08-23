@@ -17,6 +17,7 @@ export function useAuth() {
   const setRefreshToken = useAuthStore((state) => state.setRefreshToken);
   const clearAuth = useAuthStore((state) => state.clearAuth);
   const clearTemporaryPassword = useAuthStore((state) => state.clearTemporaryPassword);
+  const clearMustChangePassword = useAuthStore((state) => state.clearMustChangePassword);
   const bootstrapAuth = useAuthStore((state) => state.bootstrapAuth);
 
   return {
@@ -32,6 +33,7 @@ export function useAuth() {
     setRefreshToken,
     clearAuth,
     clearTemporaryPassword,
+    clearMustChangePassword,
     bootstrapAuth,
   };
 }

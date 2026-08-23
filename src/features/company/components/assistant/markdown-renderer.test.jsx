@@ -55,6 +55,27 @@ console.log("hello");
     expect(screen.getByText("يستحق العامل إجازة مدفوعة.")).toBeInTheDocument();
   });
 
+  it("renders LaTeX math delimiters instead of showing raw syntax", () => {
+    const markdown = String.raw`\[
+\text{مكافأة نهاية الخدمة} = 0 \times (0.5 \times 600) = **0 جنيه**
+\]`;
+
+    const { container } = render(<MarkdownRenderer text={markdown} />);
+
+    expect(container.querySelector(".katex")).toBeInTheDocument();
+    expect(container.textContent).not.toContain("\\text");
+    expect(container.textContent).not.toContain("\\[");
+    expect(container.textContent).not.toContain("\\]");
+    expect(container.textContent).not.toContain("\\times");
+  });
+
+  it("renders inline math without breaking surrounding text", () => {
+    render(<MarkdownRenderer text={String.raw`The rate is \(0.5 \times 600\) per month.`} />);
+
+    expect(screen.getByText(/The rate is/)).toBeInTheDocument();
+    expect(document.querySelector(".katex")).toBeInTheDocument();
+  });
+
   it("drops raw HTML and unsafe links from AI output", () => {
     const { container } = render(
       <MarkdownRenderer text={'<script>alert("xss")</script>\n\n[bad](javascript:alert(1))'} />
