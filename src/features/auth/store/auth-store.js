@@ -53,7 +53,9 @@ export const useAuthStore = create((set, get) => ({
    * @param {string} token - JWT access token
    * @param {string|null} [refreshToken] - Refresh token (optional)
    * @param {number|null} [expiresIn] - Access token TTL in seconds (from auth response)
-   * @param {boolean} [mustChangePassword] - Whether password change is required (optional)
+   * @param {boolean} [mustChangePassword] - Whether password change is required.
+   *   Omit (undefined) to PRESERVE the current value — a silent token refresh
+   *   must never clear a pending password change.
    */
   setToken: (token, refreshToken, expiresIn, mustChangePassword) => {
     if (!token) {
@@ -62,13 +64,15 @@ export const useAuthStore = create((set, get) => ({
     }
 
     const decoded = decodeToken(token);
+    const nextMustChangePassword =
+      mustChangePassword ?? get().mustChangePassword ?? false;
 
     // Sync the access token with the Axios request interceptor
     setAuthToken(token);
 
     // Persist to cookies — align expiry with token lifetime where known
     setAccessTokenCookie(token, expiresIn ?? null);
-    setUserCookie({ ...decoded, mustChangePassword: mustChangePassword ?? false }, expiresIn ?? null);
+    setUserCookie({ ...decoded, mustChangePassword: nextMustChangePassword }, expiresIn ?? null);
 
     const newRefreshToken = refreshToken ?? get().refreshToken;
     if (newRefreshToken) {
@@ -81,7 +85,7 @@ export const useAuthStore = create((set, get) => ({
       refreshToken: newRefreshToken,
       currentUser: decoded,
       isAuthenticated: true,
-      mustChangePassword: mustChangePassword ?? false,
+      mustChangePassword: nextMustChangePassword,
     });
   },
 
@@ -193,6 +197,24 @@ export const useAuthStore = create((set, get) => ({
   },
 
   /**
+   * Sets the mustChangePassword flag on the store and mirrors it into the user
+   * cookie so it survives a hard reload.
+   *
+   * Used by the Axios 403 `password_change_required` handler: flipping this flag
+   * lets ProtectedRoute perform a client-side redirect to /change-password,
+   * instead of a full page reload that would destroy router state.
+   *
+   * @param {boolean} value
+   */
+  setMustChangePassword: (value) => {
+    const user = get().currentUser;
+    if (user) {
+      setUserCookie({ ...user, mustChangePassword: value }, null);
+    }
+    set({ mustChangePassword: value });
+  },
+
+  /**
    * Clears the mustChangePassword flag from the store and user cookie.
    * Should be called after successful password change.
    */
@@ -251,7 +273,22 @@ export const useAuthStore = create((set, get) => ({
         const normalized = normalizeAuthResponse(raw);
 
         if (normalized.token) {
-          get().setToken(normalized.token, normalized.refreshToken ?? cookieRefreshToken, normalized.expiresIn);
+          // The refresh response only sometimes carries must_change_password.
+          // When it does not, preserve what we already know (store, then cookie)
+          // — defaulting to false here silently drops a pending password change
+          // and the user lands on a dashboard that 403s on its first request.
+          const rawFlag = raw?.must_change_password;
+          const mustChangePassword =
+            typeof rawFlag === "boolean"
+              ? rawFlag
+              : (get().mustChangePassword || cookieUser?.mustChangePassword || false);
+
+          get().setToken(
+            normalized.token,
+            normalized.refreshToken ?? cookieRefreshToken,
+            normalized.expiresIn,
+            mustChangePassword,
+          );
           return;
         }
       } catch {

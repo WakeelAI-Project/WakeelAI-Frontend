@@ -263,6 +263,7 @@
     "passwordChanged": "Password changed successfully. Please log in with your new password.",
     "passwordChangeFailed": "Failed to change password. Please try again.",
     "missingCurrentPassword": "Current password is required.",
+    "currentPasswordUnknown": "Enter the password you just signed in with. If you no longer have it, reset your password instead.",
     "passwordMismatch": "Passwords do not match",
     "changePasswordFooter": "After changing your password, you will be redirected to log in again.",
     "sessionExpired": "Your session expired. Please log in again."

@@ -1,6 +1,6 @@
 import React, { useState } from "react"
 import { useForm } from "react-hook-form"
-import { useLocation, useNavigate } from "react-router"
+import { Link, useLocation, useNavigate } from "react-router"
 import { AuthLayout } from "../../components/auth/auth-layout"
 import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
@@ -17,9 +17,12 @@ export function ChangePasswordPage() {
   const { isAuthenticated, logout, clearMustChangePassword } = useAuth()
   const [submitError, setSubmitError] = useState("")
 
-  // Get the current password from navigation state (passed from login page)
-  // If user refreshes the page, this will be empty and they'll need to provide it
+  // Get the current password from navigation state (passed from login page).
+  // A hard refresh wipes router state, so this is empty on reload — in that case
+  // the user is told plainly what to type and given a reset escape hatch, rather
+  // than being asked for a password out of nowhere.
   const temporaryPassword = location.state?.currentPassword ?? ""
+  const hasTemporaryPassword = Boolean(temporaryPassword)
 
   const {
     register,
@@ -89,6 +92,19 @@ export function ChangePasswordPage() {
         <div className="rounded-md border border-(--border-default) bg-(--bg-card-subtle) px-4 py-3 text-sm text-(--text-secondary)">
           {t("auth.firstLoginNotice", { defaultValue: "This is your first login. Please set a new password to secure your account." })}
         </div>
+
+        {!hasTemporaryPassword && (
+          <div
+            role="status"
+            className="flex flex-col gap-2 rounded-md border border-(--status-warning-fg) bg-(--status-warning-bg) px-4 py-3 text-sm text-(--status-warning-fg)">
+            <span>{t("auth.currentPasswordUnknown")}</span>
+            <Link
+              className="font-semibold underline underline-offset-4"
+              to="/forgot-password">
+              {t("auth.forgotPassword")}
+            </Link>
+          </div>
+        )}
 
         {submitError && (
           <div role="alert" className="rounded-md border border-(--status-error-fg) bg-(--status-error-bg) px-4 py-3 text-sm text-(--status-error-fg)">
