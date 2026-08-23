@@ -908,6 +908,7 @@
       "role": "Role",
       "email": "Email",
       "phone": "Phone",
+      "workingHours": "Working hours",
       "jobTitle": "Job title",
       "department": "Department",
       "joinDate": "Join date",
