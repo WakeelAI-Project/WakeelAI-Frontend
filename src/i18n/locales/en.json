@@ -250,6 +250,7 @@
     "resetPasswordError": "Unable to reset the password. Please try again.",
     "invalidOtp": "Enter the 6-digit verification code.",
     "roleMismatch": "This account does not match the selected user type. Check the selection and try again.",
+    "employeeMobileOnly": "This account is for the employee mobile app. Please use the Wakeel mobile app to sign in.",
     "loginFailed": "Unable to log in. Please try again.",
     "registerFailed": "Unable to create the account. Please try again.",
     "changePasswordTitle": "Change Your Password",
@@ -978,5 +979,11 @@
     "statusColumn": "Status",
     "active": "Active",
     "inactive": "Inactive"
+  },
+  "errors": {
+    "forbiddenTitle": "You don't have access to this area",
+    "forbiddenDescription": "Your account role does not allow access to this part of the workspace. Go back to your own dashboard, or sign out and use a different account.",
+    "backToDashboard": "Back to my dashboard",
+    "signOut": "Sign out"
   }
 }

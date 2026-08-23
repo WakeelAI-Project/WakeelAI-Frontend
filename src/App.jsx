@@ -35,6 +35,7 @@ import { DepartmentsPage } from "./pages/departments";
 import { CompanyProfilePage } from "./pages/company-profile";
 import { UserProfilePage } from "./pages/user-profile";
 import { AccountSettingsPage } from "./pages/account-settings";
+import { ForbiddenPage } from "./pages/errors/forbidden";
 import { ProtectedRoute } from "./features/auth/components/ProtectedRoute";
 import { GuestRoute } from "./features/auth/components/GuestRoute";
 import { useAuth } from "./features/auth/hooks/use-auth";
@@ -177,6 +178,12 @@ const router = createBrowserRouter([
   {
     path: "/change-password",
     element: <ChangePasswordPage />,
+  },
+  {
+    // Registered outside both guards on purpose — a guard that redirected here
+    // must never be able to re-evaluate and bounce back.
+    path: "/403",
+    element: <ForbiddenPage />,
   },
   {
     path: "/owner",

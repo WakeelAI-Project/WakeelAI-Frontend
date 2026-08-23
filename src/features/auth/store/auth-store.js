@@ -101,6 +101,50 @@ export const useAuthStore = create((set, get) => ({
   },
 
   /**
+   * Fetches and normalizes an auth response WITHOUT committing it to the store,
+   * cookies, or the Axios interceptor. No session exists until commitSession()
+   * is called with the result.
+   *
+   * This exists so callers can inspect the token's role claim *before* the app
+   * considers the user signed in — an Employee (mobile-only) must never end up
+   * with a web session, not even for a single render.
+   *
+   * @param {string} email
+   * @param {string} password
+   * @returns {Promise<object>} Normalized auth response with { password } attached
+   */
+  loginWithoutCommit: async (email, password) => {
+    const raw = await apiLogin(email, password);
+    const normalized = normalizeAuthResponse(raw);
+
+    if (!normalized.token) {
+      throw new Error("Invalid response format: missing access_token");
+    }
+
+    return { ...normalized, password };
+  },
+
+  /**
+   * Commits a normalized auth response (from loginWithoutCommit) into the store,
+   * cookies, and the Axios interceptor.
+   *
+   * @param {object} normalized - Result of loginWithoutCommit / normalizeAuthResponse
+   */
+  commitSession: (normalized) => {
+    if (!normalized?.token) {
+      get().clearAuth();
+      return;
+    }
+
+    get().setToken(
+      normalized.token,
+      normalized.refreshToken,
+      normalized.expiresIn,
+      normalized.mustChangePassword,
+    );
+  },
+
+  /**
    * Performs a login via credentials. Normalizes the backend response and
    * stores both the access token and refresh token (in memory + cookies).
    * Returns the normalized response including mustChangePassword flag.
