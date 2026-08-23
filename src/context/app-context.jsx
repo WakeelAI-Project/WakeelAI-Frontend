@@ -3,11 +3,10 @@ import React, { createContext, useContext, useMemo, useState, useCallback } from
 const AppContext = createContext(undefined)
 
 const currentUser = {
-  id: "mona-hassan",
-  name: "منى حسن",
-  nameEn: "Mona Hassan",
-  initials: "MH",
-  role: "HR & Compliance Lead"
+  id: null,
+  name: "",
+  nameEn: "",
+  role: ""
 }
 
 const notifications = [

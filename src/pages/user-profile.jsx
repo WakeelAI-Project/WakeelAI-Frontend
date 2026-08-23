@@ -16,19 +16,8 @@ import {
   ProfileSection,
 } from "../features/profile/components/profile-details"
 import { useLocale } from "../hooks/use-locale"
+import { getInitials, getUserFullName, getUserId } from "../lib/user-display"
 import { PageShell } from "./page-shell"
-
-function createInitials(name) {
-  return (
-    name
-      ?.trim()
-      .split(/\s+/)
-      .slice(0, 2)
-      .map((part) => part[0])
-      .join("")
-      .toUpperCase() || "—"
-  )
-}
 
 function getRoleTranslationKey(role) {
   const normalizedRole = role?.toLowerCase()
@@ -58,6 +47,7 @@ export function UserProfilePage() {
   const { currentUser: authUser } = useAuth()
   const { activeCompany, currentUser: defaultUser } = useApp()
   const sourceUser = authUser || defaultUser
+  const sourceUserId = getUserId(sourceUser)
 
   const [realUserDetail, setRealUserDetail] = useState(null)
   const [isLoadingProfile, setIsLoadingProfile] = useState(true)
@@ -94,13 +84,13 @@ export function UserProfilePage() {
         .finally(() => {
           setIsLoadingProfile(false)
         })
-    } else if (sourceUser?.sub) {
+    } else if (sourceUserId) {
       // Employee or Owner: use getEmployees and match by ID
       setIsLoadingProfile(true)
       setProfileError(null)
       getEmployees()
         .then((users) => {
-          const matched = users.find((u) => u.id === sourceUser.sub)
+          const matched = users.find((u) => getUserId(u) === sourceUserId)
           if (matched) {
             setRealUserDetail(matched)
           }
@@ -115,10 +105,10 @@ export function UserProfilePage() {
     } else {
       setIsLoadingProfile(false)
     }
-  }, [sourceUser?.sub, sourceUser?.role])
+  }, [sourceUserId, sourceUser?.role])
 
   const profile = useMemo(() => {
-    const rawName = realUserDetail?.name || sourceUser?.name || sourceUser?.nameEn
+    const rawName = realUserDetail?.name || getUserFullName(sourceUser)
     const rawEmail = realUserDetail?.email || sourceUser?.email
     const rawPhone = realUserDetail?.phone
     const rawRole = realUserDetail?.role || sourceUser?.role
@@ -132,7 +122,7 @@ export function UserProfilePage() {
       (isRtl ? activeCompany?.name : activeCompany?.nameEn) ||
       ""
 
-    const initials = createInitials(localizedName)
+    const initials = getInitials(localizedName)
 
     return {
       fullName: localizedName || "",

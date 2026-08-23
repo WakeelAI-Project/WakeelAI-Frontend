@@ -329,7 +329,6 @@
     "pageSummary": "صفحة {{page}} من {{totalPages}} · {{total}} قسم"
   },
   "topbar": {
-    "searchPrompt": "بحث عن موظف، عقد، أو امتثال...",
     "toggleContrast": "تبديل التباين العالي",
     "highContrast": "تباين عال",
     "toggleTheme": "تبديل المظهر",

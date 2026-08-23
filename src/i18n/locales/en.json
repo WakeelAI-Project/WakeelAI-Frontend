@@ -329,7 +329,6 @@
     "pageSummary": "Page {{page}} of {{totalPages}} · {{total}} departments"
   },
   "topbar": {
-    "searchPrompt": "Search employee, contract, or compliance...",
     "toggleContrast": "Toggle High Contrast",
     "highContrast": "High Contrast",
     "toggleTheme": "Toggle Theme",

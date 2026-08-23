@@ -42,33 +42,97 @@ import { useAuthStore } from "./features/auth/store/auth-store";
 import { configureAuthStore } from "./lib/api";
 import { useLocale } from "./hooks/use-locale";
 import { useTranslation } from "react-i18next";
+import { getEmployees } from "./features/company/services/employee-service";
 import { getCompanyProfile } from "./features/company/services/profile-service";
+import { getCurrentUserProfile } from "./features/profile/services/user-service";
+import { getUserFullName, getUserId } from "./lib/user-display";
 import "./i18n"; // Load i18n configuration
 
 configureAuthStore(useAuthStore.getState);
 
+function isHrManagerRole(role) {
+  return role?.toLowerCase() === "hr_manager";
+}
+
+function isOwnerRole(role) {
+  return role?.toLowerCase().includes("owner");
+}
+
 function DashboardShell() {
   const { toggleDirection } = useTheme();
   const { toast } = useToast();
-  const { activeCompany, currentUser: defaultUser, notifications } = useApp();
+  const { activeCompany, notifications } = useApp();
   const { currentUser: authUser, logout } = useAuth();
+  const [authenticatedUserDetail, setAuthenticatedUserDetail] = useState(null);
   const [isCommandOpen, setIsCommandOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { isRtl } = useLocale();
   const { t } = useTranslation();
+  const authUserId = getUserId(authUser);
+  const authUserRole = authUser?.role ?? "";
+
+  useEffect(() => {
+    let isActive = true;
+
+    setAuthenticatedUserDetail(null);
+
+    if (!authUser || !authUserRole) {
+      return () => {
+        isActive = false;
+      };
+    }
+
+    async function loadAuthenticatedUserDetail() {
+      try {
+        if (isHrManagerRole(authUserRole)) {
+          const profile = await getCurrentUserProfile();
+          if (!isActive || !profile) return;
+
+          setAuthenticatedUserDetail({
+            id: profile.user_id,
+            name: profile.full_name,
+            nameEn: profile.full_name,
+            email: profile.email,
+            role: profile.role,
+          });
+          return;
+        }
+
+        if (isOwnerRole(authUserRole) && authUserId) {
+          const users = await getEmployees({ role: "Company_Owner", limit: 100 });
+          if (!isActive) return;
+
+          const matchedUser = users.find((user) => getUserId(user) === authUserId);
+          if (matchedUser) {
+            setAuthenticatedUserDetail(matchedUser);
+          }
+        }
+      } catch (error) {
+        console.warn("Failed to load authenticated user details:", error);
+      }
+    }
+
+    loadAuthenticatedUserDetail();
+
+    return () => {
+      isActive = false;
+    };
+  }, [authUser, authUserId, authUserRole]);
 
   const currentUser = useMemo(() => {
-    if (!authUser) return defaultUser;
+    if (!authUser) return null;
+    const fullName = getUserFullName(authenticatedUserDetail) || getUserFullName(authUser);
+
     return {
-      id: authUser.sub || defaultUser.id,
-      name: authUser.name || defaultUser.name,
-      nameEn: authUser.nameEn || defaultUser.nameEn,
-      initials: authUser.initials || "MH",
-      role: authUser.role || defaultUser.role,
+      ...authUser,
+      id: authUserId,
+      name: fullName,
+      nameEn: fullName,
+      role: authUserRole,
     };
-  }, [authUser, defaultUser]);
+  }, [authenticatedUserDetail, authUser, authUserId, authUserRole]);
 
   const pathParts = location.pathname.split("/");
   const activeId = pathParts[2] || pathParts[1] || "employees";
@@ -111,12 +175,11 @@ function DashboardShell() {
         <Topbar
           activeId={activeId}
           onMenuClick={() => setIsSidebarOpen(true)}
-          onSearchClick={() => setIsCommandOpen(true)}
           onAssistantToggle={
             isHrUser ? () => navigate(`${rolePrefix}/assistant`) : undefined
           }
           notificationsCount={notifications.length}
-          userInitials={currentUser.initials}
+          userName={currentUser?.name}
           onLogout={logout}
           rolePrefix={rolePrefix}
         />
