@@ -150,7 +150,7 @@ export function DocumentsPage() {
       title: t("documents.columns.status"),
       key: "status",
       render: (value) => (
-        <Badge variant={getStatusVariant(value)} shape="pill">
+        <Badge variant={getStatusVariant(value)} shape="pill" className="w-fit whitespace-nowrap">
           {getStatusLabel(t, value)}
         </Badge>
       ),

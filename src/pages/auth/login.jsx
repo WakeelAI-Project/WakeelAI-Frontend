@@ -108,6 +108,7 @@ export function LoginPage() {
           </span>
           <SegmentedControl
             name="login-role"
+            fullWidth
             className="w-full"
             value={selectedRole}
             onChange={setSelectedRole}
