@@ -280,7 +280,7 @@ export function CompanyProfilePage() {
           noValidate>
           <section className="rounded-md border border-(--border-default) bg-(--bg-card) p-6 text-start shadow-(--shadow-1)">
             <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
-              <div className="w-full sm:w-52 shrink-0">
+              <div className="w-max max-w-full shrink-0">
                 <LogoUploader
                   currentLogo={getImageUrl(company.logoUrl)}
                   value={logo}
