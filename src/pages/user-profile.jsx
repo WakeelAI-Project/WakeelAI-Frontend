@@ -8,7 +8,6 @@ import { Avatar, AvatarFallback } from "../components/ui/avatar"
 import { Badge } from "../components/ui/badge"
 import { useApp } from "../context/app-context"
 import { useAuth } from "../features/auth/hooks/use-auth"
-import { getEmployees } from "../features/company/services/employee-service"
 import { getCurrentUserProfile } from "../features/profile/services/user-service"
 import {
   DetailGrid,
@@ -42,13 +41,6 @@ function getRoleTranslationKey(role) {
   return null
 }
 
-function isHrRole(role) {
-  const normalizedRole = role?.toLowerCase()
-  return normalizedRole === "hr_manager" || 
-         normalizedRole === "hr" || 
-         normalizedRole === "hr & compliance lead"
-}
-
 // eslint-disable-next-line no-unused-vars
 const PASSWORD_MIN_LENGTH = 8
 
@@ -63,59 +55,43 @@ export function UserProfilePage() {
   const [isLoadingProfile, setIsLoadingProfile] = useState(true)
   const [profileError, setProfileError] = useState(null)
 
+  // GET /api/users/me is the profile source for BOTH HR managers and owners.
+  // (The old owner branch keyed off `sourceUser.sub`, a claim this JWT never
+  // carries, so no request was ever fired and every field rendered "—".)
   useEffect(() => {
-    const userRole = sourceUser?.role
-    const isHr = isHrRole(userRole)
+    let cancelled = false
 
-    if (isHr) {
-      // HR Manager: use GET /api/users/me
-      setIsLoadingProfile(true)
-      setProfileError(null)
-      getCurrentUserProfile()
-        .then((profile) => {
-          if (profile) {
-            // Map API response to internal structure
-            setRealUserDetail({
-              id: profile.user_id,
-              name: profile.full_name,
-              email: profile.email,
-              phone: profile.phone,
-              role: profile.role,
-              isActive: profile.is_active,
-              createdAt: profile.created_at,
-              companyId: profile.company_id,
-            })
-          }
+    setIsLoadingProfile(true)
+    setProfileError(null)
+
+    getCurrentUserProfile()
+      .then((profile) => {
+        if (cancelled || !profile) return
+        // Map API response to internal structure
+        setRealUserDetail({
+          id: profile.user_id,
+          name: profile.full_name,
+          email: profile.email,
+          phone: profile.phone,
+          role: profile.role,
+          isActive: profile.is_active,
+          createdAt: profile.created_at,
+          companyId: profile.company_id,
         })
-        .catch((err) => {
-          console.error("Failed to load HR Manager profile from /api/users/me:", err)
-          setProfileError(err?.message || "Failed to load profile")
-        })
-        .finally(() => {
-          setIsLoadingProfile(false)
-        })
-    } else if (sourceUser?.sub) {
-      // Employee or Owner: use getEmployees and match by ID
-      setIsLoadingProfile(true)
-      setProfileError(null)
-      getEmployees()
-        .then((users) => {
-          const matched = users.find((u) => u.id === sourceUser.sub)
-          if (matched) {
-            setRealUserDetail(matched)
-          }
-        })
-        .catch((err) => {
-          console.error("Failed to load user profile details from API:", err)
-          setProfileError(err?.message || "Failed to load profile")
-        })
-        .finally(() => {
-          setIsLoadingProfile(false)
-        })
-    } else {
-      setIsLoadingProfile(false)
+      })
+      .catch((err) => {
+        if (cancelled) return
+        console.error("Failed to load profile from /api/users/me:", err)
+        setProfileError(err?.message || "Failed to load profile")
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoadingProfile(false)
+      })
+
+    return () => {
+      cancelled = true
     }
-  }, [sourceUser?.sub, sourceUser?.role])
+  }, [])
 
   const profile = useMemo(() => {
     const rawName = realUserDetail?.name || sourceUser?.name || sourceUser?.nameEn
