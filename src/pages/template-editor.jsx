@@ -377,38 +377,9 @@ export function TemplateEditorPage({ mode = "create" }) {
   const { toast } = useToast();
   const contentRef = useRef(null);
 
-  // Holds the id once the template exists (edit mode: from route; create mode: after first save)
+  // Holds the id once the template exists (edit mode: from route; create mode: after save)
   const [ensuredTemplateId, setEnsuredTemplateId] = useState(templateId ?? null);
   const [boilerplateLang, setBoilerplateLang] = useState("en");
-
-  // Document type is a single source of truth: once a template row has been persisted
-  // (either because we're editing an existing one, or because clause generation silently
-  // pre-created a draft row via ensureTemplatePersisted), the backend treats DocumentType
-  // as immutable — PATCH doesn't even accept it. Locking the Select/Quick Start here keeps
-  // the visible type and the type that will actually be saved from ever diverging.
-  const isDocumentTypeLocked = isEdit || Boolean(ensuredTemplateId);
-
-  // Ensures a template row exists so clause generation (which needs an id) can run in create mode.
-  const ensureTemplatePersisted = useCallback(
-    async (values) => {
-      if (ensuredTemplateId) return ensuredTemplateId;
-      if (templateId) {
-        setEnsuredTemplateId(templateId);
-        return templateId;
-      }
-      const created = await createTemplate({
-        name: (values?.name || "Untitled template").trim(),
-        document_type: values?.document_type || "Contract",
-        content_template: values?.content_template || " ",
-        is_active: false,
-      });
-      const newId =
-        created?.template_id ?? created?.templateId ?? created?.id ?? null;
-      setEnsuredTemplateId(newId);
-      return newId;
-    },
-    [ensuredTemplateId, templateId],
-  );
 
   const [loading, setLoading] = useState(isEdit);
   const [loadError, setLoadError] = useState(null);
@@ -540,6 +511,48 @@ export function TemplateEditorPage({ mode = "create" }) {
     });
   };
 
+  /**
+   * Quick Start insertion: specifically prepends the boilerplate content at the TOP
+   * of the template, preserving any existing content underneath.
+   */
+  const handleInsertQuickStart = (docType) => {
+    setValue("document_type", docType, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+
+    const quickStartContent =
+      BOILERPLATE_TEMPLATES[boilerplateLang]?.[docType] ||
+      BOILERPLATE_TEMPLATES.en[docType] ||
+      "";
+
+    if (!quickStartContent) return;
+
+    const existingContent = getValues("content_template") || "";
+    const trimmedExisting = existingContent.trim();
+
+    // Prepend Quick Start content to the top, preserving existing content below
+    const nextContent = trimmedExisting
+      ? `${quickStartContent}\n\n${trimmedExisting}`
+      : quickStartContent;
+
+    setValue("content_template", nextContent, {
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true,
+    });
+
+    // Focus and position the cursor after the inserted Quick Start block
+    window.requestAnimationFrame(() => {
+      const textarea = contentRef.current;
+      if (textarea) {
+        textarea.focus();
+        const cursorPosition = quickStartContent.length + (trimmedExisting ? 2 : 0);
+        textarea.setSelectionRange(cursorPosition, cursorPosition);
+      }
+    });
+  };
+
   const handleGenerateClauses = async () => {
     setGenerationError("");
 
@@ -552,21 +565,13 @@ export function TemplateEditorPage({ mode = "create" }) {
     setGenerationPhase("context");
 
     try {
-      // Grab the current form values so we can persist a draft in create mode.
-      const currentValues = getValues();
-      const effectiveTemplateId = await ensureTemplatePersisted(currentValues);
-      if (!effectiveTemplateId) {
-        setGenerationError(
-          t("templates.errors.templateIdRequired") ||
-            "Could not prepare the template for clause generation.",
-        );
-        return;
-      }
-
       setGenerationPhase("clauses");
-      const response = await generateLegalClauses(effectiveTemplateId, {
+      const currentValues = getValues();
+      const response = await generateLegalClauses(templateId || null, {
         language: generationForm.language,
         clause_type: generationForm.clause_type,
+        document_type: generationForm.clause_type,
+        template_name: currentValues.name || generationForm.clause_type,
         include_labor_law: generationForm.include_labor_law,
         include_company_policy: generationForm.include_company_policy,
         instruction: generationForm.instruction,
@@ -694,21 +699,19 @@ export function TemplateEditorPage({ mode = "create" }) {
   const onSubmit = handleSubmit(async (values) => {
     clearErrors("root");
 
-    const sharedPayload = {
+    const payload = {
       name: values.name.trim(),
+      document_type: values.document_type,
       content_template: values.content_template,
       is_active: Boolean(values.is_active),
     };
 
     try {
-      if (isEdit || ensuredTemplateId) {
-        await updateTemplate(templateId ?? ensuredTemplateId, sharedPayload);
+      if (isEdit) {
+        await updateTemplate(templateId, payload);
         toast({ type: "success", message: t("templates.messages.updated") });
       } else {
-        const created = await createTemplate({
-          ...sharedPayload,
-          document_type: values.document_type,
-        });
+        const created = await createTemplate(payload);
         setEnsuredTemplateId(created?.template_id ?? created?.templateId ?? created?.id ?? null);
         toast({ type: "success", message: t("templates.messages.created") });
       }
@@ -740,11 +743,6 @@ export function TemplateEditorPage({ mode = "create" }) {
             <ArrowLeft className="h-4 w-4 rtl:rotate-180" aria-hidden="true" />
             {t("templates.backToTemplates")}
           </Button>
-          {isDocumentTypeLocked && (
-            <Badge variant="document" shape="pill">
-              {t("templates.documentTypeImmutable")}
-            </Badge>
-          )}
         </div>
 
         <div className="flex items-center gap-2">
@@ -867,7 +865,7 @@ export function TemplateEditorPage({ mode = "create" }) {
                       <Select
                         value={field.value || ""}
                         onValueChange={field.onChange}
-                        disabled={isDocumentTypeLocked || isSubmitting}>
+                        disabled={isSubmitting}>
                         <SelectTrigger
                           aria-label={t("templates.fields.documentType")}
                           className={
@@ -978,34 +976,7 @@ export function TemplateEditorPage({ mode = "create" }) {
                     variant="secondary"
                     size="sm"
                     disabled={isSubmitting}
-                    onClick={() => {
-                      if (!isDocumentTypeLocked) {
-                        setValue("document_type", docType, {
-                          shouldDirty: true,
-                          shouldValidate: true,
-                        });
-                      }
-
-                      const quickStartContent =
-                        BOILERPLATE_TEMPLATES[boilerplateLang]?.[docType] ||
-                        BOILERPLATE_TEMPLATES.en[docType];
-                      const existingContent = (getValues("content_template") || "").trim();
-                      // Insert at the beginning — never overwrite what HR already typed.
-                      const nextContent = existingContent
-                        ? `${quickStartContent}\n\n${existingContent}`
-                        : quickStartContent;
-
-                      setValue("content_template", nextContent, {
-                        shouldDirty: true,
-                        shouldTouch: true,
-                        shouldValidate: true,
-                      });
-
-                      window.requestAnimationFrame(() => {
-                        contentRef.current?.focus();
-                        contentRef.current?.setSelectionRange(0, 0);
-                      });
-                    }}
+                    onClick={() => handleInsertQuickStart(docType)}
                     className="justify-start text-left">
                     {label}
                   </Button>
@@ -1192,6 +1163,16 @@ export function TemplateEditorPage({ mode = "create" }) {
         generationError={generationError}
         form={generationForm}
         setForm={setGenerationForm}
+        onClauseTypeChange={(nextType) => {
+          setGenerationForm((current) => ({
+            ...current,
+            clause_type: nextType,
+          }));
+          setValue("document_type", nextType, {
+            shouldDirty: true,
+            shouldValidate: true,
+          });
+        }}
         onGenerate={handleGenerateClauses}
         clauses={generatedClauses}
         selectedClauseIds={selectedClauseIds}
@@ -1218,6 +1199,7 @@ function ClauseGenerationDialog({
   generationError,
   form,
   setForm,
+  onClauseTypeChange,
   onGenerate,
   clauses,
   selectedClauseIds,
@@ -1288,12 +1270,17 @@ function ClauseGenerationDialog({
                   <select
                     className="h-10 rounded-sm border border-(--border-default) bg-paper px-3 text-sm text-(--text-primary) focus:outline-none focus:border-(--border-focus)"
                     value={form.clause_type}
-                    onChange={(event) =>
-                      setForm((current) => ({
-                        ...current,
-                        clause_type: event.target.value,
-                      }))
-                    }
+                    onChange={(event) => {
+                      const nextType = event.target.value;
+                      if (onClauseTypeChange) {
+                        onClauseTypeChange(nextType);
+                      } else {
+                        setForm((current) => ({
+                          ...current,
+                          clause_type: nextType,
+                        }));
+                      }
+                    }}
                     aria-label={t("templates.generateLegalClausesClauseType")}>
                     <option value="" disabled>
                       {t("templates.generateLegalClausesClauseTypePlaceholder")}

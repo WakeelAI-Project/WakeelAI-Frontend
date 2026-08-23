@@ -56,10 +56,13 @@ const katexSanitizeSchema = {
   },
 };
 
-// The model sometimes returns LaTeX using `\[...\]` / `\(...\)` delimiters
-// instead of the `$$...$$` / `$...$` that remark-math recognizes. Convert
-// them before parsing, but never touch fenced/inline code so real code
-// samples containing backslashes or brackets aren't corrupted.
+// Unicode "asterisk" characters that LLMs sometimes emit instead of the
+// standard ASCII '*' (U+002A).  We normalise them to '*' so that
+// ReactMarkdown can turn ** ... ** into <strong> elements.
+const UNICODE_ASTERISK_RE = /[∗＊﹡⁎٭]/g;
+
+// Never touch fenced/inline code so real code samples containing
+// backslashes or brackets aren't corrupted.
 const CODE_SEGMENT_REGEX = /(```[\s\S]*?```|`[^`\n]*`)/g;
 
 function normalizeMathDelimiters(text) {
@@ -67,12 +70,47 @@ function normalizeMathDelimiters(text) {
     .split(CODE_SEGMENT_REGEX)
     .map((segment, index) => {
       if (index % 2 === 1) return segment; // code fence/span — leave untouched
-      return segment
-        .replace(/\\\[([\s\S]+?)\\\]/g, (_match, expr) => `\n\n$$${expr.trim()}$$\n\n`)
-        .replace(/\\\(([\s\S]+?)\\\)/g, (_match, expr) => `$${expr.trim()}$`);
+
+      // 1. Normalise Unicode asterisk variants → ASCII '*' outside code blocks.
+      let out = segment.replace(UNICODE_ASTERISK_RE, "*");
+
+      // 2. Convert \[...\] block math.  Strip any **bold** markers *inside*
+      //    the LaTeX expression so KaTeX doesn't choke on them, then render
+      //    the bold text as a separate Markdown segment that follows the math block.
+      out = out.replace(/\\\[([\s\S]+?)\\\]/g, (_match, expr) => {
+        // Extract trailing "= **value unit**" / "= *value unit*" patterns that
+        // the LLM incorrectly placed inside the math block.
+        const boldTrail = [];
+        let cleanExpr = expr.replace(
+          /=\s*\*{1,2}([^*]+?)\*{1,2}/g,
+          (_m, inner) => {
+            boldTrail.push(`**${inner.trim()}**`);
+            return "";
+          }
+        );
+        const suffix = boldTrail.length ? ` ${boldTrail.join(" ")}` : "";
+        return `\n\n$$${cleanExpr.trim()}$$\n\n${suffix}`;
+      });
+
+      // 3. Convert \(...\) inline math.  Same bold-extraction logic.
+      out = out.replace(/\\\(([\s\S]+?)\\\)/g, (_match, expr) => {
+        const boldTrail = [];
+        let cleanExpr = expr.replace(
+          /=\s*\*{1,2}([^*]+?)\*{1,2}/g,
+          (_m, inner) => {
+            boldTrail.push(`**${inner.trim()}**`);
+            return "";
+          }
+        );
+        const suffix = boldTrail.length ? ` ${boldTrail.join(" ")}` : "";
+        return `$${cleanExpr.trim()}$${suffix}`;
+      });
+
+      return out;
     })
     .join("");
 }
+
 
 export function safeMarkdownUrl(value) {
   const url = String(value || "").trim();

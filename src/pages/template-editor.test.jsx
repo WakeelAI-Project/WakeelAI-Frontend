@@ -57,6 +57,8 @@ vi.mock("react-i18next", () => ({
           "Choose a clause type before generating.",
         "templates.fields.documentType": "Document Type",
         "templates.fields.content": "Content Template",
+        "templates.placeholders.employeeName": "Employee Name",
+        "templates.placeholders.jobTitle": "Job Title",
         "templates.errors.aiUnavailable":
           "AI service is currently unavailable.",
         "templates.errors.noRelevantSources":
@@ -286,6 +288,69 @@ describe("TemplateEditorPage legal clause generation", () => {
     // Boilerplate must come first, existing content preserved after it.
     expect(contentTextarea.value.indexOf("Employment Contract")).toBeLessThan(
       contentTextarea.value.indexOf("My custom clause text."),
+    );
+  });
+
+  it("normal editor typing and inserting variable placeholders work at cursor and are not forced to top", async () => {
+    const { container } = render(<TemplateEditorPage mode="create" />);
+
+    const contentTextarea = container.querySelector('textarea[name="content_template"]');
+    fireEvent.change(contentTextarea, { target: { value: "Header line\nMiddle line\nFooter line" } });
+    expect(contentTextarea).toHaveValue("Header line\nMiddle line\nFooter line");
+
+    // Simulate placing cursor at the end
+    contentTextarea.selectionStart = contentTextarea.value.length;
+    contentTextarea.selectionEnd = contentTextarea.value.length;
+
+    // Normal typing appends where typed
+    fireEvent.change(contentTextarea, { target: { value: contentTextarea.value + "\nAppended text" } });
+    expect(contentTextarea.value.endsWith("Appended text")).toBe(true);
+
+    // Clicking a placeholder inserts at cursor position (at the end)
+    contentTextarea.selectionStart = contentTextarea.value.length;
+    contentTextarea.selectionEnd = contentTextarea.value.length;
+    const placeholderButton = screen.getAllByRole("button", { name: /Employee Name/i })[0];
+    if (placeholderButton) {
+      fireEvent.click(placeholderButton);
+      expect(contentTextarea.value.endsWith("{{employee_name}}")).toBe(true);
+    }
+  });
+
+  it("successive Quick Start clicks prepend each time without losing existing content (both Arabic and English)", async () => {
+    const { container } = render(<TemplateEditorPage mode="create" />);
+
+    const contentTextarea = container.querySelector('textarea[name="content_template"]');
+    fireEvent.change(contentTextarea, { target: { value: "Initial base content" } });
+
+    const quickStartSection = screen.getAllByText("Quick start")[0].closest("section");
+    
+    // English Quick Start
+    fireEvent.click(within(quickStartSection).getByRole("button", { name: "Warning Letter" }));
+    await waitFor(() => {
+      expect(contentTextarea.value).toContain("Warning Letter");
+      expect(contentTextarea.value).toContain("Initial base content");
+    });
+    expect(contentTextarea.value.indexOf("Warning Letter")).toBeLessThan(
+      contentTextarea.value.indexOf("Initial base content"),
+    );
+
+    // Switch to Arabic and insert Arabic Quick Start
+    fireEvent.click(within(quickStartSection).getByRole("button", { name: "العربية" }));
+    const arButton = await within(quickStartSection).findByRole("button", { name: "عقد عمل فردي" });
+    fireEvent.click(arButton);
+
+    await waitFor(() => {
+      expect(contentTextarea.value).toContain("عقد عمل فردي");
+      expect(contentTextarea.value).toContain("Warning Letter");
+      expect(contentTextarea.value).toContain("Initial base content");
+    });
+
+    // Arabic contract is prepended to top, warning letter is below it, initial content is at the bottom
+    expect(contentTextarea.value.indexOf("عقد عمل فردي")).toBeLessThan(
+      contentTextarea.value.indexOf("Warning Letter"),
+    );
+    expect(contentTextarea.value.indexOf("Warning Letter")).toBeLessThan(
+      contentTextarea.value.indexOf("Initial base content"),
     );
   });
 

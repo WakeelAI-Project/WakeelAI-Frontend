@@ -7,6 +7,7 @@ import {
   sendMessage as sendAssistantMessage,
   deleteConversation as deleteConversationService,
 } from "../services/assistant-service";
+import { registerAssistantStoreReset } from "../../auth/store/auth-store";
 
 const createLocalId = (prefix) =>
   `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -106,6 +107,15 @@ export const useAssistantStore = create((set, get) => ({
 
   setTargetContext: (targetContext) => {
     set({ targetContext });
+  },
+
+  /**
+   * Resets all assistant state to the initial empty state.
+   * Must be called on logout, clearAuth, and whenever the authenticated user changes
+   * to prevent cross-user conversation leakage.
+   */
+  resetStore: () => {
+    set({ ...initialState });
   },
 
   selectConversation: async (conversationId) => {
@@ -329,3 +339,8 @@ export const useAssistantStore = create((set, get) => ({
     }
   },
 }));
+
+// Register the resetStore function with the auth store so that clearAuth()
+// (called on logout) automatically resets assistant state, preventing
+// cross-user conversation leakage within the same browser session.
+registerAssistantStoreReset(() => useAssistantStore.getState().resetStore());

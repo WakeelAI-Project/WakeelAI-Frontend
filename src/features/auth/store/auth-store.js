@@ -12,6 +12,15 @@ import {
   setUserCookie,
 } from "../../../lib/cookies";
 
+/**
+ * Lazily-resolved reference to the assistant store's resetStore action.
+ * The assistant store registers itself here after initialization, breaking
+ * the circular module dependency that would occur with a static import.
+ */
+let _resetAssistantStore = null;
+export const registerAssistantStoreReset = (fn) => { _resetAssistantStore = fn; };
+const resetAssistantStore = () => { if (_resetAssistantStore) _resetAssistantStore(); };
+
 // Bug 3c fix: the backend refresh token is an opaque random string, not a JWT.
 // Attempting to JWT-decode it always throws and logs a console.error.
 // Use a fixed 30-day TTL instead.
@@ -159,6 +168,8 @@ export const useAuthStore = create((set, get) => ({
     setAuthToken(null);
     removeAllAuthCookies();
     set(initialStoreState);
+    // Reset assistant store to prevent cross-user conversation leakage
+    resetAssistantStore();
   },
 
   /**

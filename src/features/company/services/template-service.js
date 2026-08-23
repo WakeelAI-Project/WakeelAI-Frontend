@@ -83,12 +83,18 @@ export async function updateTemplate(templateId, payload) {
   return data;
 }
 
-export async function generateLegalClauses(templateId, payload) {
-  if (!templateId) {
-    const error = new Error("templateId is required.");
-    error.code = "validation_error";
-    error.retryable = false;
-    throw error;
+export async function generateLegalClauses(templateIdOrPayload, maybePayload) {
+  let templateId = null;
+  let payload = null;
+
+  if (typeof templateIdOrPayload === "string" && templateIdOrPayload.trim()) {
+    templateId = templateIdOrPayload.trim();
+    payload = maybePayload || {};
+  } else if (templateIdOrPayload && typeof templateIdOrPayload === "object") {
+    payload = templateIdOrPayload;
+    templateId = maybePayload && typeof maybePayload === "string" ? maybePayload : null;
+  } else {
+    payload = maybePayload || {};
   }
 
   const requestBody = {
@@ -97,12 +103,15 @@ export async function generateLegalClauses(templateId, payload) {
     include_company_policy: Boolean(payload?.include_company_policy),
     instruction: payload?.instruction ?? "",
     ...(payload?.clause_type ? { clause_type: payload.clause_type } : {}),
+    ...(payload?.document_type ? { document_type: payload.document_type } : {}),
+    ...(payload?.template_name ? { template_name: payload.template_name } : {}),
   };
 
-  const { data } = await api.post(
-    `/Templates/${templateId}/generate-clauses`,
-    requestBody,
-  );
+  const endpoint = templateId
+    ? `/Templates/${templateId}/generate-clauses`
+    : `/Templates/generate-clauses`;
+
+  const { data } = await api.post(endpoint, requestBody);
   return data;
 }
 

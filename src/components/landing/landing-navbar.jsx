@@ -1,8 +1,9 @@
 import React, { useState } from "react"
 import { Link } from "react-router"
-import { Menu, X } from "lucide-react"
+import { Menu, Moon, Sun, X } from "lucide-react"
 import { useReducedMotion } from "framer-motion"
 import { Button } from "../ui/button"
+import { useTheme } from "../providers/theme-provider"
 import { useLocale } from "../../hooks/use-locale"
 import { cn } from "../../lib/utils"
 
@@ -17,6 +18,7 @@ export function LandingNavbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const shouldReduceMotion = useReducedMotion()
   const { t, isRtl, changeLanguage } = useLocale()
+  const { theme, toggleTheme } = useTheme()
 
   const handleSectionClick = (event, href) => {
     event.preventDefault()
@@ -67,6 +69,19 @@ export function LandingNavbar() {
         </nav>
 
         <div className="hidden items-center gap-2 lg:flex">
+          <Button
+            variant="ghost"
+            size="md"
+            onClick={toggleTheme}
+            className="h-10 w-10 p-0 cursor-pointer text-(--text-secondary) hover:text-(--text-primary) hover:bg-(--bg-card-subtle) border border-(--border-default) rounded-sm"
+            aria-label={t("topbar.toggleTheme")}
+            title={t("topbar.toggleTheme")}>
+            {theme === "light" ? (
+              <Moon className="h-4 w-4" />
+            ) : (
+              <Sun className="h-4 w-4" />
+            )}
+          </Button>
           <button
             className="inline-flex h-10 min-w-16 items-center justify-center rounded-sm border border-(--border-default) bg-(--bg-card-subtle) px-3 text-sm font-semibold text-(--text-secondary) transition-colors hover:bg-(--bg-card) hover:text-(--text-primary) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--border-focus)"
             onClick={toggleLanguage}
@@ -118,13 +133,28 @@ export function LandingNavbar() {
           ))}
         </nav>
         <div className="mt-4 grid gap-2 border-t border-(--border-default) pt-4">
-          <button
-            className="inline-flex h-10 items-center justify-center rounded-sm border border-(--border-default) bg-(--bg-card-subtle) px-3 text-sm font-semibold text-(--text-secondary) transition-colors hover:bg-(--bg-card) hover:text-(--text-primary) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--border-focus)"
-            onClick={toggleLanguage}
-            type="button"
-          >
-            {isRtl ? t("topbar.englishLayout") : t("topbar.arabicLayout")}
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              className="inline-flex h-10 flex-1 items-center justify-center rounded-sm border border-(--border-default) bg-(--bg-card-subtle) px-3 text-sm font-semibold text-(--text-secondary) transition-colors hover:bg-(--bg-card) hover:text-(--text-primary) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--border-focus)"
+              onClick={toggleLanguage}
+              type="button"
+            >
+              {isRtl ? t("topbar.englishLayout") : t("topbar.arabicLayout")}
+            </button>
+            <Button
+              variant="ghost"
+              size="md"
+              onClick={toggleTheme}
+              className="h-10 w-10 shrink-0 p-0 border border-(--border-default) bg-(--bg-card-subtle) cursor-pointer text-(--text-secondary) hover:text-(--text-primary) hover:bg-(--bg-card)"
+              aria-label={t("topbar.toggleTheme")}
+              title={t("topbar.toggleTheme")}>
+              {theme === "light" ? (
+                <Moon className="h-4 w-4" />
+              ) : (
+                <Sun className="h-4 w-4" />
+              )}
+            </Button>
+          </div>
           <Button asChild size="md" variant="secondary">
             <Link onClick={() => setIsMenuOpen(false)} to="/login">
               {t("landing.actions.signIn")}
