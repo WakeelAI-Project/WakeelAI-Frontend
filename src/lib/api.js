@@ -141,9 +141,10 @@ api.interceptors.response.use(
       error.response?.status === 403 &&
       error.response?.data?.error === "password_change_required"
     ) {
-      if (typeof window !== "undefined" && !window.location.pathname.includes("/change-password")) {
-        window.location.href = "/change-password";
-      }
+      // Flip the flag and let ProtectedRoute navigate client-side.
+      // A `window.location.href` here would hard-reload the SPA and destroy the
+      // router state carrying the temporary password from the login screen.
+      _getStoreState?.().setMustChangePassword?.(true);
       return Promise.reject(error);
     }
 

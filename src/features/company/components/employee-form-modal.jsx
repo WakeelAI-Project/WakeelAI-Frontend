@@ -1,6 +1,8 @@
 import React, { useEffect } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
+import { Link } from "react-router"
+import { useAuth } from "../../auth/hooks/use-auth"
 import { Button } from "../../../components/ui/button"
 import { Dropdown } from "../../../components/ui/dropdown"
 import { Input } from "../../../components/ui/input"
@@ -92,7 +94,13 @@ export function EmployeeFormModal({
   onSuccess,
 }) {
   const { t } = useTranslation()
+  const { currentUser } = useAuth()
   const isEdit = mode === "edit"
+  // FIX-13: department create is Company_Owner-only, so a fresh company's HR
+  // account can hit this modal with nothing to pick from. Editing an existing
+  // employee is unaffected — they already have a valid department assigned.
+  const hasNoDepartments = !isEdit && departments.length === 0
+  const isOwner = currentUser?.role === "Company_Owner" || currentUser?.role === "Owner"
 
   const {
     control,
@@ -187,6 +195,40 @@ export function EmployeeFormModal({
       onSuccess?.({ error: err })
     }
   })
+
+  if (hasNoDepartments) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t("employees.formCreateTitle")}</DialogTitle>
+          </DialogHeader>
+
+          <div className="rounded-md border border-dashed border-(--border-default) bg-(--bg-card-subtle) p-5 text-start">
+            <p className="text-sm font-medium text-(--text-primary)">
+              {t("employees.noDepartmentsTitle")}
+            </p>
+            <p className="mt-1.5 text-sm text-(--text-secondary)">
+              {isOwner
+                ? t("employees.noDepartmentsDescriptionOwner")
+                : t("employees.noDepartmentsDescriptionHr")}
+            </p>
+            {isOwner && (
+              <Button asChild variant="secondary" size="sm" className="mt-4">
+                <Link to="/owner/departments">{t("employees.goToDepartments")}</Link>
+              </Button>
+            )}
+          </div>
+
+          <DialogFooter className="pt-2">
+            <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
+              {t("common.close")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    )
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

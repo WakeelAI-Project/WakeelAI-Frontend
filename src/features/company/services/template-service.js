@@ -85,7 +85,7 @@ export async function updateTemplate(templateId, payload) {
 
 export async function generateLegalClauses(templateIdOrPayload, maybePayload) {
   let templateId = null;
-  let payload = null;
+  let payload;
 
   if (typeof templateIdOrPayload === "string" && templateIdOrPayload.trim()) {
     templateId = templateIdOrPayload.trim();

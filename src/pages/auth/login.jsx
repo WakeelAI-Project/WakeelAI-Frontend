@@ -1,21 +1,26 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { Link, useLocation, useNavigate } from "react-router";
+import { Link, useLocation, useNavigate, useOutletContext } from "react-router";
 import { AuthLayout } from "../../components/auth/auth-layout";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { SegmentedControl } from "../../components/ui/segmented-control";
 import { useAuth } from "../../features/auth/hooks/use-auth";
 import { decodeToken } from "../../features/auth/utils/jwt";
+import {
+  dashboardPathForRole,
+  resolveWebRole,
+} from "../../features/auth/utils/roles";
 import { useLocale } from "../../hooks/use-locale";
 import { useTranslation } from "react-i18next";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function LoginPage() {
-  const { login } = useAuth();
+  const { loginWithoutCommit, commitSession, clearAuth } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const outletContext = useOutletContext();
   const [selectedRole, setSelectedRole] = useState("Owner");
   const [submitError, setSubmitError] = useState("");
   const [successMessage, setSuccessMessage] = useState(
@@ -36,6 +41,13 @@ export function LoginPage() {
       navigate(location.pathname, { replace: true });
     }
   }, [location.search, location.pathname, navigate, t]);
+
+  // GuestRoute clears any session whose role has no web console (Employee) and
+  // hands the reason down through the outlet context.
+  const authNotice = outletContext?.authNotice;
+  React.useEffect(() => {
+    if (authNotice) setSubmitError(t(authNotice));
+  }, [authNotice, t]);
   const {
     register,
     handleSubmit,
@@ -51,8 +63,10 @@ export function LoginPage() {
     setSessionExpiredMessage("");
 
     try {
-      // Use the auth store's login method which handles temporary password storage
-      const normalized = await login(email, password);
+      // Fetch the token WITHOUT committing a session — the role claim has to be
+      // inspected first, otherwise GuestRoute navigates away the instant
+      // isAuthenticated flips and the checks below become unreachable.
+      const normalized = await loginWithoutCommit(email, password);
 
       if (!normalized.token) {
         setSubmitError(t("auth.loginFailed"));
@@ -60,35 +74,40 @@ export function LoginPage() {
       }
 
       const decoded = decodeToken(normalized.token);
-      const role = (decoded?.role || "").toLowerCase();
+      const webRole = resolveWebRole(decoded?.role);
+
+      // Employees are mobile-only — no web session is created for them.
+      if (!webRole) {
+        clearAuth();
+        resetField("password");
+        setSubmitError(t("auth.employeeMobileOnly"));
+        return;
+      }
+
       const matchesRole =
-        selectedRole === "Owner" ? role.includes("owner") : role.includes("hr");
+        selectedRole === "Owner" ? webRole === "owner" : webRole === "hr";
 
       if (!matchesRole) {
+        clearAuth();
         resetField("password");
         setSubmitError(t("auth.roleMismatch"));
         return;
       }
 
+      // Role verified — only now does a session exist.
+      commitSession(normalized);
+
       // Check must_change_password and redirect if needed
       if (normalized.mustChangePassword) {
         // Redirect to change password page with password in navigation state
-        navigate("/change-password", { 
+        navigate("/change-password", {
           replace: true,
           state: { currentPassword: password }
         });
         return;
       }
 
-      // Normal login flow - navigate directly to role-specific dashboard
-      if (role.includes("hr")) {
-        navigate("/hr/dashboard", { replace: true });
-      } else if (role.includes("owner")) {
-        navigate("/owner/dashboard", { replace: true });
-      } else {
-        // Fallback to HR dashboard for unknown roles
-        navigate("/hr/dashboard", { replace: true });
-      }
+      navigate(dashboardPathForRole(decoded?.role), { replace: true });
     } catch (error) {
       setSubmitError(error?.message || t("auth.loginFailed"));
     }

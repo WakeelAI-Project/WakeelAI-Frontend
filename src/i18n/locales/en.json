@@ -250,6 +250,7 @@
     "resetPasswordError": "Unable to reset the password. Please try again.",
     "invalidOtp": "Enter the 6-digit verification code.",
     "roleMismatch": "This account does not match the selected user type. Check the selection and try again.",
+    "employeeMobileOnly": "This account is for the employee mobile app. Please use the Wakeel mobile app to sign in.",
     "loginFailed": "Unable to log in. Please try again.",
     "registerFailed": "Unable to create the account. Please try again.",
     "changePasswordTitle": "Change Your Password",
@@ -262,6 +263,7 @@
     "passwordChanged": "Password changed successfully. Please log in with your new password.",
     "passwordChangeFailed": "Failed to change password. Please try again.",
     "missingCurrentPassword": "Current password is required.",
+    "currentPasswordUnknown": "Enter the password you just signed in with. If you no longer have it, reset your password instead.",
     "passwordMismatch": "Passwords do not match",
     "changePasswordFooter": "After changing your password, you will be redirected to log in again.",
     "sessionExpired": "Your session expired. Please log in again."
@@ -279,9 +281,7 @@
     "companyProfile": "Company Profile",
     "myProfile": "My Profile",
     "employees": "Employees",
-    "contracts": "Contracts",
     "leave": "Leave",
-    "compliance": "Compliance",
     "documents": "Documents",
     "templates": "Templates",
     "assistant": "AI Assistant",
@@ -436,6 +436,10 @@
     "jobTitleRequired": "Job title is required",
     "departmentRequired": "Department is required",
     "departmentNotFound": "Selected department no longer exists.",
+    "noDepartmentsTitle": "No departments yet",
+    "noDepartmentsDescriptionOwner": "You need at least one department before you can add employees. Create one from the Departments page.",
+    "noDepartmentsDescriptionHr": "Ask the company owner to create a department before adding employees.",
+    "goToDepartments": "Go to Departments",
     "hireDateRequired": "Hire date is required",
     "hireDateFuture": "Hire date cannot be in the future",
     "salaryRequired": "Salary is required",
@@ -448,16 +452,9 @@
     "deactivateSuccess": "Employee status updated"
   },
   "contracts": {
-    "officialRecords": "Official Records",
-    "title": "Contracts",
-    "description": "Draft, verify, and file employment agreements with a clear official/legal treatment.",
-    "employeeLabel": "Employee: {{name}}",
     "issuedDate": "Issued Date",
-    "basicSalary": "Basic Salary",
     "viewContract": "View Contract",
-    "tempAgreement": "Temporary Employment Agreement",
-    "citation": "Article 84 · Labor Law 12/2003",
-    "content": "Under this agreement, both parties commit to the temporary employment terms while respecting Egyptian Labor Law limits on working hours, pay, and leave.\n\nArticle One: Scope of Work\nThe employee is assigned consulting duties for three months, renewable by mutual consent."
+    "citation": "Article 84 · Labor Law 12/2003"
   },
   "leave": {
     "timeOff": "Time Off",
@@ -469,6 +466,8 @@
     "durationLabel": "Leave Duration",
     "days": "days",
     "leaveApprovals": "Leave Approvals",
+    "leaveOverviewTitle": "Leave Overview",
+    "readOnlyDescription": "View your company's leave requests. Approving and rejecting is handled by HR.",
     "employeeName": "Employee Name",
     "leaveType": "Leave Type",
     "startDate": "Start Date",
@@ -510,17 +509,6 @@
     "actionFailed": "Action Failed",
     "approveFailed": "Approval Failed",
     "rejectFailed": "Rejection Failed"
-  },
-  "compliance": {
-    "grounding": "Visible Grounding",
-    "title": "Compliance",
-    "description": "Every recommendation stays tied to the exact labor-law article behind it.",
-    "scanTitle": "Working-hours scan",
-    "scanDesc": "Matched attendance logs against Article 84.",
-    "reviewTitle": "Leave review",
-    "reviewDesc": "Two cases need review before month end.",
-    "exportTitle": "Export report",
-    "exportDesc": "Ready after review approval."
   },
   "documents": {
     "vault": "Document Vault",
@@ -978,5 +966,11 @@
     "statusColumn": "Status",
     "active": "Active",
     "inactive": "Inactive"
+  },
+  "errors": {
+    "forbiddenTitle": "You don't have access to this area",
+    "forbiddenDescription": "Your account role does not allow access to this part of the workspace. Go back to your own dashboard, or sign out and use a different account.",
+    "backToDashboard": "Back to my dashboard",
+    "signOut": "Sign out"
   }
 }

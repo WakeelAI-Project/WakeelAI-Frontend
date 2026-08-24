@@ -25,7 +25,7 @@ import {
 import { ExternalLink, Eye } from "lucide-react"
 import { getImageUrl } from "../utils/get-image-url"
 
-export function LeavePage() {
+export function LeavePage({ readOnly = false }) {
   const { t } = useTranslation()
   const { isRtl } = useLocale()
   const { toast } = useToast()
@@ -215,7 +215,7 @@ export function LeavePage() {
               <Eye className="h-3.5 w-3.5" />
             </Button>
           )}
-          {row.status === "Pending" && (
+          {!readOnly && row.status === "Pending" && (
             <>
               <Button
                 variant="primary"
@@ -243,8 +243,8 @@ export function LeavePage() {
   return (
     <PageShell
       eyebrow={t("leave.timeOff")}
-      title={t("leave.leaveApprovals")}
-      description={t("leave.description")}
+      title={readOnly ? t("leave.leaveOverviewTitle") : t("leave.leaveApprovals")}
+      description={readOnly ? t("leave.readOnlyDescription") : t("leave.description")}
     >
       <div className="space-y-6">
         {/* Tab Selection & Sub-filters */}

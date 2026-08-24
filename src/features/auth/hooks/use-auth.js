@@ -12,11 +12,14 @@ export function useAuth() {
   const mustChangePassword = useAuthStore((state) => state.mustChangePassword);
   const temporaryPassword = useAuthStore((state) => state.temporaryPassword);
   const login = useAuthStore((state) => state.login);
+  const loginWithoutCommit = useAuthStore((state) => state.loginWithoutCommit);
+  const commitSession = useAuthStore((state) => state.commitSession);
   const logout = useAuthStore((state) => state.logout);
   const setToken = useAuthStore((state) => state.setToken);
   const setRefreshToken = useAuthStore((state) => state.setRefreshToken);
   const clearAuth = useAuthStore((state) => state.clearAuth);
   const clearTemporaryPassword = useAuthStore((state) => state.clearTemporaryPassword);
+  const setMustChangePassword = useAuthStore((state) => state.setMustChangePassword);
   const clearMustChangePassword = useAuthStore((state) => state.clearMustChangePassword);
   const bootstrapAuth = useAuthStore((state) => state.bootstrapAuth);
 
@@ -28,11 +31,14 @@ export function useAuth() {
     mustChangePassword,
     temporaryPassword,
     login,
+    loginWithoutCommit,
+    commitSession,
     logout,
     setToken,
     setRefreshToken,
     clearAuth,
     clearTemporaryPassword,
+    setMustChangePassword,
     clearMustChangePassword,
     bootstrapAuth,
   };
