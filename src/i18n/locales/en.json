@@ -731,7 +731,7 @@
     "title": "AI Assistant",
     "description": "Ask Wakeel to answer HR questions, draft documents, calculate entitlements, and cite the sources behind its answers.",
     "identity": "Wakeel AI",
-    "searching": "Searching Egyptian Labor Law...",
+    "searching": "Working on your request...",
     "thinking": "Drafting overtime clause...",
     "inputPlaceholder": "Ask Wakeel about any regulation...",
     "composerLabel": "Message Wakeel AI",
