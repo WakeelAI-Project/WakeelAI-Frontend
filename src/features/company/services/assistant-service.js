@@ -135,34 +135,6 @@ export function normalizeResultCard(rawCard) {
     };
   }
 
-  // FIX-05: confirmation prompt for an irreversible action (e.g. submitting or
-  // cancelling a leave draft resolved from a typed "send it" / "cancel it") - the
-  // assistant executes only on the user's next affirmative turn, never on card render.
-  if (rawCard.type === "confirmation") {
-    return {
-      type: "confirmation",
-      message: pick(rawCard, ["message", "prompt"]) || null,
-      confirmPrompt: pick(rawCard, ["confirm_prompt", "confirmPrompt"]) || null,
-      cancelPrompt: pick(rawCard, ["cancel_prompt", "cancelPrompt"]) || null,
-    };
-  }
-
-  // A typed "send it" / "cancel it" that matches more than one draft - the assistant
-  // lists the candidates and waits for the user to pick one in their next turn.
-  if (rawCard.type === "needs_disambiguation") {
-    return {
-      type: "needs_disambiguation",
-      message: pick(rawCard, ["message", "prompt"]) || null,
-      options: toArray(rawCard.options).map((option) => ({
-        requestId: pick(option, ["request_id", "requestId"]) || null,
-        leaveType: pick(option, ["leave_type", "leaveType"]) || null,
-        startDate: pick(option, ["start_date", "startDate"]) || null,
-        endDate: pick(option, ["end_date", "endDate"]) || null,
-        label: pick(option, ["label"]) || null,
-      })),
-    };
-  }
-
   return {
     type: stringifyValue(rawCard.type),
     raw: rawCard,
