@@ -281,9 +281,7 @@
     "companyProfile": "Company Profile",
     "myProfile": "My Profile",
     "employees": "Employees",
-    "contracts": "Contracts",
     "leave": "Leave",
-    "compliance": "Compliance",
     "documents": "Documents",
     "templates": "Templates",
     "assistant": "AI Assistant",
@@ -455,16 +453,9 @@
     "deactivateSuccess": "Employee status updated"
   },
   "contracts": {
-    "officialRecords": "Official Records",
-    "title": "Contracts",
-    "description": "Draft, verify, and file employment agreements with a clear official/legal treatment.",
-    "employeeLabel": "Employee: {{name}}",
     "issuedDate": "Issued Date",
-    "basicSalary": "Basic Salary",
     "viewContract": "View Contract",
-    "tempAgreement": "Temporary Employment Agreement",
-    "citation": "Article 84 · Labor Law 12/2003",
-    "content": "Under this agreement, both parties commit to the temporary employment terms while respecting Egyptian Labor Law limits on working hours, pay, and leave.\n\nArticle One: Scope of Work\nThe employee is assigned consulting duties for three months, renewable by mutual consent."
+    "citation": "Article 84 · Labor Law 12/2003"
   },
   "leave": {
     "timeOff": "Time Off",
@@ -519,17 +510,6 @@
     "actionFailed": "Action Failed",
     "approveFailed": "Approval Failed",
     "rejectFailed": "Rejection Failed"
-  },
-  "compliance": {
-    "grounding": "Visible Grounding",
-    "title": "Compliance",
-    "description": "Every recommendation stays tied to the exact labor-law article behind it.",
-    "scanTitle": "Working-hours scan",
-    "scanDesc": "Matched attendance logs against Article 84.",
-    "reviewTitle": "Leave review",
-    "reviewDesc": "Two cases need review before month end.",
-    "exportTitle": "Export report",
-    "exportDesc": "Ready after review approval."
   },
   "documents": {
     "vault": "Document Vault",
