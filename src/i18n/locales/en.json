@@ -476,6 +476,8 @@
     "durationLabel": "Leave Duration",
     "days": "days",
     "leaveApprovals": "Leave Approvals",
+    "leaveOverviewTitle": "Leave Overview",
+    "readOnlyDescription": "View your company's leave requests. Approving and rejecting is handled by HR.",
     "employeeName": "Employee Name",
     "leaveType": "Leave Type",
     "startDate": "Start Date",

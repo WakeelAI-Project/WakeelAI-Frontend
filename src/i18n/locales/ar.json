@@ -474,6 +474,8 @@
     "durationLabel": "مدة الإجازة",
     "days": "أيام",
     "leaveApprovals": "موافقات الإجازات",
+    "leaveOverviewTitle": "نظرة عامة على الإجازات",
+    "readOnlyDescription": "اطّلع على طلبات إجازات شركتك. تتولى الموارد البشرية الموافقة والرفض.",
     "employeeName": "اسم الموظف",
     "leaveType": "نوع الإجازة",
     "startDate": "تاريخ البدء",

@@ -66,6 +66,7 @@ export function Sidebar({
             "company-profile",
             "departments",
             "hr-team",
+            "leave",
           ].includes(item.id),
         )
       : NAV_ITEMS.filter(

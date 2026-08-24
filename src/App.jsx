@@ -200,6 +200,7 @@ const router = createBrowserRouter([
           { path: "account-settings", element: <AccountSettingsPage /> },
           { path: "departments", element: <DepartmentsPage canManage /> },
           { path: "hr-team", element: <HrTeamPage /> },
+          { path: "leave", element: <LeavePage readOnly /> },
         ],
       },
     ],
