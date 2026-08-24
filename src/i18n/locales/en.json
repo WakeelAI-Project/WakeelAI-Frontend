@@ -208,6 +208,18 @@
     }
   },
   "auth": {
+    "heroBadge": "Secure. Compliant. Intelligent.",
+    "heroHeadlinePart1": "AI-Powered Legal",
+    "heroHeadlineAccent": "Intelligence",
+    "heroHeadlinePart2": "for HR",
+    "heroDescription": "Empowering HR teams and company owners with smart legal insights, compliant documents, and seamless management.",
+    "feature1Title": "HR & Owner Focused",
+    "feature1Desc": "Built for your daily legal needs",
+    "feature2Title": "100% Compliant",
+    "feature2Desc": "Aligned with Egyptian Labor Law",
+    "feature3Title": "AI Legal Assistant",
+    "feature3Desc": "Ask. Get answers. Take action.",
+    "footerText": "Wakeel AI • Final project build",
     "welcomeBack": "Welcome back",
     "welcomeDesc": "Sign in as the company owner or an invited HR user.",
     "createOwner": "Create owner account",

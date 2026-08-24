@@ -165,6 +165,7 @@ export function LoginPage() {
         <Input
           type="email"
           label={t("auth.email")}
+          placeholder="you@example.com"
           autoComplete="email"
           required
           errorText={errors.email?.message}
@@ -176,39 +177,42 @@ export function LoginPage() {
             },
           })}
         />
-        <Input
-          type="password"
-          label={t("auth.password")}
-          autoComplete="current-password"
-          required
-          errorText={errors.password?.message}
-          {...register("password", { required: t("validation.required") })}
-        />
+        <div className="flex flex-col gap-1.5">
+          <Input
+            type="password"
+            label={t("auth.password")}
+            autoComplete="current-password"
+            required
+            errorText={errors.password?.message}
+            {...register("password", { required: t("validation.required") })}
+          />
+          <div className="flex justify-end pt-1">
+            <Link
+              className="text-sm font-medium text-sky-600 hover:text-sky-700 dark:text-sky-400 dark:hover:text-sky-300 underline-offset-4 hover:underline transition-colors"
+              to="/forgot-password">
+              {t("auth.forgotPassword")}
+            </Link>
+          </div>
+        </div>
+
         <Button
           type="submit"
           variant="primary"
           size="lg"
-          className="mt-2 w-full"
+          className="mt-2 w-full h-11 text-base font-semibold shadow-sm"
           isLoading={isSubmitting}
           loadingText={t("auth.signingIn")}>
           {t("auth.signIn")}
         </Button>
       </form>
 
-      <div className="mt-6 flex flex-col items-center gap-2 text-sm text-(--text-secondary)">
+      <div className="mt-8 text-center text-sm text-(--text-secondary)">
+        <span>{t("auth.newOwner")} </span>
         <Link
-          className="font-medium text-(--brand-primary) underline-offset-4 hover:underline"
-          to="/forgot-password">
-          {t("auth.forgotPassword")}
+          className="font-semibold text-sky-600 hover:text-sky-700 dark:text-sky-400 dark:hover:text-sky-300 underline-offset-4 hover:underline transition-colors ms-1"
+          to="/register">
+          {t("auth.createAccount")}
         </Link>
-        <p>
-          {t("auth.newOwner")}{" "}
-          <Link
-            className="font-semibold text-(--brand-primary) underline-offset-4 hover:underline"
-            to="/register">
-            {t("auth.createAccount")}
-          </Link>
-        </p>
       </div>
     </AuthLayout>
   );
