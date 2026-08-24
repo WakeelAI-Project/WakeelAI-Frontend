@@ -133,7 +133,6 @@ Branch off `develop` (not `main`) and name branches by what they do: `feature/<n
 Built by the Wakeel AI graduation team as an ITI AI Capstone project:
 
 - [Assem Mohamed](https://github.com/Assem-Mohamed)
-- Ahmed Alaa
-- [Ahmed Hegazy](https://github.com/ahmedalaa417)
+- [Ahmed Alaa](https://github.com/ahmedalaa417)
 - [Hosam Abdullah](https://github.com/Hosam-Abdullah)
-- Mohanad Tarek
+- [Mohanad Tarek](https://github.com/HONDA-74)
