@@ -77,8 +77,8 @@ export function CompanyProfilePage() {
     reset,
     formState: { errors, isSubmitting },
   } = useForm({ defaultValues: EMPTY_COMPANY });
-  // Loads exactly once per mount. On 403, no company data (real, JWT-derived,
-  // or mock) is ever set — isForbidden gates the entire form.
+  // Loads exactly once per mount. On 403, no company data is set;
+  // isForbidden gates the entire form.
   useEffect(() => {
     let ignore = false;
     setIsLoading(true);

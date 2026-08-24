@@ -5,23 +5,21 @@ import { WakeelLogo } from "../brand/wakeel-logo"
 import { useTheme } from "../providers/theme-provider"
 import { useLocale } from "../../hooks/use-locale"
 import { AuthHero } from "./auth-hero"
-import { AnimatedWaveDivider } from "./animated-wave-divider"
 
 export function AuthLayout({ title, description, children }) {
   const { theme, toggleDirection, toggleTheme } = useTheme()
   const { isRtl, t } = useLocale()
 
   return (
-    <main className="min-h-screen bg-(--bg-page) text-(--text-primary) selection:bg-sky-500/20">
+    <main className="min-h-screen overflow-x-hidden bg-(--bg-page) text-(--text-primary) selection:bg-sky-500/20">
       <div className="grid min-h-screen lg:grid-cols-[1.18fr_1fr] xl:grid-cols-[54%_46%]">
-        {/* Left Column: Visual Hero Section with Animated Organic Wave Boundary */}
-        <section className="relative hidden overflow-hidden bg-[#071022] lg:flex lg:flex-col">
+        {/* Hero Column: Visual Section with Straight Boundary */}
+        <section className="relative hidden min-w-0 overflow-hidden border-e border-white/10 bg-[#071022] lg:flex lg:flex-col">
           <AuthHero />
-          <AnimatedWaveDivider isRtl={isRtl} />
         </section>
 
         {/* Right Column: Authentication Form Panel */}
-        <section className="relative flex min-h-screen flex-col bg-(--bg-card) px-6 py-8 sm:px-12 lg:px-12 xl:px-16 transition-colors duration-200">
+        <section className="relative flex min-h-screen min-w-0 flex-col bg-(--bg-card) px-6 py-8 sm:px-12 lg:px-12 xl:px-16 transition-colors duration-200">
           {/* Top Bar Controls */}
           <div className="mb-8 flex items-center justify-between lg:justify-end">
             <Link to="/login" className="flex items-center gap-2 lg:hidden">

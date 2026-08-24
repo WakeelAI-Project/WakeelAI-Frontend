@@ -3,7 +3,6 @@ import { Link } from "react-router"
 import { ShieldCheck, Sparkles, UsersRound } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { WakeelLogo } from "../brand/wakeel-logo"
-import { useLocale } from "../../hooks/use-locale"
 import loginHeroImage from "../../assets/images/login-hero.jpg"
 
 /**
@@ -12,7 +11,6 @@ import loginHeroImage from "../../assets/images/login-hero.jpg"
  * legal-tech atmosphere, branding, badge, typography, feature list, and local visual asset.
  */
 export function AuthHero() {
-  const { isRtl } = useLocale()
   const { t } = useTranslation()
 
   const features = [
@@ -68,7 +66,7 @@ export function AuthHero() {
           <WakeelLogo framed className="h-10 w-10 p-1.5" />
           <div className="flex flex-col text-start leading-none">
             <span className="font-display text-2xl font-bold tracking-tight text-white">Wakeel AI</span>
-            <span className="mt-1 text-xs text-sky-200/70 font-medium">وكيل الذكاء الاصطناعي</span>
+            <span className="mt-1 text-xs text-sky-200/70 font-medium">{t("common.subTitle")}</span>
           </div>
         </Link>
       </div>

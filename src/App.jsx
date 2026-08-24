@@ -62,7 +62,7 @@ function isOwnerRole(role) {
 function DashboardShell() {
   const { toggleDirection } = useTheme();
   const { toast } = useToast();
-  const { activeCompany, notifications } = useApp();
+  const { activeCompany } = useApp();
   const { currentUser: authUser, logout } = useAuth();
   const [authenticatedUserDetail, setAuthenticatedUserDetail] = useState(null);
   const [isCommandOpen, setIsCommandOpen] = useState(false);
@@ -179,7 +179,6 @@ function DashboardShell() {
           onAssistantToggle={
             isHrUser ? () => navigate(`${rolePrefix}/assistant`) : undefined
           }
-          notificationsCount={notifications.length}
           userName={currentUser?.name}
           onLogout={logout}
           rolePrefix={rolePrefix}
@@ -345,8 +344,7 @@ function AuthBootstrap() {
         }
       })
       .catch((err) => {
-        // 403 (HR) or any other failure: leave activeCompany cleared —
-        // no fallback/mock data is substituted here.
+        // 403 (HR) or any other failure: leave activeCompany cleared.
         console.error("Failed to load company profile on bootstrap:", err);
       });
   }, [isAuthenticated, setActiveCompany, clearActiveCompany]);

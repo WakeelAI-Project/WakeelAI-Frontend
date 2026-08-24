@@ -3,7 +3,6 @@ import { useForm } from "react-hook-form"
 import { Building2, Send, ShieldCheck, Users } from "lucide-react"
 import { Button } from "../components/ui/button"
 import { Input } from "../components/ui/input"
-import { Badge } from "../components/ui/badge"
 import { useToast } from "../components/ui/toast"
 import { PageShell } from "./page-shell"
 import { useTranslation } from "react-i18next"
@@ -97,7 +96,6 @@ export function OwnerDashboardPage() {
               {t("dashboard.inviteHrDesc")}
             </p>
           </div>
-          <Badge variant="info">{t("dashboard.demo")}</Badge>
         </div>
 
         <form className="grid gap-4 md:grid-cols-[1fr_1fr_auto]" onSubmit={handleSubmit(onInvite)} noValidate>

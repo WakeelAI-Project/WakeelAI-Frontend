@@ -9,12 +9,6 @@ const currentUser = {
   role: ""
 }
 
-const notifications = [
-  { id: "n-1", type: "warning", message: "Contract review due today" },
-  { id: "n-2", type: "ai", message: "AI draft has two citations ready" },
-  { id: "n-3", type: "info", message: "Payroll audit exported" }
-]
-
 const EMPTY_COMPANY = { id: null, name: "", nameEn: "" }
 
 export function AppProvider({ children }) {
@@ -29,8 +23,7 @@ export function AppProvider({ children }) {
       activeCompany,
       setActiveCompany,
       clearActiveCompany,
-      currentUser,
-      notifications
+      currentUser
     }),
     [activeCompany, clearActiveCompany]
   )

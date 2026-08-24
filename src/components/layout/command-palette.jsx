@@ -1,19 +1,15 @@
 import React, { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import {
-  ArrowRight,
-  Calendar,
-  FileText,
-  Search,
-  Sparkles,
-  User,
-} from "lucide-react";
-import { useLocale } from "../../hooks/use-locale";
+import { ArrowRight, Search, Sparkles } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { NAV_ITEMS } from "./sidebar";
+
+const COMMAND_NAV_IDS = new Set(["employees", "documents", "leave"]);
 
 export function CommandPalette({ isOpen, onClose, onOpen, onNavSelect }) {
   const [query, setQuery] = useState("");
   const inputRef = useRef(null);
-  const { isRtl } = useLocale();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -43,40 +39,22 @@ export function CommandPalette({ isOpen, onClose, onOpen, onNavSelect }) {
     };
   }, [isOpen]);
 
+  const normalizedQuery = query.trim().toLowerCase();
   const isAiQuery =
-    query.startsWith("أنشئ") ||
-    query.startsWith("اكتب") ||
-    query.startsWith("احسب") ||
-    query.toLowerCase().startsWith("draft") ||
-    query.toLowerCase().startsWith("calculate");
+    normalizedQuery.startsWith("draft") ||
+    normalizedQuery.startsWith("calculate");
 
-  const navigationResults = [
-    {
-      labelKey: "sidebar.employees",
-      labelText: "الموظفون - أحمد محمد",
-      labelTextEn: "Employees - Ahmed Mohamed",
-      icon: User,
-      id: "employees",
-    },
-    {
-      labelKey: "sidebar.documents",
-      labelText: "المستندات - عقد عمل",
-      labelTextEn: "Documents - Employment agreement",
-      icon: FileText,
-      id: "documents",
-    },
-    {
-      labelKey: "sidebar.leave",
-      labelText: "الإجازات - رصيد سنوي",
-      labelTextEn: "Leave - Annual Balance",
-      icon: Calendar,
-      id: "leave",
-    },
-  ].filter(
-    (item) =>
-      item.labelText.includes(query) ||
-      item.labelTextEn.toLowerCase().includes(query.toLowerCase()),
-  );
+  const navigationResults = NAV_ITEMS.filter((item) => COMMAND_NAV_IDS.has(item.id))
+    .map((item) => ({
+      ...item,
+      label: t(item.labelKey),
+    }))
+    .filter(
+      (item) =>
+        normalizedQuery &&
+        (item.label.toLowerCase().includes(normalizedQuery) ||
+          item.id.includes(normalizedQuery)),
+    );
 
   return (
     <AnimatePresence>
@@ -95,29 +73,23 @@ export function CommandPalette({ isOpen, onClose, onOpen, onNavSelect }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.16 }}
-            className="relative z-50 w-full max-w-xl bg-(--bg-card) rounded-lg shadow-(--shadow-4) border border-(--border-default) overflow-hidden flex flex-col">
-            <div className="flex items-center border-b border-(--border-default) px-4 py-3 shrink-0">
-              <Search className="h-5 w-5 opacity-55 me-3 shrink-0 text-(--text-muted)" />
+            className="relative z-50 flex w-full max-w-xl flex-col overflow-hidden rounded-lg border border-(--border-default) bg-(--bg-card) shadow-(--shadow-4)">
+            <div className="flex shrink-0 items-center border-b border-(--border-default) px-4 py-3">
+              <Search className="me-3 h-5 w-5 shrink-0 text-(--text-muted) opacity-55" />
               <input
                 ref={inputRef}
                 type="text"
-                placeholder={
-                  isRtl
-                    ? "ابحث أو اكتب أمرا للمساعد الذكي..."
-                    : "Search or type a command..."
-                }
+                placeholder={t("commandPalette.placeholder")}
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                className="flex-1 bg-transparent border-0 outline-none text-base text-(--text-primary) placeholder:text-(--text-muted) text-start"
+                className="flex-1 border-0 bg-transparent text-start text-base text-(--text-primary) outline-none placeholder:text-(--text-muted)"
               />
             </div>
 
             <div className="max-h-90 overflow-y-auto p-2">
               {query === "" ? (
                 <div className="p-4 text-center text-sm text-(--text-secondary)">
-                  {isRtl
-                    ? "اكتب للبدء في البحث..."
-                    : "Type to start searching..."}
+                  {t("commandPalette.typeToStart")}
                 </div>
               ) : (
                 <div className="flex flex-col gap-1">
@@ -127,32 +99,26 @@ export function CommandPalette({ isOpen, onClose, onOpen, onNavSelect }) {
                         onNavSelect("assistant", query);
                         onClose();
                       }}
-                      className="w-full flex items-center justify-between p-3 rounded-md bg-(--ai-surface) hover:border-(--ai-primary) text-start border border-(--border-emphasis) cursor-pointer transition-colors">
-                      <span className="flex items-center gap-3">
-                        <Sparkles className="h-5 w-5 text-(--ai-primary) shrink-0" />
-                        <span className="flex flex-col">
-                          <span className="text-sm font-semibold text-(--brand-primary)">
-                            {isRtl
-                              ? `طلب المساعد الذكي: "${query}"`
-                              : `AI prompt action: "${query}"`}
+                      className="flex w-full cursor-pointer items-center justify-between rounded-md border border-(--border-emphasis) bg-(--ai-surface) p-3 text-start transition-colors hover:border-(--ai-primary)">
+                      <span className="flex min-w-0 items-center gap-3">
+                        <Sparkles className="h-5 w-5 shrink-0 text-(--ai-primary)" />
+                        <span className="flex min-w-0 flex-col">
+                          <span className="wrap-break-word text-sm font-semibold text-(--brand-primary)">
+                            {t("commandPalette.aiAction", { query })}
                           </span>
                           <span className="text-xs text-(--text-secondary)">
-                            {isRtl
-                              ? "صياغة أو تحليل مستند إلى قانون العمل"
-                              : "Draft or analyze with labor-law grounding"}
+                            {t("commandPalette.aiDescription")}
                           </span>
                         </span>
                       </span>
-                      <ArrowRight className="h-4 w-4 text-(--ai-primary) rtl:rotate-180" />
+                      <ArrowRight className="h-4 w-4 shrink-0 text-(--ai-primary) rtl:rotate-180" />
                     </button>
                   )}
 
                   {navigationResults.length > 0 && (
                     <div className="mt-2 px-2 pb-1">
-                      <span className="text-xs font-semibold text-(--text-muted) uppercase tracking-wider">
-                        {isRtl
-                          ? "التنقل والاختصارات"
-                          : "Navigation & Shortcuts"}
+                      <span className="text-xs font-semibold uppercase tracking-wider text-(--text-muted)">
+                        {t("commandPalette.navigation")}
                       </span>
                     </div>
                   )}
@@ -166,10 +132,10 @@ export function CommandPalette({ isOpen, onClose, onOpen, onNavSelect }) {
                           onNavSelect(item.id);
                           onClose();
                         }}
-                        className="w-full flex items-center gap-3 p-3 rounded-md hover:bg-(--bg-page-alt) text-start cursor-pointer transition-colors">
-                        <Icon className="h-5 w-5 text-(--text-muted) shrink-0" />
+                        className="flex w-full cursor-pointer items-center gap-3 rounded-md p-3 text-start transition-colors hover:bg-(--bg-page-alt)">
+                        <Icon className="h-5 w-5 shrink-0 text-(--text-muted)" />
                         <span className="text-sm font-medium text-(--text-primary)">
-                          {isRtl ? item.labelText : item.labelTextEn}
+                          {item.label}
                         </span>
                       </button>
                     );
@@ -177,27 +143,25 @@ export function CommandPalette({ isOpen, onClose, onOpen, onNavSelect }) {
 
                   {navigationResults.length === 0 && !isAiQuery && (
                     <div className="p-8 text-center text-sm text-(--text-secondary)">
-                      {isRtl
-                        ? "لا توجد نتائج مطابقة"
-                        : "No matching results found"}
+                      {t("commandPalette.noResults")}
                     </div>
                   )}
                 </div>
               )}
             </div>
 
-            <div className="p-3 bg-(--bg-card-subtle) border-t border-(--border-default) text-(--text-muted) text-[11px] flex gap-4 select-none shrink-0">
+            <div className="flex shrink-0 gap-4 border-t border-(--border-default) bg-(--bg-card-subtle) p-3 text-[11px] text-(--text-muted) select-none">
               <span>
-                <kbd className="border rounded px-1.5 py-0.5 me-1 font-sans">
+                <kbd className="me-1 rounded border px-1.5 py-0.5 font-sans">
                   Enter
                 </kbd>
-                {isRtl ? "للاختيار" : "to select"}
+                {t("commandPalette.selectHint")}
               </span>
               <span>
-                <kbd className="border rounded px-1.5 py-0.5 me-1 font-sans">
+                <kbd className="me-1 rounded border px-1.5 py-0.5 font-sans">
                   Esc
                 </kbd>
-                {isRtl ? "للخروج" : "to close"}
+                {t("commandPalette.closeHint")}
               </span>
             </div>
           </motion.div>
