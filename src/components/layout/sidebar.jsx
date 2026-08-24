@@ -15,7 +15,7 @@ import {
   Users,
 } from "lucide-react";
 import { cn } from "../../lib/utils";
-import { SealMark } from "../brand/seal-mark";
+import { WakeelLogo } from "../brand/wakeel-logo";
 import { useTranslation } from "react-i18next";
 
 export const NAV_ITEMS = [
@@ -83,7 +83,7 @@ export function Sidebar({
       )}
     >
       <div className="flex items-center gap-3 border-b border-(--brand-primary-hover) p-5 sm:p-6">
-        <SealMark className="shrink-0" />
+        <WakeelLogo framed className="h-9 w-9 p-1.5" />
         <div className="flex min-w-0 flex-col text-start leading-none">
           <span className="truncate font-display text-lg font-semibold tracking-wide">
             {t("common.appName")}

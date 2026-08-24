@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from "react";
 import {
   Menu,
   Moon,
-  Search,
   Settings,
   Sparkles,
   Sun,
@@ -16,14 +15,14 @@ import { useTheme } from "../providers/theme-provider";
 import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../features/auth/hooks/use-auth";
+import { getInitials, getUserFullName } from "../../lib/user-display";
 import { NAV_ITEMS } from "./sidebar";
 
 export function Topbar({
   activeId,
   onMenuClick,
-  onSearchClick,
   onAssistantToggle,
-  userInitials = "MH",
+  userName,
   onLogout,
   rolePrefix = "/hr",
 }) {
@@ -32,10 +31,11 @@ export function Topbar({
   const menuRef = useRef(null);
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { currentUser } = useAuth();
+  const { currentUser: authUser } = useAuth();
 
   // Check if current user is Owner (hide My Profile for owners)
-  const isOwner = currentUser?.role?.toLowerCase().includes("owner");
+  const isOwner = authUser?.role?.toLowerCase().includes("owner");
+  const avatarInitials = getInitials(userName || getUserFullName(authUser), "?");
 
   const handleLogout = async () => {
     await onLogout();
@@ -61,8 +61,8 @@ export function Topbar({
         : t("sidebar.dashboard");
 
   return (
-    <header className="flex min-h-16 w-full shrink-0 items-center justify-between gap-2 border-b border-(--border-default) bg-(--bg-card) px-3 sm:px-4 lg:px-6">
-      <div className="flex min-w-0 items-center gap-3">
+    <header className="flex min-h-16 w-full shrink-0 items-center justify-between gap-3 border-b border-(--border-default) bg-(--bg-card) px-3 sm:px-4 lg:px-6">
+      <div className="flex min-w-0 flex-1 items-center gap-3">
         <Button
           type="button"
           variant="ghost"
@@ -79,21 +79,7 @@ export function Topbar({
         </h1>
       </div>
 
-      <div className="mx-4 hidden max-w-md flex-1 md:block lg:mx-6">
-        <button
-          onClick={onSearchClick}
-          className="w-full flex items-center justify-between px-3 h-10 rounded-sm border border-(--border-default) bg-(--bg-card-subtle) hover:bg-(--bg-card-raised) text-sm text-(--text-muted) transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-(--border-focus) cursor-pointer text-start">
-          <span className="flex min-w-0 items-center gap-2">
-            <Search className="h-4 w-4 shrink-0" />
-            <span className="truncate">{t("topbar.searchPrompt")}</span>
-          </span>
-          <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border border-(--border-default) bg-(--bg-page-alt) px-1.5 font-mono text-[10px] font-medium opacity-100">
-            Ctrl K
-          </kbd>
-        </button>
-      </div>
-
-      <div className="flex shrink-0 items-center gap-1.5 select-none sm:gap-2 lg:gap-3">
+      <div className="ms-auto flex shrink-0 items-center gap-1.5 select-none sm:gap-2 lg:gap-3">
         <Button
           variant="ghost"
           size="xs"
@@ -139,7 +125,7 @@ export function Topbar({
             className="h-8 w-8 cursor-pointer select-none ring-offset-2 ring-blue-500 hover:ring-2 transition-all"
             onClick={() => setShowMenu(!showMenu)}>
             <AvatarImage src="" />
-            <AvatarFallback>{userInitials}</AvatarFallback>
+            <AvatarFallback>{avatarInitials}</AvatarFallback>
           </Avatar>
 
           {showMenu && (

@@ -329,7 +329,6 @@
     "pageSummary": "صفحة {{page}} من {{totalPages}} · {{total}} قسم"
   },
   "topbar": {
-    "searchPrompt": "بحث عن موظف، عقد، أو امتثال...",
     "toggleContrast": "تبديل التباين العالي",
     "highContrast": "تباين عال",
     "toggleTheme": "تبديل المظهر",
@@ -845,6 +844,18 @@
       "forbiddenTitle": "ليس لديك صلاحية الوصول لهذه الصفحة",
       "forbiddenDesc": "تفاصيل ملف الشركة متاحة فقط لمالك الشركة."
     },
+    "policy": {
+      "description": "ارفع أحدث دليل لسياسات الشركة لتوفير سياق قانوني مدعوم بالذكاء الاصطناعي.",
+      "titleLabel": "عنوان السياسة",
+      "titlePlaceholder": "دليل الموظفين",
+      "fileLabel": "ملف سياسة الشركة PDF",
+      "uploadButton": "رفع السياسة",
+      "uploading": "جاري الرفع...",
+      "uploadSuccess": "تم رفع سياسة الشركة بنجاح.",
+      "uploadError": "تعذر رفع ملف السياسة PDF.",
+      "titleRequired": "عنوان السياسة مطلوب.",
+      "uploadRequired": "اختر ملف PDF للرفع."
+    },
     "user": {
       "eyebrow": "نظرة عامة على الحساب",
       "title": "ملفي الشخصي",
@@ -890,6 +901,7 @@
       "role": "الدور",
       "email": "البريد الإلكتروني",
       "phone": "الهاتف",
+      "workingHours": "ساعات العمل",
       "jobTitle": "المسمى الوظيفي",
       "department": "القسم",
       "joinDate": "تاريخ الانضمام",

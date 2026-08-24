@@ -3,6 +3,7 @@ import { Link } from "react-router"
 import { Menu, Moon, Sun, X } from "lucide-react"
 import { useReducedMotion } from "framer-motion"
 import { Button } from "../ui/button"
+import { WakeelLogo } from "../brand/wakeel-logo"
 import { useTheme } from "../providers/theme-provider"
 import { useLocale } from "../../hooks/use-locale"
 import { cn } from "../../lib/utils"
@@ -41,7 +42,7 @@ export function LandingNavbar() {
           to="/"
           className="flex min-w-0 items-center gap-3 rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-(--border-focus)"
         >
-          <img alt="" className="h-9 w-9 shrink-0" src="/wakeel-logo.svg" />
+          <WakeelLogo className="h-9 w-9" />
           <span className="flex flex-col leading-none">
             <span className="font-display text-xl font-semibold text-(--text-primary)">
               {t("landing.brand.name")}

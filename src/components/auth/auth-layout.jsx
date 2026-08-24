@@ -1,7 +1,7 @@
 import React from "react"
 import { Link } from "react-router"
 import { Moon, Scale, Sun } from "lucide-react"
-import { SealMark } from "../brand/seal-mark"
+import { WakeelLogo } from "../brand/wakeel-logo"
 import { useTheme } from "../providers/theme-provider"
 import { useLocale } from "../../hooks/use-locale"
 
@@ -14,7 +14,7 @@ export function AuthLayout({ title, description, children }) {
       <div className="grid min-h-screen lg:grid-cols-[1fr_460px]">
         <section className="hidden bg-(--bg-sidebar) px-10 py-8 text-(--text-on-brand) lg:flex lg:flex-col lg:justify-between">
           <Link to="/login" className="flex items-center gap-3">
-            <SealMark />
+            <WakeelLogo framed className="h-9 w-9 p-1.5" />
             <div className="flex flex-col leading-none">
               <span className="font-display text-xl font-semibold tracking-wide">Wakeel AI</span>
               <span className="mt-1 text-xs text-(--text-muted)">وكيل الذكاء الاصطناعي</span>
@@ -41,7 +41,7 @@ export function AuthLayout({ title, description, children }) {
         <section className="flex min-h-screen flex-col bg-(--bg-card) px-6 py-6 sm:px-10">
           <div className="mb-8 flex items-center justify-between lg:justify-end">
             <Link to="/login" className="flex items-center gap-2 lg:hidden">
-              <SealMark className="h-9 w-9" />
+              <WakeelLogo framed className="h-9 w-9 p-1.5" />
               <span className="font-display text-lg font-semibold">Wakeel AI</span>
             </Link>
             <button

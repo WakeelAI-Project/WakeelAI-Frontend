@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { AlertTriangle, User } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { SealMark } from "../../../../components/brand/seal-mark";
+import { WakeelLogo } from "../../../../components/brand/wakeel-logo";
 import { Avatar, AvatarFallback } from "../../../../components/ui/avatar";
 import { AssistantSources } from "./assistant-sources";
 import { AssistantResultCard } from "./assistant-result-card";
@@ -120,7 +120,7 @@ export function ChatMessage({
     <article dir="ltr" className="flex w-full justify-start">
       <div className="flex max-w-[min(42rem,90%)] flex-col items-start gap-2">
         <div className="flex items-center gap-2">
-          <SealMark className="h-7 w-7" iconClassName="h-2.5 w-2.5" />
+          <WakeelLogo framed className="h-7 w-7 p-1" />
           <span className="text-[11px] font-semibold uppercase text-(--ai-primary)">
             {t("assistant.identity")}
           </span>

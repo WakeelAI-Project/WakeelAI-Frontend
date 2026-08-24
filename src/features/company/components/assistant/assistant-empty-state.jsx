@@ -1,7 +1,7 @@
 import React from "react";
 import { HelpCircle, Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { SealMark } from "../../../../components/brand/seal-mark";
+import { WakeelLogo } from "../../../../components/brand/wakeel-logo";
 
 export function AssistantEmptyState({ onSelectPrompt }) {
   const { t } = useTranslation();
@@ -12,7 +12,7 @@ export function AssistantEmptyState({ onSelectPrompt }) {
     <div className="mx-auto flex max-w-2xl flex-1 flex-col items-center justify-center px-6 py-12 text-center">
       <div className="relative mb-5 flex h-16 w-16 items-center justify-center rounded-full border border-(--border-emphasis) bg-(--ai-surface)">
         <div className="absolute inset-0 rounded-full bg-(--ai-primary) opacity-10 animate-ink-bloom" />
-        <SealMark className="relative h-12 w-12" iconClassName="h-4 w-4" />
+        <WakeelLogo framed className="relative h-12 w-12 p-2" />
       </div>
 
       <div className="flex items-center gap-2 text-(--ai-primary)">
