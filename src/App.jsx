@@ -172,7 +172,7 @@ function DashboardShell() {
         className="hidden lg:flex"
       />
 
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
         <Topbar
           activeId={activeId}
           onMenuClick={() => setIsSidebarOpen(true)}
@@ -184,7 +184,7 @@ function DashboardShell() {
           rolePrefix={rolePrefix}
         />
 
-        <div className="flex items-center justify-end gap-2 border-b border-(--border-default) bg-(--bg-card-subtle) px-3 py-2 sm:px-4 lg:px-6">
+        <div className="flex shrink-0 items-center justify-end gap-2 border-b border-(--border-default) bg-(--bg-card-subtle) px-3 py-2 sm:px-4 lg:px-6">
           <button
             type="button"
             onClick={toggleDirection}
@@ -193,7 +193,7 @@ function DashboardShell() {
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto h-full">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
           <Outlet />
         </div>
       </div>

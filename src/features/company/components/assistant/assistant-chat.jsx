@@ -207,7 +207,7 @@ export function AssistantChat({ className }) {
         <div className="hidden min-h-0 lg:block">{sidebar}</div>
 
         <div className="flex min-h-0 min-w-0 flex-col">
-          <div className="flex flex-col gap-3 border-b border-(--border-default) bg-(--bg-card-subtle) px-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-4">
+          <div className="flex shrink-0 flex-col gap-3 border-b border-(--border-default) bg-(--bg-card-subtle) px-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-4">
             <div className="min-w-0 text-start">
               <h2 className="truncate text-sm font-semibold text-(--text-primary)">
                 {activeConversationId ? t("assistant.chat.activeTitle") : t("assistant.chat.newTitle")}
@@ -261,7 +261,7 @@ export function AssistantChat({ className }) {
             )}
           </div>
 
-          <div className="border-t border-(--border-default) bg-(--bg-card) p-3 sm:p-4">
+          <div className="shrink-0 border-t border-(--border-default) bg-(--bg-card) p-3 sm:p-4">
             <ErrorBanner error={error} canRetry={Boolean(retryableMessage)} onRetry={retryLastMessage} />
             <AssistantComposer
               value={composerValue}

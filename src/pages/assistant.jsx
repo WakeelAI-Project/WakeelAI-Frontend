@@ -3,9 +3,9 @@ import { AssistantChat } from "../features/company/components/assistant/assistan
 
 export function AssistantPage() {
   return (
-    <main className="flex h-full min-w-0 bg-(--bg-page) p-2 sm:p-4 lg:p-6">
-      <div className="flex h-full w-full min-w-0">
-        <AssistantChat className="w-full flex-1" />
+    <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-(--bg-page) p-2 sm:p-4 lg:p-6">
+      <div className="flex min-h-0 min-w-0 h-full w-full flex-1">
+        <AssistantChat className="h-full w-full min-h-0 flex-1" />
       </div>
     </main>
   );
