@@ -59,4 +59,17 @@ describe("LeavePage readOnly mode", () => {
     expect(screen.getByRole("button", { name: /approve/i })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /reject/i })).toBeInTheDocument();
   });
+
+  it("correctly renders date-only fields and localized submitted timestamp", async () => {
+    render(
+      <ToastProvider>
+        <LeavePage />
+      </ToastProvider>
+    );
+
+    await waitFor(() => expect(screen.getByText("Nour Hassan")).toBeInTheDocument());
+
+    expect(screen.getByText("Mar 1, 2026")).toBeInTheDocument();
+    expect(screen.getByText("Mar 3, 2026")).toBeInTheDocument();
+  });
 });

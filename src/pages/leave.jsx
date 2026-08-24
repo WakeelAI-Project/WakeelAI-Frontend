@@ -24,6 +24,7 @@ import {
 } from "../components/overlay/dialog"
 import { ExternalLink, Eye } from "lucide-react"
 import { getImageUrl } from "../utils/get-image-url"
+import { formatLocalDateOnly, formatLocalDateTime } from "../utils/date-format"
 
 export function LeavePage({ readOnly = false }) {
   const { t } = useTranslation()
@@ -173,12 +174,12 @@ export function LeavePage({ readOnly = false }) {
     {
       title: t("leave.startDate"),
       key: "start_date",
-      render: (val) => new Date(val).toLocaleDateString(isRtl ? "ar-EG" : "en-US", { year: "numeric", month: "short", day: "numeric" })
+      render: (val) => formatLocalDateOnly(val, isRtl ? "ar-EG" : "en-US")
     },
     {
       title: t("leave.endDate"),
       key: "end_date",
-      render: (val) => new Date(val).toLocaleDateString(isRtl ? "ar-EG" : "en-US", { year: "numeric", month: "short", day: "numeric" })
+      render: (val) => formatLocalDateOnly(val, isRtl ? "ar-EG" : "en-US")
     },
     {
       title: t("leave.duration"),
@@ -198,7 +199,7 @@ export function LeavePage({ readOnly = false }) {
     {
       title: t("leave.submittedDate"),
       key: "submitted_at",
-      render: (val) => val ? new Date(val).toLocaleDateString(isRtl ? "ar-EG" : "en-US", { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "-"
+      render: (val) => formatLocalDateTime(val, isRtl ? "ar-EG" : "en-US")
     },
     ...(!readOnly ? [{
       title: t("leave.actions"),
