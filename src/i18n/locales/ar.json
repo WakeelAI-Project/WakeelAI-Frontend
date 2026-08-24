@@ -734,6 +734,42 @@
     "inputPlaceholder": "اسأل وكيل عن أي بند أو قانون...",
     "composerLabel": "رسالة إلى وكيل",
     "send": "إرسال الرسالة",
+    "slashCommands": {
+      "menuLabel": "قائمة أوامر الشرطة المائلة",
+      "noResults": "لا توجد أوامر مطابقة",
+      "clearSelection": "إزالة الأمر المحدد",
+      "commands": {
+        "employeeContext": {
+          "label": "سياق الموظف",
+          "description": "احصل على معلومات عن موظف"
+        },
+        "companyContext": {
+          "label": "سياق الشركة",
+          "description": "اسأل عن بيانات الشركة"
+        },
+        "companyPolicy": {
+          "label": "سياسة الشركة",
+          "description": "اسأل عن سياسات شركتك"
+        },
+        "laborLaw": {
+          "label": "قانون العمل",
+          "description": "اسأل عن قانون العمل المصري"
+        },
+        "calculation": {
+          "label": "حساب",
+          "description": "نفذ حسابات متعلقة بالموارد البشرية"
+        },
+        "documentGenerate": {
+          "label": "إنشاء مستند",
+          "description": "أنشئ مستندا للموارد البشرية"
+        }
+      },
+      "documentTypes": {
+        "contract": "عقد",
+        "warningLetter": "خطاب إنذار",
+        "terminationLetter": "خطاب إنهاء خدمة"
+      }
+    },
     "you": "أنت",
     "humanReview": "هذا الجزء يحتاج مراجعة بشرية",
     "chat": {

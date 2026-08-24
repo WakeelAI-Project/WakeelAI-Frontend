@@ -18,6 +18,7 @@ import { AssistantComposer } from "./assistant-composer";
 import { AssistantEmptyState } from "./assistant-empty-state";
 import { ConversationSidebar } from "./conversation-sidebar";
 import { resolveDocumentDraftRoute } from "./assistant-result-card";
+import { getSlashCommandFieldValues } from "./slash-commands";
 
 function getRequestLanguage(language) {
   return language?.startsWith("ar") ? "AR" : "EN";
@@ -102,6 +103,7 @@ export function AssistantChat({ className }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [composerValue, setComposerValue] = useState("");
+  const [selectedSlashCommand, setSelectedSlashCommand] = useState(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const scrollRef = useRef(null);
 
@@ -142,6 +144,7 @@ export function AssistantChat({ className }) {
   useEffect(() => {
     if (locationTargetEmployeeId && locationTargetEmployeeName) {
       startNewConversation();
+      setSelectedSlashCommand(null);
       setTargetContext({
         targetEmployeeId: locationTargetEmployeeId,
         targetEmployeeName: locationTargetEmployeeName,
@@ -156,9 +159,17 @@ export function AssistantChat({ className }) {
   const requestLanguage = getRequestLanguage(language);
 
   const handleSend = async (message) => {
-    const sent = await sendMessage({ message, language: requestLanguage });
+    const slashFieldValues = getSlashCommandFieldValues(selectedSlashCommand);
+    const hasSlashFieldValues = Object.keys(slashFieldValues).length > 0;
+    const sent = await sendMessage({
+      message,
+      language: requestLanguage,
+      ...(hasSlashFieldValues ? { fieldValues: slashFieldValues } : {}),
+    });
+
     if (sent) {
       setComposerValue("");
+      setSelectedSlashCommand(null);
     }
   };
 
@@ -176,11 +187,13 @@ export function AssistantChat({ className }) {
 
   const handleSelectConversation = (conversationId) => {
     setIsDrawerOpen(false);
+    setSelectedSlashCommand(null);
     selectConversation(conversationId);
   };
 
   const handleNewConversation = () => {
     setIsDrawerOpen(false);
+    setSelectedSlashCommand(null);
     startNewConversation();
   };
 
@@ -268,6 +281,9 @@ export function AssistantChat({ className }) {
               onChange={setComposerValue}
               onSubmit={handleSend}
               isSending={isSending}
+              selectedCommand={selectedSlashCommand}
+              onSelectCommand={setSelectedSlashCommand}
+              onClearCommand={() => setSelectedSlashCommand(null)}
             />
           </div>
         </div>

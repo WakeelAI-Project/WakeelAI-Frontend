@@ -736,6 +736,42 @@
     "inputPlaceholder": "Ask Wakeel about any regulation...",
     "composerLabel": "Message Wakeel AI",
     "send": "Send message",
+    "slashCommands": {
+      "menuLabel": "Slash command menu",
+      "noResults": "No matching commands",
+      "clearSelection": "Remove selected command",
+      "commands": {
+        "employeeContext": {
+          "label": "Employee Context",
+          "description": "Get information about an employee"
+        },
+        "companyContext": {
+          "label": "Company Context",
+          "description": "Ask about your company details"
+        },
+        "companyPolicy": {
+          "label": "Company Policy",
+          "description": "Ask about your company's policies"
+        },
+        "laborLaw": {
+          "label": "Labor Law",
+          "description": "Ask about Egyptian labor law"
+        },
+        "calculation": {
+          "label": "Calculation",
+          "description": "Perform HR-related calculations"
+        },
+        "documentGenerate": {
+          "label": "Document Generate",
+          "description": "Generate an HR document"
+        }
+      },
+      "documentTypes": {
+        "contract": "Contract",
+        "warningLetter": "Warning Letter",
+        "terminationLetter": "Termination Letter"
+      }
+    },
     "you": "You",
     "humanReview": "This section requires human review",
     "chat": {

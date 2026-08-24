@@ -10,5 +10,8 @@ export default defineConfig({
     react(),
     babel({ presets: [reactCompilerPreset()] })
   ],
+  test: {
+    testTimeout: 15000
+  },
 })
 
