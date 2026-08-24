@@ -65,8 +65,7 @@ export async function getUserProfile() {
 
 /**
  * @returns {Promise<object|null>} Normalized company profile object
- * @throws {Error} with `.status` set — callers must branch on `.status === 403`
- *   and must NOT substitute mock/fallback data for a 403.
+ * @throws {Error} with `.status` set — callers must branch on `.status === 403`.
  */
 export async function getCompanyProfile() {
   try {

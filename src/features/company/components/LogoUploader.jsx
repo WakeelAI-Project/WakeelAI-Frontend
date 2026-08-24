@@ -2,8 +2,7 @@
 // Story #168 — Logo validation (type + size)
 
 import React, { useCallback, useEffect, useRef, useState } from "react"
-import { Camera, Trash2 } from "lucide-react"
-import { Button } from "../../../components/ui/button"
+import { Camera } from "lucide-react"
 import { useToast } from "../../../components/ui/toast"
 import { cn } from "../../../lib/utils"
 import { ALLOWED_LOGO_TYPES_ACCEPT, MAX_LOGO_SIZE_LABEL, ALLOWED_LOGO_TYPES_LABEL } from "../constants/logo"
@@ -15,7 +14,6 @@ import { validateLogo } from "../utils/imageValidation"
  * Respects the disabled prop — when disabled, the logo is non-interactive:
  * - No hover effects
  * - No click to upload
- * - Upload button is hidden
  * - Drag-and-drop is disabled
  *
  * When enabled (not disabled):
@@ -93,14 +91,6 @@ export function LogoUploader({ value, onChange, currentLogo = null, disabled = f
     if (file) handleFile(file)
   }
 
-  // ── Remove ───────────────────────────────────────────────────────────────
-
-  const handleRemove = (e) => {
-    e.stopPropagation()
-    setPreviewUrl(null)
-    onChange(null)
-  }
-
   const hasPreview = Boolean(previewUrl)
 
   return (
@@ -109,7 +99,7 @@ export function LogoUploader({ value, onChange, currentLogo = null, disabled = f
       <div
         role={disabled ? "img" : "button"}
         tabIndex={disabled ? -1 : 0}
-        aria-label={disabled ? "Company logo" : "Upload company logo"}
+        aria-label={disabled ? "Company logo" : hasPreview ? "Replace company logo" : "Upload company logo"}
         onClick={disabled ? undefined : openFilePicker}
         onKeyDown={disabled ? undefined : (e) => {
           if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openFilePicker() }
@@ -179,37 +169,6 @@ export function LogoUploader({ value, onChange, currentLogo = null, disabled = f
         disabled={disabled}
         onChange={handleInputChange}
       />
-
-      {/* ── Action row ─────────────────────────────────────────────────── */}
-      {!disabled && (
-        <div className="flex flex-wrap items-center gap-2">
-          <Button
-            type="button"
-            variant="secondary"
-            size="sm"
-            disabled={disabled}
-            onClick={openFilePicker}
-            className="flex items-center gap-1.5"
-          >
-            <Camera className="h-3.5 w-3.5" />
-            {hasPreview ? "Replace" : "Upload logo"}
-          </Button>
-
-          {hasPreview && (
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              disabled={disabled}
-              onClick={handleRemove}
-              className="flex items-center gap-1.5 text-(--status-error-fg) hover:bg-(--status-error-bg)"
-            >
-              <Trash2 className="h-3.5 w-3.5" />
-              Remove
-            </Button>
-          )}
-        </div>
-      )}
 
       {/* Hint text — only shown when enabled */}
       {!disabled && (

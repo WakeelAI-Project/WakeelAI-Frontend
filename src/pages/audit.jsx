@@ -110,6 +110,9 @@ export function AuditPage() {
     1,
     Math.ceil((meta.total || 0) / (meta.limit || PAGE_SIZE)),
   );
+  const hasResourceData = events.some(
+    (event) => event.resourceType || event.resourceId,
+  );
 
   return (
     <PageShell
@@ -204,7 +207,7 @@ export function AuditPage() {
                 <colgroup>
                   <col style={{ width: "18%" }} />
                   <col style={{ width: "14%" }} />
-                  <col style={{ width: "18%" }} />
+                  {hasResourceData && <col style={{ width: "18%" }} />}
                   <col />
                   <col style={{ width: "18%" }} />
                 </colgroup>
@@ -212,7 +215,9 @@ export function AuditPage() {
                   <tr>
                     <th className="px-4 py-3 font-semibold">Action</th>
                     <th className="px-4 py-3 font-semibold">User</th>
-                    <th className="px-4 py-3 font-semibold">Resource</th>
+                    {hasResourceData && (
+                      <th className="px-4 py-3 font-semibold">Resource</th>
+                    )}
                     <th className="px-4 py-3 font-semibold">Details</th>
                     <th className="px-4 py-3 font-semibold whitespace-nowrap">Timestamp</th>
                   </tr>
@@ -238,25 +243,27 @@ export function AuditPage() {
                           </span>
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-(--text-secondary)">
-                        <div className="space-y-1">
-                          {event.resourceType ? (
-                            <p className="wrap-break-word font-medium text-(--text-primary)">
-                              {event.resourceType}
-                            </p>
-                          ) : (
-                            <p className="font-medium text-(--text-primary)">
-                              —
-                            </p>
-                          )}
-                          {event.resourceId && (
-                            <p className="wrap-break-word text-xs">{event.resourceId}</p>
-                          )}
-                        </div>
-                      </td>
+                      {hasResourceData && (
+                        <td className="px-4 py-3 text-(--text-secondary)">
+                          <div className="space-y-1">
+                            {event.resourceType ? (
+                              <p className="wrap-break-word font-medium text-(--text-primary)">
+                                {event.resourceType}
+                              </p>
+                            ) : (
+                              <p className="font-medium text-(--text-primary)">
+                                -
+                              </p>
+                            )}
+                            {event.resourceId && (
+                              <p className="wrap-break-word text-xs">{event.resourceId}</p>
+                            )}
+                          </div>
+                        </td>
+                      )}
                       <td className="max-w-md px-4 py-3 text-(--text-secondary)">
                         <div className="wrap-break-word">
-                        {event.details || "No details provided."}
+                          {event.details || "No details provided."}
                         </div>
                       </td>
                       <td className="px-4 py-3 text-(--text-secondary)">

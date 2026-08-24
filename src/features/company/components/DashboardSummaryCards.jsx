@@ -2,7 +2,6 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { StatCard } from "../../../components/data-display/stat-card";
 import { cn } from "../../../lib/utils";
-import { useDashboardSummary } from "../hooks/use-dashboard-summary";
 
 // ---------------------------------------------------------------------------
 // Skeleton placeholder — matches the StatCard proportions
@@ -65,9 +64,9 @@ function SummaryCard({ title, domain, loading, error, value, description }) {
  * active_employees is surfaced in the employees card description without changing
  * the overall layout.
  */
-export function DashboardSummaryCards({ className }) {
+export function DashboardSummaryCards({ className, summary }) {
   const { t } = useTranslation();
-  const { employees, leaveRequests, documents } = useDashboardSummary();
+  const { employees, leaveRequests, documents } = summary;
 
   const cards = [
     {

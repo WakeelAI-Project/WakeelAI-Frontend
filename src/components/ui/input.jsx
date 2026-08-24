@@ -51,6 +51,7 @@ const Input = React.forwardRef(
               "flex h-10 w-full rounded-sm border border-(--border-default) bg-paper px-3 py-2 text-sm text-(--text-primary) placeholder:text-(--text-muted) transition-all file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none focus-visible:border-(--border-focus) focus-visible:ring-1 focus-visible:ring-(--border-focus) disabled:cursor-not-allowed disabled:bg-(--bg-disabled) disabled:text-(--text-secondary) dark:bg-(--bg-card) dark:border-(--border-emphasis) dark:focus-visible:ring-(--border-focus)",
               (isSearch || prefixIcon || isCurrency) && "ps-10",
               (isPassword || suffixIcon) && "pe-10",
+              isPassword && "password-input",
               errorText && "border-(--status-error-fg) focus-visible:ring-(--status-error-fg) focus-visible:border-(--status-error-fg)",
               className
             )}

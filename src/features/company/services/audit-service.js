@@ -16,8 +16,8 @@ function normalizeAuditLog(record) {
     userIdDisplay: userName || rawUserId || "—",
     createdAt: record.created_at ?? record.createdAt ?? null,
     timestamp: record.created_at ?? record.createdAt ?? null,
-    resourceType: record.resource_type ?? record.resourceType ?? null,
-    resourceId: record.resource_id ?? record.resourceId ?? null,
+    resourceType: record.resource_type ?? record.resourceType ?? record.ResourceType ?? null,
+    resourceId: record.resource_id ?? record.resourceId ?? record.ResourceId ?? null,
   };
 }
 
