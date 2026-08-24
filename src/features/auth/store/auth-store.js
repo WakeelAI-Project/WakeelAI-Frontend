@@ -35,16 +35,36 @@ const REFRESH_TOKEN_DEFAULT_TTL_SECONDS = 60 * 60 * 24 * 30; // 30 days
 // but with cross-reload persistence and explicit logout clearing. See cookies.js.
 // ---------------------------------------------------------------------------
 
-const initialStoreState = {
-  token: null,
-  refreshToken: null,
-  currentUser: null,
-  isAuthenticated: false,
-  mustChangePassword: false,
+const getInitialAuthState = () => {
+  const cookieToken = getAccessTokenCookie();
+  const cookieRefreshToken = getRefreshTokenCookie();
+  const cookieUser = getUserCookie();
+
+  if (cookieToken && !isTokenExpired(cookieToken)) {
+    const decoded = cookieUser ?? decodeToken(cookieToken);
+    setAuthToken(cookieToken);
+    return {
+      token: cookieToken,
+      refreshToken: cookieRefreshToken ?? null,
+      currentUser: decoded,
+      isAuthenticated: true,
+      mustChangePassword: cookieUser?.mustChangePassword ?? false,
+      isInitializing: false,
+    };
+  }
+
+  return {
+    token: null,
+    refreshToken: cookieRefreshToken ?? null,
+    currentUser: null,
+    isAuthenticated: false,
+    mustChangePassword: false,
+    isInitializing: Boolean(cookieRefreshToken),
+  };
 };
 
 export const useAuthStore = create((set, get) => ({
-  ...initialStoreState,
+  ...getInitialAuthState(),
 
   /**
    * Stores the access token (and optionally the refresh token) in the store,
@@ -82,10 +102,11 @@ export const useAuthStore = create((set, get) => ({
 
     set({
       token,
-      refreshToken: newRefreshToken,
+      refreshToken: newRefreshToken ?? null,
       currentUser: decoded,
       isAuthenticated: true,
       mustChangePassword: nextMustChangePassword,
+      isInitializing: false,
     });
   },
 
@@ -233,7 +254,14 @@ export const useAuthStore = create((set, get) => ({
   clearAuth: () => {
     setAuthToken(null);
     removeAllAuthCookies();
-    set(initialStoreState);
+    set({
+      token: null,
+      refreshToken: null,
+      currentUser: null,
+      isAuthenticated: false,
+      mustChangePassword: false,
+      isInitializing: false,
+    });
     // Reset assistant store to prevent cross-user conversation leakage
     resetAssistantStore();
   },
@@ -262,6 +290,7 @@ export const useAuthStore = create((set, get) => ({
         currentUser: decoded,
         isAuthenticated: true,
         mustChangePassword: cookieUser?.mustChangePassword ?? false,
+        isInitializing: false,
       });
       return;
     }
@@ -273,10 +302,6 @@ export const useAuthStore = create((set, get) => ({
         const normalized = normalizeAuthResponse(raw);
 
         if (normalized.token) {
-          // The refresh response only sometimes carries must_change_password.
-          // When it does not, preserve what we already know (store, then cookie)
-          // — defaulting to false here silently drops a pending password change
-          // and the user lands on a dashboard that 403s on its first request.
           const rawFlag = raw?.must_change_password;
           const mustChangePassword =
             typeof rawFlag === "boolean"
@@ -289,6 +314,7 @@ export const useAuthStore = create((set, get) => ({
             normalized.expiresIn,
             mustChangePassword,
           );
+          set({ isInitializing: false });
           return;
         }
       } catch {

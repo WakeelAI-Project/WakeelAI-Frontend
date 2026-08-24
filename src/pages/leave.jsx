@@ -200,7 +200,7 @@ export function LeavePage({ readOnly = false }) {
       key: "submitted_at",
       render: (val) => val ? new Date(val).toLocaleDateString(isRtl ? "ar-EG" : "en-US", { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "-"
     },
-    {
+    ...(!readOnly ? [{
       title: t("leave.actions"),
       key: "actions",
       render: (_, row) => (
@@ -215,7 +215,7 @@ export function LeavePage({ readOnly = false }) {
               <Eye className="h-3.5 w-3.5" />
             </Button>
           )}
-          {!readOnly && row.status === "Pending" && (
+          {row.status === "Pending" && (
             <>
               <Button
                 variant="primary"
@@ -235,7 +235,7 @@ export function LeavePage({ readOnly = false }) {
           )}
         </div>
       )
-    }
+    }] : [])
   ]
 
   const totalPages = Math.ceil(total / PAGE_SIZE)

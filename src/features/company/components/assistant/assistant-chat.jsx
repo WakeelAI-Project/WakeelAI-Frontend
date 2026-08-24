@@ -213,7 +213,11 @@ export function AssistantChat({ className }) {
                 {activeConversationId ? t("assistant.chat.activeTitle") : t("assistant.chat.newTitle")}
               </h2>
               <p className="mt-0.5 truncate text-xs text-(--text-secondary)">
-                {currentTargetName ? t("assistant.chat.askingAbout", { name: currentTargetName }) : (activeConversationId || t("assistant.chat.newDescription"))}
+                {currentTargetName
+                  ? t("assistant.chat.askingAbout", { name: currentTargetName })
+                  : (activeConversationId
+                      ? t("assistant.chat.activeDescription", { defaultValue: "Ask questions, review policies, or draft documents." })
+                      : t("assistant.chat.newDescription"))}
               </p>
             </div>
             <div className="flex min-w-0 flex-wrap items-center gap-2">

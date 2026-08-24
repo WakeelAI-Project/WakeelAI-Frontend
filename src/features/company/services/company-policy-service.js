@@ -47,3 +47,12 @@ export async function uploadCompanyPolicy({ pdf, title }) {
     throw wrapped;
   }
 }
+
+export async function getCompanyPolicy() {
+  try {
+    const { data } = await api.get("/company/policy");
+    return data;
+  } catch (error) {
+    return { has_policy: false, policy: null };
+  }
+}

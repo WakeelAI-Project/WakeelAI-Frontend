@@ -93,19 +93,6 @@ export function ChangePasswordPage() {
           {t("auth.firstLoginNotice", { defaultValue: "This is your first login. Please set a new password to secure your account." })}
         </div>
 
-        {!hasTemporaryPassword && (
-          <div
-            role="status"
-            className="flex flex-col gap-2 rounded-md border border-(--status-warning-fg) bg-(--status-warning-bg) px-4 py-3 text-sm text-(--status-warning-fg)">
-            <span>{t("auth.currentPasswordUnknown")}</span>
-            <Link
-              className="font-semibold underline underline-offset-4"
-              to="/forgot-password">
-              {t("auth.forgotPassword")}
-            </Link>
-          </div>
-        )}
-
         {submitError && (
           <div role="alert" className="rounded-md border border-(--status-error-fg) bg-(--status-error-bg) px-4 py-3 text-sm text-(--status-error-fg)">
             {submitError}

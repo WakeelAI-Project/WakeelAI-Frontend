@@ -20,8 +20,18 @@ import { ForbiddenPage } from "../../../pages/errors/forbidden";
  * @param {string} [props.redirectTo] - Route to redirect to if unauthenticated
  */
 export function ProtectedRoute({ allowedRoles, redirectTo = "/login" }) {
-  const { isAuthenticated, currentUser, mustChangePassword } = useAuth();
+  const { isAuthenticated, currentUser, mustChangePassword, isInitializing } = useAuth();
   const location = useLocation();
+
+  // If auth is still initializing (e.g. performing silent token refresh on page reload),
+  // show a spinner to prevent premature redirection.
+  if (isInitializing) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-(--bg-base)">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-(--brand-primary) border-t-transparent" />
+      </div>
+    );
+  }
 
   // Hard loop-breaker: never navigate to the path we are already on.
   const goTo = (target) =>

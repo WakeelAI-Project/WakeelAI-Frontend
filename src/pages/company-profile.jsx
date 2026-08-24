@@ -20,7 +20,10 @@ import {
   getCompanyProfile,
   updateCompanyProfile,
 } from "../features/company/services/profile-service";
-import { uploadCompanyPolicy } from "../features/company/services/company-policy-service";
+import {
+  getCompanyPolicy,
+  uploadCompanyPolicy,
+} from "../features/company/services/company-policy-service";
 import { FileUpload } from "../components/forms/file-upload";
 import { useAuth } from "../features/auth/hooks/use-auth";
 import {
@@ -64,6 +67,7 @@ export function CompanyProfilePage() {
   const [isForbidden, setIsForbidden] = useState(false);
 
   const [company, setCompany] = useState(EMPTY_COMPANY);
+  const [activePolicy, setActivePolicy] = useState(null);
   const [policyTitle, setPolicyTitle] = useState("");
   const [policyFile, setPolicyFile] = useState(null);
   const [policyUploadError, setPolicyUploadError] = useState("");
@@ -104,6 +108,13 @@ export function CompanyProfilePage() {
       .finally(() => {
         if (!ignore) setIsLoading(false);
       });
+
+    getCompanyPolicy().then((res) => {
+      if (ignore) return;
+      if (res?.has_policy && res.policy) {
+        setActivePolicy(res.policy);
+      }
+    });
 
     return () => {
       ignore = true;
@@ -201,9 +212,15 @@ export function CompanyProfilePage() {
       setPolicyUploadError("");
       setPolicyUploadSuccess("");
 
-      await uploadCompanyPolicy({
+      const uploaded = await uploadCompanyPolicy({
         title: trimmedTitle,
         pdf: policyFile,
+      });
+
+      setActivePolicy({
+        title: trimmedTitle,
+        uploaded_at: uploaded?.uploaded_at || new Date().toISOString(),
+        file_url: uploaded?.file_url,
       });
 
       setPolicyTitle("");
@@ -451,10 +468,35 @@ export function CompanyProfilePage() {
                       "Upload the latest company policy handbook for AI-powered legal context.",
                   })}>
                   <div className="grid gap-4">
+                    {activePolicy && (
+                      <div className="flex flex-col gap-2 rounded-md border border-(--border-focus) bg-(--bg-card-subtle) p-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500" />
+                            <span className="font-semibold text-sm text-(--text-primary)">
+                              {t("profile.policy.uploadedStatus", { defaultValue: "Company Policy Uploaded" })}
+                            </span>
+                          </div>
+                          <Badge variant="success" shape="pill">
+                            {t("common.active", { defaultValue: "Active" })}
+                          </Badge>
+                        </div>
+                        <p className="text-xs text-(--text-secondary)">
+                          <span className="font-medium text-(--text-primary)">{activePolicy.title}</span>
+                          {activePolicy.uploaded_at && (
+                            <> &bull; {new Date(activePolicy.uploaded_at).toLocaleDateString()}</>
+                          )}
+                        </p>
+                        <p className="text-xs text-(--text-muted) mt-1">
+                          {t("profile.policy.replaceNote", {
+                            defaultValue: "Uploading a new PDF handbook will replace the existing policy and re-index the AI legal context.",
+                          })}
+                        </p>
+                      </div>
+                    )}
+
                     <Input
-                      label={t("profile.policy.titleLabel", {
-                        defaultValue: "Policy title",
-                      })}
+                      label={activePolicy ? t("profile.policy.replaceTitleLabel", { defaultValue: "New policy title" }) : t("profile.policy.titleLabel", { defaultValue: "Policy title" })}
                       value={policyTitle}
                       onChange={(event) => setPolicyTitle(event.target.value)}
                       placeholder={t("profile.policy.titlePlaceholder", {
@@ -464,9 +506,7 @@ export function CompanyProfilePage() {
 
                     <FileUpload
                       key={policyUploadKey}
-                      label={t("profile.policy.fileLabel", {
-                        defaultValue: "Company policy PDF",
-                      })}
+                      label={activePolicy ? t("profile.policy.replaceFileLabel", { defaultValue: "Upload replacement policy PDF" }) : t("profile.policy.fileLabel", { defaultValue: "Company policy PDF" })}
                       maxSizeMB={20}
                       acceptedTypes=".pdf,application/pdf"
                       onFileDrop={(files) => setPolicyFile(files[0] ?? null)}
@@ -497,9 +537,9 @@ export function CompanyProfilePage() {
                       loadingText={t("profile.policy.uploading", {
                         defaultValue: "Uploading...",
                       })}>
-                      {t("profile.policy.uploadButton", {
-                        defaultValue: "Upload policy",
-                      })}
+                      {activePolicy
+                        ? t("profile.policy.replaceButton", { defaultValue: "Replace policy" })
+                        : t("profile.policy.uploadButton", { defaultValue: "Upload policy" })}
                     </Button>
                   </div>
                 </ProfileSection>

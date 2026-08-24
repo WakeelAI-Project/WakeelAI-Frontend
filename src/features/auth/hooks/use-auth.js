@@ -9,6 +9,7 @@ export function useAuth() {
   const refreshToken = useAuthStore((state) => state.refreshToken);
   const currentUser = useAuthStore((state) => state.currentUser);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const isInitializing = useAuthStore((state) => state.isInitializing);
   const mustChangePassword = useAuthStore((state) => state.mustChangePassword);
   const temporaryPassword = useAuthStore((state) => state.temporaryPassword);
   const login = useAuthStore((state) => state.login);
@@ -28,6 +29,7 @@ export function useAuth() {
     refreshToken,
     currentUser,
     isAuthenticated,
+    isInitializing,
     mustChangePassword,
     temporaryPassword,
     login,

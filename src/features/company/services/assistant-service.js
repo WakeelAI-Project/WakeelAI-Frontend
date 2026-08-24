@@ -143,15 +143,20 @@ export function normalizeResultCard(rawCard) {
 
 export function normalizeChatMessageDto(rawMessage, fallbackConversationId) {
   const role = rawMessage?.role === "assistant" || rawMessage?.role === "ai" ? "assistant" : "user";
-  const content = role === "assistant"
+  const rawContent = role === "assistant"
     ? pick(rawMessage, ["reply", "content", "message"]) || ""
     : pick(rawMessage, ["content", "message"]) || "";
+
+  // Strip technical [Provided Data] metadata blocks that may exist in historical messages
+  const sanitizedContent = String(rawContent)
+    .replace(/\n*\[Provided Data\][\s\S]*$/i, "")
+    .trim();
 
   return {
     id: stringifyValue(pick(rawMessage, ["chat_id", "chatId", "messageId", "message_id", "id"])) || createFallbackId(role),
     conversationId: pick(rawMessage, ["conversation_id", "conversationId"]) || fallbackConversationId || null,
     role,
-    content: stringifyValue(content),
+    content: sanitizedContent || stringifyValue(rawContent),
     createdAt: pick(rawMessage, ["created_at", "createdAt"]) || new Date().toISOString(),
     sources: role === "assistant" ? normalizeSources(rawMessage?.sources) : [],
     missingFields: role === "assistant" ? normalizeMissingFields(rawMessage?.missing_fields ?? rawMessage?.missingFields) : [],
